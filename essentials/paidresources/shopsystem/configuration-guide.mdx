@@ -1,10 +1,10 @@
 ---
-title: 'Configuration Guide'
-description: 'Complete configuration documentation for Lofi_DiscordAPI script. Set up Discord bot integration, role checking, and server access controls.'
-icon: 'gear'
+title: "Configuration Guide"
+description: "Complete configuration documentation for Lofi_DiscordAPI script. Set up Discord bot integration, role checking, and server access controls."
+icon: "gear"
 ---
 
-This guide covers all configuration options for the Lofi_DiscordAPI script. If you need help with anything not covered here, reach out to us via [Discord](https://discord.gg/lofidev)!
+This guide covers all configuration options for the Lofi_DiscordAPI script. If you need help with anything not covered here, reach out to us via [Discord](https://discord.gg/lofidev)\!
 
 ## Discord Bot Setup
 
@@ -20,19 +20,20 @@ Before configuring the script, you need to create a Discord bot and get your ser
     1. Go to the "Bot" section in the left sidebar
     2. Click "Add Bot"
     3. Under "Token", click "Copy" to get your bot token
-    
+
     <Warning>
-    Keep your bot token secret! Never share it publicly or commit it to version control.
+      Keep your bot token secret\! Never share it publicly or commit it to version control.
     </Warning>
   </Step>
   <Step title="Set Bot Permissions">
     Your bot needs these permissions in your Discord server:
+
     - View Channels
     - View Server Members
     - Read Message History
-    
+
     <Info>
-    Administrator permission works too, but it's not recommended for security reasons.
+      Administrator permission works too, but it's not recommended for security reasons.
     </Info>
   </Step>
   <Step title="Invite Bot to Server">
@@ -71,14 +72,14 @@ Config = {
 <Steps>
   <Step title="Add Bot Token">
     Replace `"PUT_BOT_TOKEN_HERE"` with your actual bot token:
-    
+
     ```C#
     bot_token = "MTIzNDU2Nzg5MDEyMzQ1Njc4.GhIjKl.MnOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWx",
     ```
   </Step>
   <Step title="Add Guild ID">
     Replace `"PUT_GUILD_ID_HERE"` with your Discord server ID:
-    
+
     ```C#
     guild_id = "123456789012345678",
     ```
@@ -94,6 +95,7 @@ debug = true, -- Set to false to disable debug messages in the console
 ```
 
 **When to use:**
+
 - `true` - During setup and troubleshooting
 - `false` - For production servers (reduces console spam)
 
@@ -104,6 +106,7 @@ timeout = 5, -- Timeout in seconds for Discord API requests
 ```
 
 **Recommended values:**
+
 - `3-5` seconds for most servers
 - `10+` seconds if you have connection issues
 - Lower values = faster responses but more timeouts
@@ -116,6 +119,7 @@ kick_message = "You must be in our Discord server to play!" -- Message sent to k
 ```
 
 **Options:**
+
 - `true` - Kicks players who aren't in your Discord server
 - `false` - Allows anyone to join (Discord data won't be available for non-members)
 
@@ -180,7 +184,7 @@ Config = {
 
 ### Development/Testing Server
 
-```C#
+```c#
 Config = {
     bot_token = "YOUR_BOT_TOKEN",
     guild_id = "YOUR_GUILD_ID",
@@ -195,12 +199,12 @@ Config = {
 
 ### Common Issues
 
-| Issue | Solution |
-|-------|----------|
-| "MISSING BOT TOKEN" error | Make sure you've replaced `PUT_BOT_TOKEN_HERE` with your actual token |
-| "MISSING GUILD ID" error | Make sure you've replaced `PUT_GUILD_ID_HERE` with your server ID |
+| Issue                              | Solution                                                              |
+| ---------------------------------- | --------------------------------------------------------------------- |
+| "MISSING BOT TOKEN" error          | Make sure you've replaced `PUT_BOT_TOKEN_HERE` with your actual token |
+| "MISSING GUILD ID" error           | Make sure you've replaced `PUT_GUILD_ID_HERE` with your server ID     |
 | Players getting kicked immediately | Check if your bot is in the Discord server and has proper permissions |
-| No Discord data loading | Verify bot permissions include "View Server Members" |
+| No Discord data loading            | Verify bot permissions include "View Server Members"                  |
 
 ### Testing Your Configuration
 
@@ -210,6 +214,7 @@ Config = {
   </Step>
   <Step title="Check Console Output">
     Look for these messages:
+
     ```
     [Lofi_DiscordAPI] [SYSTEM]: API initialized successfully
     [Lofi_DiscordAPI] [SYSTEM]: Guild ID: 123456789012345678
@@ -217,6 +222,7 @@ Config = {
   </Step>
   <Step title="Test Player Connection">
     Have a Discord server member join and check console for:
+
     ```
     [Lofi_DiscordAPI] [INFO]: Player PlayerName (ID: 1) connected | Discord: username#1234 | Roles: 3 | Avatar: Loaded
     ```
@@ -226,7 +232,7 @@ Config = {
 ## Security Best Practices
 
 <Warning>
-**Never share your bot token publicly!** Anyone with your token can control your bot.
+  **Never share your bot token publicly\!** Anyone with your token can control your bot.
 </Warning>
 
 - Store bot tokens securely
@@ -245,5 +251,5 @@ If you're having configuration issues:
 - Enable debug mode for detailed error messages
 
 <Info>
-Remember to restart your server after making configuration changes!
+  Remember to restart your server after making configuration changes\!
 </Info>

@@ -1,0 +1,349 @@
+---
+title: "Common Errors"
+description: "Quick solutions for common Advanced Shop System errors. Fix framework issues, item problems, purchase failures, and UI display errors."
+icon: "alert-triangle"
+---
+
+This guide covers the most common errors and their quick solutions for the Advanced Shop System.
+
+## Framework Errors
+
+### "attempt to index a nil value (global 'ESX')" Error
+
+**Problem:** ESX framework not loading properly.
+
+**Solution:**
+
+1. Check your framework setting in config:
+
+```C#
+Config.Framework = 'esx'
+```
+
+2. Make sure ESX is started before your shop script in `server.cfg`:
+
+```cfg
+ensure es_extended
+ensure advanced-shop-system
+```
+
+3. Verify ESX export name matches your server:
+
+```c#
+-- Try these if default doesn't work
+ESX = exports['es_extended']:getSharedObject()
+ESX = exports['esx']:getSharedObject()
+```
+
+### "attempt to call a nil value (method 'GetCoreObject')" Error
+
+**Problem:** QBCore framework not loading properly.
+
+**Solution:**
+
+1. Check your framework setting:
+
+```C#
+Config.Framework = 'qbcore'
+```
+
+2. Ensure proper load order:
+
+```cfg
+ensure qb-core
+ensure advanced-shop-system
+```
+
+3. Verify QBCore export name:
+
+```C#
+-- Try these if default doesn't work
+QBCore = exports['qb-core']:GetCoreObject()
+QBCore = exports['qbx_core']:GetCoreObject()
+```
+
+## Shop Display Issues
+
+### Shop Won't Open / No Interaction
+
+**Problem:** Can't interact with shop locations.
+
+**Solutions:**
+
+1. **Check Coordinates:** Make sure you're at the exact location:
+
+```C#
+locations = {
+    vec3(373.8, 325.8, 102.9), -- Make sure these are correct
+}
+```
+
+2. **Verify Script Running:** Check F8 console for:
+
+```
+[script:advanced-shop-system] Resource started
+```
+
+3. **Check Distance:** Stand very close to the coordinates (within 2-3 meters).
+
+### Items Not Showing in Shop
+
+**Problem:** Shop opens but no items display.
+
+**Solutions:**
+
+1. **Check Item Names:** Verify items exist in your server's database:
+
+```C#
+-- Make sure these match your items.sql exactly
+{ name = 'bread', displayName = 'Bread', ... }  -- ✅ Correct
+{ name = 'Bread', displayName = 'Bread', ... }  -- ❌ Wrong case
+```
+
+2. **Check Categories:** Ensure item categories match:
+
+```C#
+categories = { 'All', 'Food', 'Drinks' },
+items = {
+    { name = 'bread', category = 'Food', ... },     -- ✅ Matches
+    { name = 'water', category = 'Beverages', ... } -- ❌ Category doesn't exist
+}
+```
+
+### Images Not Loading
+
+**Problem:** Item images show as broken/missing.
+
+**Solutions:**
+
+1. **Check Image Directory Path:**
+
+```C#
+-- Common paths - use the one that matches your inventory
+Config.InventoryImageDir = 'nui://ox_inventory/web/images'
+Config.InventoryImageDir = 'nui://qb-inventory/html/images'
+Config.InventoryImageDir = 'nui://qs-inventory/html/images'
+```
+
+2. **Verify Image Files Exist:** Make sure image files are in the correct folder:
+
+```
+ox_inventory/web/images/bread.png  ✅
+ox_inventory/web/images/bread.jpg  ❌ Wrong format
+```
+
+3. **Check Image Names:** Ensure exact filename match:
+
+```C#
+{ name = 'bread', image = 'bread.png' }     -- ✅ File exists
+{ name = 'bread', image = 'Bread.png' }     -- ❌ Wrong case
+```
+
+## Purchase Errors
+
+### "You do not have enough money\!" Error
+
+**Problem:** Purchase fails even with enough money.
+
+**Solutions:**
+
+1. **Check Money Type (QBCore):** Make sure using correct money type:
+
+```C#
+-- In framework/qbcore.lua, check this line:
+if Player.PlayerData.money['cash'] < totalCost then  -- Should be 'cash' or 'bank'
+```
+
+2. **Check Money Function (ESX):** Verify money checking:
+
+```C#
+-- Should use getMoney() for cash or getBank() for bank
+if xPlayer.getMoney() < totalCost then
+```
+
+### "Item not recognized" Error
+
+**Problem:** Server doesn't recognize item names.
+
+**Solutions:**
+
+1. **Check Item Database:** Verify items exist in your `items` table:
+
+```sql
+SELECT * FROM items WHERE name = 'bread';
+```
+
+2. **Match Exact Names:** Item names must match database exactly:
+
+```C#
+-- Database has 'WEAPON_PISTOL'
+{ name = 'WEAPON_PISTOL', ... }  -- ✅ Correct
+{ name = 'weapon_pistol', ... }  -- ❌ Wrong case
+```
+
+### "Not enough inventory space\!" Error
+
+**Problem:** Purchase fails due to inventory limits.
+
+**Solutions:**
+
+1. **Check Item Limits (ESX):** Verify item weight/limits in database:
+
+```sql
+UPDATE items SET weight = 1, limit = 10 WHERE name = 'bread';
+```
+
+2. **Inventory Full:** Player needs to free up inventory space.
+
+## License System Errors
+
+### License Check Failing
+
+**Problem:** Players can't buy licensed items even with license.
+
+**Solutions:**
+
+1. **Check License Item Name:**
+
+```C#
+-- Make sure license item exists in database
+{ name = 'WEAPON_PISTOL', license = 'weaponlicense' }
+```
+
+2. **Verify Player Has License:** Check player inventory for license item:
+
+```C#
+-- Player must have 'weaponlicense' item in inventory
+```
+
+3. **Case Sensitivity:** License names are case-sensitive:
+
+```C#
+license = 'weaponlicense'  -- ✅ Correct
+license = 'WeaponLicense'  -- ❌ Wrong case
+```
+
+## Blip Issues
+
+### Blips Not Showing on Map
+
+**Problem:** Shop blips don't appear on the map.
+
+**Solutions:**
+
+1. **Check Blip Configuration:**
+
+```C#
+blip = {
+    name = "Shop Name",
+    id = 59,        -- Valid blip sprite ID
+    colour = 83,    -- Valid color ID
+    scale = 0.65    -- Size between 0.1 and 2.0
+}
+```
+
+2. **Verify Blip IDs:** Use valid blip sprite IDs (1-826).
+3. **Check Locations:** Blips only show if locations are defined:
+
+```C#
+locations = {
+    vec3(373.8, 325.8, 102.9), -- At least one location required
+}
+```
+
+## Console Error Messages
+
+### "attempt to index a nil value (field 'items')"
+
+**Problem:** Shop configuration missing items array.
+
+**Solution:**
+
+```C#
+{
+    shopType = 'myshop',
+    title = 'My Shop',
+    items = {}, -- ✅ Add empty items array at minimum
+    -- ... other config
+}
+```
+
+### "bad argument #1 to 'ipairs'"
+
+**Problem:** Items or categories not configured as arrays.
+
+**Solution:**
+
+```C#
+-- ✅ Correct - arrays with {}
+categories = { 'All', 'Food' },
+items = { { name = 'bread', ... } },
+
+-- ❌ Wrong - not arrays
+categories = 'All, Food',
+items = { name = 'bread', ... },
+```
+
+## Troubleshooting Steps
+
+When encountering errors:
+
+<Steps>
+  <Step title="Check Console">
+    Look at F8 console for specific error messages
+  </Step>
+  <Step title="Verify Framework">
+    Make sure ESX/QBCore is running and configured correctly
+  </Step>
+  <Step title="Test Basic Shop">
+    Try with a simple shop configuration first
+  </Step>
+  <Step title="Check Item Database">
+    Verify all item names exist in your server's item database
+  </Step>
+  <Step title="Test Purchase">
+    Try buying a basic item like bread or water
+  </Step>
+</Steps>
+
+## Debug Configuration
+
+Add this temporary shop to test basic functionality:
+
+```C#
+{
+    shopType = 'debug_shop',
+    title = 'Debug Shop',
+    subtitle = 'TEST',
+    description = 'Test shop for debugging',
+    categories = { 'All' },
+    items = {
+        { name = 'bread', displayName = 'Bread', category = 'All', price = 1, image = 'bread.png' }
+    },
+    blip = { name = "Debug Shop", id = 59, colour = 2, scale = 1.0 },
+    locations = {
+        vec3(0.0, 0.0, 72.0) -- Center of map for easy testing
+    }
+}
+```
+
+<Warning>
+  Always check your server console (F8) for specific error messages. They usually point directly to the problem\!
+</Warning>
+
+<Info>
+  Most errors are caused by incorrect item names or framework configuration. Double-check these first before looking elsewhere.
+</Info>
+
+## Getting Help
+
+If you're still having issues:
+
+1. **Enable Debug:** Check console for detailed error messages
+2. **Test Minimal Config:** Use the debug shop above to isolate issues
+3. **Check Dependencies:** Verify ESX/QBCore and inventory system are working
+4. **Join Discord:** Get help at [discord.gg/lofidev](https://discord.gg/lofidev)
+
+<Warning>
+  When asking for help, always include the exact error message from your console and your framework type (ESX/QBCore).
+</Warning>

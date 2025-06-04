@@ -12,14 +12,14 @@ This is where you will find all the documentation covering the configuration for
   <Step title="Set Your Framework">
     Choose which framework your server uses:
     
-    ```lua
+    ```C#
     Config.Framework = "ox" -- Options: "esx", "qbcore", or "ox"
     ```
   </Step>
   <Step title="Inventory Integration">
     Configure inventory settings:
     
-    ```lua
+    ```C#
     Config.EnableOxInventoryIntegration = true -- Enable/disable inventory restrictions
     Config.DeleteVehiclesInZone = false -- Auto-delete vehicles in redzone
     ```
@@ -31,7 +31,7 @@ This is where you will find all the documentation covering the configuration for
 ### User Interface Position
 Set where the redzone UI appears on screen:
 
-```lua
+```C#
 Config.UIPosition = "center-right"
 ```
 
@@ -46,7 +46,7 @@ Config.UIPosition = "center-right"
 
 ### Map Blip Configuration
 
-```lua
+```C#
 Config.EnableBlip = true -- Show blip on map
 Config.ZoneBlipIcon = 310 -- Blip icon ID
 Config.ZoneBlipIconColor = 1 -- Color (GTA V color code)
@@ -55,7 +55,7 @@ Config.ZoneBlipIconScale = 0.8 -- Size of the blip
 
 ### Zone Markers
 
-```lua
+```C#
 Config.MarkerColor = { r = 255, g = 0, b = 0, a = 100 } -- RGBA color values
 Config.MarkerDrawDistance = 50.0 -- Distance to render markers
 ```
@@ -64,7 +64,7 @@ Config.MarkerDrawDistance = 50.0 -- Distance to render markers
 
 ### Damage & Combat
 
-```lua
+```C#
 Config.BlockCrossZoneDamage = false -- Only allow damage between players in same zone
 ```
 

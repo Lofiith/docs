@@ -22,7 +22,7 @@ When players die in the redzone, they don't get revived and respawned properly.
   <Step title="Find the Revive Trigger">
     Look for **line 185** in the server.lua file. You'll see this code:
     
-    ```lua
+    ```C#
     TriggerClientEvent('esx_ambulancejob:revive', src)
     ```
   </Step>
@@ -30,17 +30,17 @@ When players die in the redzone, they don't get revived and respawned properly.
     Replace the revive trigger based on your server's ambulance system:
     
     **For ESX (Default - works with Wasabi and most ESX ambulance scripts):**
-    ```lua
+    ```C#
     TriggerClientEvent('esx_ambulancejob:revive', src)
     ```
     
     **For QBCore:**
-    ```lua
+    ```C#
     TriggerClientEvent('hospital:client:Revive', src)
     ```
     
     **For QBox:**
-    ```lua
+    ```C#
     TriggerClientEvent('qbx_medical:client:revivePlayer', src)
     ```
   </Step>

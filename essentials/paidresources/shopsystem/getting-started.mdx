@@ -1,0 +1,147 @@
+---
+title: "Getting Started"
+description: "Quick setup guide for Advanced Shop System. Learn how to install and configure your first shop in minutes with ESX or QBCore framework support."
+icon: "rocket"
+---
+
+Get your Advanced Shop System up and running in just a few minutes. This guide covers installation, basic configuration, and creating your first shop.
+
+## Installation
+
+<Steps>
+  <Step title="Download & Extract">
+    1. Download the Advanced Shop System from your purchase
+    2. Extract the folder to your FiveM server's `resources` directory
+    3. Rename the folder to `Lofi_AdvancedShop` (or your preferred name)
+  </Step>
+  <Step title="Add to Server Config">
+    Add this line to your `server.cfg`:
+
+    ```cfg
+    ensure Lofi_AdvancedShop
+    ```
+  </Step>
+  <Step title="Configure Framework">
+    Open `config.lua` and set your framework:
+
+    ```C#
+    -- Choose 'esx' or 'qbcore'
+    Config.Framework = 'esx'
+    ```
+  </Step>
+  <Step title="Set Inventory Images">
+    Configure your inventory image directory:
+
+    ```C#
+    -- For ox_inventory users
+    Config.InventoryImageDir = 'nui://ox_inventory/web/images'
+    
+    -- For other inventories, change to your path
+    Config.InventoryImageDir = 'nui://your_inventory/images'
+    ```
+  </Step>
+  <Step title="Start Server">
+    Restart your FiveM server and the shops will be ready to use\!
+  </Step>
+</Steps>
+
+## Default Shops
+
+The script comes with two pre-configured shops:
+
+### 24/7 Store
+
+- **Items:** Snacks and drinks
+- **Locations:** Multiple locations around the map
+- **Categories:** Snacks, Drinks
+- **Blip:** Blue shopping cart icon
+
+### Ammunation
+
+- **Items:** Weapons and ammo
+- **Locations:** Gun stores around the map
+- **Categories:** Handguns, Melee, Ammo
+- **License Required:** Some items need weapon license
+- **Blip:** Red gun icon
+
+## Basic Configuration
+
+### Framework Setup
+
+Choose your framework in `config.lua`:
+
+```C#
+-- For ESX servers
+Config.Framework = 'esx'
+
+-- For QBCore servers  
+Config.Framework = 'qbcore'
+```
+
+### Inventory Images
+
+Set the correct path for your inventory images:
+
+```C#
+-- Common inventory systems:
+
+-- ox_inventory
+Config.InventoryImageDir = 'nui://ox_inventory/web/images'
+
+-- qb-inventory
+Config.InventoryImageDir = 'nui://qb-inventory/html/images'
+
+-- Custom inventory
+Config.InventoryImageDir = 'nui://your_inventory/images'
+```
+
+## Creating Your First Shop
+
+Here's how to add a simple clothing store:
+
+```c#
+{
+    shopType = 'clothing',
+    title = 'Clothing Store',
+    subtitle = 'FASHION',
+    description = 'Latest fashion trends and accessories',
+    categories = { 'All', 'Shirts', 'Pants', 'Shoes' },
+    items = {
+        { name = 'tshirt', displayName = 'T-Shirt', category = 'Shirts', price = 25, image = 'tshirt.png' },
+        { name = 'jeans', displayName = 'Jeans', category = 'Pants', price = 50, image = 'jeans.png' },
+        { name = 'sneakers', displayName = 'Sneakers', category = 'Shoes', price = 75, image = 'sneakers.png' },
+    },
+    blip = { name = "Clothing", id = 73, colour = 3, scale = 0.7 },
+    locations = {
+        vec3(72.3, -1399.1, 29.4), -- Ponsonbys
+        vec3(-703.8, -152.3, 37.4), -- Suburban
+    }
+}
+```
+
+Add this to the `Config.Shops` table in your config file.
+
+## Testing Your Setup
+
+<Steps>
+  <Step title="Check Console">
+    Look for any error messages when the server starts
+  </Step>
+  <Step title="Visit Shop Location">
+    Go to any shop location (check your map for blips)
+  </Step>
+  <Step title="Open Shop">
+    Walk up to the shop entrance and press the interaction key
+  </Step>
+  <Step title="Test Purchase">
+    Try buying an item to make sure everything works
+  </Step>
+</Steps>
+
+<Info>
+  The script comes with working examples for both ESX and QBCore. Use these as templates for creating your own shops\!
+</Info>
+
+<Warning>
+  Make sure your item names in the config match exactly with your server's item database, including capitalization.
+</Warning>
