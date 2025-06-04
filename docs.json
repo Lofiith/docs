@@ -1,0 +1,75 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Lofi Development",
+  "colors": {
+    "primary": "#16A34A",
+    "light": "#07C983",
+    "dark": "#15803D"
+  },
+  "favicon": "",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "tos",
+              "cfx"
+            ]
+          },
+{
+  "group": "Free Resources",
+  "pages": [
+    {
+      "group": "Jungle RZ",
+      "icon": "crosshairs",
+      "pages": [
+        "essentials/freeresources/jungle-rz/getting-started",
+        "essentials/freeresources/jungle-rz/configuration-guide",
+        "essentials/freeresources/jungle-rz/common-errors"
+      ]
+    },
+        {
+      "group": "Discord API",
+      "icon": "discord",
+      "pages": [
+        "essentials/freeresources/discord-api/getting-started",
+        "essentials/freeresources/discord-api/configuration-guide",
+        "essentials/freeresources/discord-api/common-errors",
+                "essentials/freeresources/discord-api/usage"
+      ]
+    }
+  ]
+}
+        ]
+      }
+    ]
+  },
+  "logo": {
+    "light": "",
+    "dark": ""
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "https://discord.gg/lofidev"
+      },
+            {
+        "label": "Store",
+        "href": "https://lofidev.fragmentor.io/"
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "youtube": "https://www.youtube.com/@LofiDevelopment",
+      "github": "https://github.com/Lofiith",
+      "discord": "https://discord.gg/lofidev"
+    }
+  }
+}

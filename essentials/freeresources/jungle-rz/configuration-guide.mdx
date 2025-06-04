@@ -1,0 +1,173 @@
+---
+title: 'Configuration Guide'
+description: 'Complete configuration documentation for Jungle RZ script. Customize your redzone settings, framework integration, and zone parameters.'
+icon: 'gear'
+---
+
+This is where you will find all the documentation covering the configuration for our Jungle RZ script. If you need anything that is not a configurable option, do not hesitate to reach out to us via [Discord](https://discord.gg/lofidev)!
+
+## Framework Configuration
+
+<Steps>
+  <Step title="Set Your Framework">
+    Choose which framework your server uses:
+    
+    ```lua
+    Config.Framework = "ox" -- Options: "esx", "qbcore", or "ox"
+    ```
+  </Step>
+  <Step title="Inventory Integration">
+    Configure inventory settings:
+    
+    ```lua
+    Config.EnableOxInventoryIntegration = true -- Enable/disable inventory restrictions
+    Config.DeleteVehiclesInZone = false -- Auto-delete vehicles in redzone
+    ```
+  </Step>
+</Steps>
+
+## UI & Display Settings
+
+### User Interface Position
+Set where the redzone UI appears on screen:
+
+```lua
+Config.UIPosition = "center-right"
+```
+
+**Available positions:**
+- `"bottom-left"`
+- `"bottom-right"` 
+- `"top-left"`
+- `"top-right"`
+- `"center-left"`
+- `"center-right"`
+- `"center-top"`
+
+### Map Blip Configuration
+
+```lua
+Config.EnableBlip = true -- Show blip on map
+Config.ZoneBlipIcon = 310 -- Blip icon ID
+Config.ZoneBlipIconColor = 1 -- Color (GTA V color code)
+Config.ZoneBlipIconScale = 0.8 -- Size of the blip
+```
+
+### Zone Markers
+
+```lua
+Config.MarkerColor = { r = 255, g = 0, b = 0, a = 100 } -- RGBA color values
+Config.MarkerDrawDistance = 50.0 -- Distance to render markers
+```
+
+## Advanced Settings
+
+### Damage & Combat
+
+```lua
+Config.BlockCrossZoneDamage = false -- Only allow damage between players in same zone
+```
+
+<Info>
+When enabled, players can only damage other players who are also inside the same redzone.
+</Info>
+
+### Routing Buckets
+
+```lua
+Config.UseRoutingBuckets = false -- Separate voice chat for redzone players
+```
+
+<Warning>
+When enabled, players in redzones will be moved to a separate routing bucket and cannot communicate with players outside the zone.
+</Warning>
+
+## Zone Configuration
+
+### Basic Zone Setup
+
+Each zone in `Config.Zones` requires these parameters:
+
+```lua
+Config.Zones = {
+    {
+        name = "JungleRZ", -- Zone identifier
+        coords = vector4(410.5369, -1513.8037, 29.2915, 60), -- x, y, z, radius
+        exitCoords = {
+            vector3(425.2147, -1448.5138, 29.3411), -- Spawn point 1
+            vector3(431.3346, -1451.1184, 29.3419)  -- Spawn point 2
+        },
+        items = {
+            { type = "weapon", name = "weapon_pistol", ammo = 100 }
+        },
+        startingReward = 500, -- First kill reward
+        rewardIncrement = 500 -- Additional reward per consecutive kill
+    }
+}
+```
+
+### Zone Parameters Explained
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `name` | string | Unique zone identifier |
+| `coords` | vector4 | Zone center (x, y, z, radius) |
+| `exitCoords` | table | Respawn/exit locations |
+| `items` | table | Weapons/items given on entry |
+| `startingReward` | number | Base kill reward amount |
+| `rewardIncrement` | number | Reward increase per kill streak |
+
+### Adding Multiple Zones
+
+<Steps>
+  <Step title="Copy Zone Template">
+    Copy the existing zone configuration block.
+  </Step>
+  <Step title="Modify Parameters">
+    Change the name, coordinates, and settings for your new zone.
+  </Step>
+  <Step title="Add to Config">
+    Add your new zone to the `Config.Zones` table:
+    
+    ```lua
+    Config.Zones = {
+        {
+            name = "JungleRZ",
+            -- ... existing zone config
+        },
+        {
+            name = "DesertRZ", -- Your new zone
+            coords = vector4(100.0, 200.0, 30.0, 75),
+            exitCoords = {
+                vector3(150.0, 250.0, 30.0)
+            },
+            items = {
+                { type = "weapon", name = "weapon_assaultrifle", ammo = 200 }
+            },
+            startingReward = 750,
+            rewardIncrement = 250
+        }
+    }
+    ```
+  </Step>
+</Steps>
+
+## Getting Coordinates
+
+To find coordinates for your zones:
+
+1. **In-game method**: Use `/coords` command (if available)
+2. **Admin tools**: Use your admin menu's teleport/coordinate features
+3. **External tools**: Use tools like CodeWalker or FiveM coordinate finders
+
+<Info>
+Remember to restart your server after making configuration changes!
+</Info>
+
+## Need Help?
+
+Join our [Discord community](https://discord.gg/lofidev) for:
+- Configuration assistance
+- Custom zone setups
+- Troubleshooting support
+- Script updates and announcements

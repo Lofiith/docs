@@ -1,0 +1,341 @@
+---
+title: 'Common Issues'
+description: 'Troubleshooting guide for common Lofi_DiscordAPI problems. Solutions for bot token issues, permission errors, API timeouts, and Discord integration problems.'
+icon: 'triangle-exclamation'
+---
+
+This guide covers the most common issues you might encounter with Lofi_DiscordAPI and how to fix them. Each solution includes step-by-step instructions that are easy to follow.
+
+## Bot Token Issues
+
+### "MISSING BOT TOKEN IN CONFIG.LUA!" Error
+
+This is the most common error when first setting up the script.
+
+#### The Problem
+You haven't properly configured your Discord bot token in the config file.
+
+#### The Solution
+
+<Steps>
+  <Step title="Check Your Config">
+    Open `config.lua` and look for this line:
+    
+    ```lua
+    bot_token = "PUT_BOT_TOKEN_HERE",
+    ```
+  </Step>
+  <Step title="Replace with Real Token">
+    Make sure you've replaced the placeholder with your actual bot token:
+    
+    ```lua
+    -- ❌ Wrong - still has placeholder
+    bot_token = "PUT_BOT_TOKEN_HERE",
+    
+    -- ✅ Correct - actual bot token
+    bot_token = "MTIzNDU2Nzg5MDEyMzQ1Njc4.GhIjKl.MnOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWx",
+    ```
+  </Step>
+  <Step title="Verify Token Format">
+    Discord bot tokens should look like: `MTIzNDU2Nzg5.GhIjKl.MnOpQrStUvWxYzAbCdEf`
+    - They contain letters, numbers, dots, and underscores
+    - They're usually 50+ characters long
+  </Step>
+</Steps>
+
+### Invalid Bot Token Error
+
+#### The Problem
+Your bot token is incorrect or has been regenerated.
+
+#### The Solution
+
+<Steps>
+  <Step title="Get New Token">
+    1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
+    2. Select your application
+    3. Go to "Bot" section
+    4. Click "Reset Token" to generate a new one
+  </Step>
+  <Step title="Update Config">
+    Copy the new token and update your `config.lua` file.
+  </Step>
+  <Step title="Restart Server">
+    Restart your FiveM server for changes to take effect.
+  </Step>
+</Steps>
+
+## Guild ID Issues
+
+### "MISSING GUILD ID IN CONFIG.LUA!" Error
+
+#### The Problem
+You haven't configured your Discord server's Guild ID.
+
+#### The Solution
+
+<Steps>
+  <Step title="Enable Developer Mode">
+    In Discord: Settings → Advanced → Enable "Developer Mode"
+  </Step>
+  <Step title="Copy Server ID">
+    Right-click your Discord server icon → "Copy Server ID"
+  </Step>
+  <Step title="Update Config">
+    Replace the placeholder in `config.lua`:
+    
+    ```lua
+    -- ❌ Wrong
+    guild_id = "PUT_GUILD_ID_HERE",
+    
+    -- ✅ Correct
+    guild_id = "123456789012345678",
+    ```
+  </Step>
+</Steps>
+
+## Bot Permission Issues
+
+### Players Getting Kicked Immediately
+
+#### The Problem
+Your bot doesn't have the required permissions in your Discord server.
+
+#### The Solution
+
+<Steps>
+  <Step title="Check Bot is in Server">
+    Make sure your bot appears in your Discord server's member list.
+  </Step>
+  <Step title="Verify Bot Permissions">
+    Your bot needs these permissions:
+    - View Channels
+    - View Server Members (**Most Important**)
+    - Read Message History
+  </Step>
+  <Step title="Fix Permissions">
+    1. Go to Server Settings → Roles
+    2. Find your bot's role
+    3. Enable the required permissions
+    4. Or give the bot Administrator permission (not recommended for production)
+  </Step>
+</Steps>
+
+### "Status 403" Errors in Console
+
+#### The Problem
+Your bot doesn't have permission to access Discord's API for your server.
+
+#### The Solution
+This is usually a permission issue. Follow the steps above to fix bot permissions.
+
+## API Connection Issues
+
+### "Status 429" Rate Limited Error
+
+#### The Problem
+Your server is making too many requests to Discord's API.
+
+#### The Solution
+
+<Steps>
+  <Step title="Increase Timeout">
+    In `config.lua`, increase the timeout value:
+    
+    ```lua
+    timeout = 10, -- Increase from 5 to 10 seconds
+    ```
+  </Step>
+  <Step title="Check for Loops">
+    Make sure you're not calling Discord API functions in loops or timers.
+  </Step>
+  <Step title="Reduce Debug Logging">
+    Set debug to false to reduce API calls:
+    
+    ```lua
+    debug = false,
+    ```
+  </Step>
+</Steps>
+
+### "Status 500/502/503" Server Errors
+
+#### The Problem
+Discord's API is temporarily unavailable.
+
+#### The Solution
+These are usually temporary Discord issues. Wait a few minutes and try again.
+
+## Player Connection Issues
+
+### "Discord not detected" Kicks
+
+#### The Problem
+Players are getting kicked because Discord isn't detected.
+
+#### The Solution
+
+<Steps>
+  <Step title="Check Player Setup">
+    Players need to:
+    1. Have Discord running on their computer
+    2. Have Discord linked to their FiveM account
+  </Step>
+  <Step title="Disable Strict Mode (Temporary)">
+    If you want to allow players without Discord:
+    
+    ```lua
+    kick_not_in_discord = false,
+    ```
+  </Step>
+  <Step title="Help Players Link Discord">
+    Guide players to link Discord:
+    1. Open FiveM Settings
+    2. Go to "Game" tab
+    3. Enable "Discord Rich Presence"
+  </Step>
+</Steps>
+
+### No Discord Data Loading
+
+#### The Problem
+Players connect but their Discord data doesn't load.
+
+#### The Solution
+
+<Steps>
+  <Step title="Check Console Messages">
+    Look for error messages when players connect.
+  </Step>
+  <Step title="Verify Bot Permissions">
+    Ensure your bot has "View Server Members" permission.
+  </Step>
+  <Step title="Check Player is in Discord">
+    Verify the player is actually in your Discord server.
+  </Step>
+</Steps>
+
+## Export Function Issues
+
+### Exports Returning nil/false
+
+#### The Problem
+Other scripts can't get Discord data using exports.
+
+#### The Solution
+
+<Steps>
+  <Step title="Check Script Load Order">
+    Make sure Lofi_DiscordAPI starts before scripts that use it:
+    
+    ```cfg
+    # In server.cfg - order matters!
+    ensure Lofi_DiscordAPI
+    ensure your_other_script
+    ```
+  </Step>
+  <Step title="Add Delays">
+    Discord data takes time to load. Add delays in other scripts:
+    
+    ```lua
+    -- Wait for Discord data to load
+    Citizen.CreateThread(function()
+        Citizen.Wait(5000) -- Wait 5 seconds
+        local avatar = exports['Lofi_DiscordAPI']:GetDiscordAvatar(playerId)
+    end)
+    ```
+  </Step>
+  <Step title="Check Player ID">
+    Make sure you're using the correct player ID format.
+  </Step>
+</Steps>
+
+## Console Spam Issues
+
+### Too Many Debug Messages
+
+#### The Problem
+Your console is flooded with debug messages.
+
+#### The Solution
+
+<Steps>
+  <Step title="Disable Debug Mode">
+    In `config.lua`:
+    
+    ```lua
+    debug = false, -- Turn off debug messages
+    ```
+  </Step>
+  <Step title="Restart Server">
+    Restart your server to apply changes.
+  </Step>
+</Steps>
+
+## Performance Issues
+
+### Server Lag When Players Connect
+
+#### The Problem
+The script is causing lag when multiple players connect at once.
+
+#### The Solution
+
+<Steps>
+  <Step title="Increase Timeout">
+    Give API requests more time:
+    
+    ```lua
+    timeout = 10, -- Increase timeout
+    ```
+  </Step>
+  <Step title="Reduce Concurrent Requests">
+    This is handled automatically, but you can monitor console for rate limiting.
+  </Step>
+</Steps>
+
+## Troubleshooting Checklist
+
+When having issues, check these in order:
+
+<Steps>
+  <Step title="Basic Configuration">
+    - [ ] Bot token is correct and not placeholder
+    - [ ] Guild ID is correct and not placeholder
+    - [ ] Bot is in your Discord server
+    - [ ] Bot has required permissions
+  </Step>
+  <Step title="Console Messages">
+    - [ ] Check for error messages in server console
+    - [ ] Look for "API initialized successfully" message
+    - [ ] Monitor player connection messages
+  </Step>
+  <Step title="Discord Setup">
+    - [ ] Bot appears online in Discord
+    - [ ] Bot has "View Server Members" permission
+    - [ ] Players are in the Discord server
+  </Step>
+  <Step title="Script Integration">
+    - [ ] Lofi_DiscordAPI starts before other scripts
+    - [ ] Other scripts wait for Discord data to load
+    - [ ] Using correct export function names
+  </Step>
+</Steps>
+
+## Getting Help
+
+If you're still having issues:
+
+1. **Enable Debug Mode** - Set `debug = true` in config
+2. **Check Console** - Look for specific error messages
+3. **Join Discord** - Get help at [discord.gg/lofidev](https://discord.gg/lofidev)
+4. **Provide Details** - Share console errors and your configuration (without bot token!)
+
+<Warning>
+Never share your bot token when asking for help! Remove it from any code you share.
+</Warning>
+
+<Info>
+Most issues are caused by incorrect bot permissions or configuration. Double-check these first!
+</Info>
+```

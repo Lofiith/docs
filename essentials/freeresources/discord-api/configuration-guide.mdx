@@ -1,0 +1,249 @@
+---
+title: 'Configuration Guide'
+description: 'Complete configuration documentation for Lofi_DiscordAPI script. Set up Discord bot integration, role checking, and server access controls.'
+icon: 'gear'
+---
+
+This guide covers all configuration options for the Lofi_DiscordAPI script. If you need help with anything not covered here, reach out to us via [Discord](https://discord.gg/lofidev)!
+
+## Discord Bot Setup
+
+Before configuring the script, you need to create a Discord bot and get your server's Guild ID.
+
+<Steps>
+  <Step title="Create Discord Application">
+    1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
+    2. Click "New Application"
+    3. Give your bot a name and click "Create"
+  </Step>
+  <Step title="Create Bot User">
+    1. Go to the "Bot" section in the left sidebar
+    2. Click "Add Bot"
+    3. Under "Token", click "Copy" to get your bot token
+    
+    <Warning>
+    Keep your bot token secret! Never share it publicly or commit it to version control.
+    </Warning>
+  </Step>
+  <Step title="Set Bot Permissions">
+    Your bot needs these permissions in your Discord server:
+    - View Channels
+    - View Server Members
+    - Read Message History
+    
+    <Info>
+    Administrator permission works too, but it's not recommended for security reasons.
+    </Info>
+  </Step>
+  <Step title="Invite Bot to Server">
+    1. Go to "OAuth2" → "URL Generator"
+    2. Select "bot" scope
+    3. Select the required permissions
+    4. Copy the generated URL and open it in your browser
+    5. Select your Discord server and authorize the bot
+  </Step>
+</Steps>
+
+## Getting Your Guild ID
+
+<Steps>
+  <Step title="Enable Developer Mode">
+    In Discord, go to User Settings → Advanced → Enable "Developer Mode"
+  </Step>
+  <Step title="Copy Server ID">
+    Right-click on your Discord server icon and select "Copy Server ID"
+  </Step>
+</Steps>
+
+## Basic Configuration
+
+Open your `config.lua` file and configure these essential settings:
+
+### Discord API Settings
+
+```lua
+Config = {
+    bot_token = "PUT_BOT_TOKEN_HERE", -- Your Discord bot token
+    guild_id = "PUT_GUILD_ID_HERE", -- Your Discord server (guild) ID
+}
+```
+
+<Steps>
+  <Step title="Add Bot Token">
+    Replace `"PUT_BOT_TOKEN_HERE"` with your actual bot token:
+    
+    ```lua
+    bot_token = "MTIzNDU2Nzg5MDEyMzQ1Njc4.GhIjKl.MnOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWx",
+    ```
+  </Step>
+  <Step title="Add Guild ID">
+    Replace `"PUT_GUILD_ID_HERE"` with your Discord server ID:
+    
+    ```lua
+    guild_id = "123456789012345678",
+    ```
+  </Step>
+</Steps>
+
+## Advanced Configuration Options
+
+### Debug Settings
+
+```lua
+debug = true, -- Set to false to disable debug messages in the console
+```
+
+**When to use:**
+- `true` - During setup and troubleshooting
+- `false` - For production servers (reduces console spam)
+
+### API Timeout
+
+```lua
+timeout = 5, -- Timeout in seconds for Discord API requests
+```
+
+**Recommended values:**
+- `3-5` seconds for most servers
+- `10+` seconds if you have connection issues
+- Lower values = faster responses but more timeouts
+
+### Access Control
+
+```lua
+kick_not_in_discord = true, -- Set to true to kick players not in the Discord server
+kick_message = "You must be in our Discord server to play!" -- Message sent to kicked players
+```
+
+**Options:**
+- `true` - Kicks players who aren't in your Discord server
+- `false` - Allows anyone to join (Discord data won't be available for non-members)
+
+### Custom Kick Messages
+
+```lua
+kick_message = "Join our Discord: discord.gg/yourserver before playing!"
+```
+
+## Complete Configuration Example
+
+```lua:config.lua
+-- Fully server-sided, modders cannot dump it.
+Config = {
+    -- Required: Your Discord bot token from Discord Developer Portal
+    bot_token = "MTIzNDU2Nzg5MDEyMzQ1Njc4.GhIjKl.MnOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWx",
+    
+    -- Required: Your Discord server (guild) ID
+    guild_id = "123456789012345678",
+    
+    -- Optional: Enable debug messages (recommended during setup)
+    debug = true,
+    
+    -- Optional: API request timeout in seconds
+    timeout = 5,
+    
+    -- Optional: Kick players not in Discord server
+    kick_not_in_discord = true,
+    
+    -- Optional: Custom kick message
+    kick_message = "You must join our Discord server to play! discord.gg/yourserver"
+}
+```
+
+## Configuration for Different Server Types
+
+### Public Server (Anyone Can Join)
+
+```lua
+Config = {
+    bot_token = "YOUR_BOT_TOKEN",
+    guild_id = "YOUR_GUILD_ID",
+    debug = false,
+    timeout = 5,
+    kick_not_in_discord = false, -- Allow non-Discord members
+    kick_message = "Consider joining our Discord for the full experience!"
+}
+```
+
+### Private/Whitelist Server
+
+```lua
+Config = {
+    bot_token = "YOUR_BOT_TOKEN",
+    guild_id = "YOUR_GUILD_ID",
+    debug = false,
+    timeout = 3,
+    kick_not_in_discord = true, -- Only Discord members allowed
+    kick_message = "This server requires Discord membership. Join: discord.gg/yourserver"
+}
+```
+
+### Development/Testing Server
+
+```lua
+Config = {
+    bot_token = "YOUR_BOT_TOKEN",
+    guild_id = "YOUR_GUILD_ID",
+    debug = true, -- Enable detailed logging
+    timeout = 10, -- Higher timeout for testing
+    kick_not_in_discord = false, -- Allow testing without Discord
+    kick_message = "Development server - Discord integration testing"
+}
+```
+
+## Troubleshooting Configuration
+
+### Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| "MISSING BOT TOKEN" error | Make sure you've replaced `PUT_BOT_TOKEN_HERE` with your actual token |
+| "MISSING GUILD ID" error | Make sure you've replaced `PUT_GUILD_ID_HERE` with your server ID |
+| Players getting kicked immediately | Check if your bot is in the Discord server and has proper permissions |
+| No Discord data loading | Verify bot permissions include "View Server Members" |
+
+### Testing Your Configuration
+
+<Steps>
+  <Step title="Start Server">
+    Start your FiveM server and check the console for initialization messages.
+  </Step>
+  <Step title="Check Console Output">
+    Look for these messages:
+    ```
+    [Lofi_DiscordAPI] [SYSTEM]: API initialized successfully
+    [Lofi_DiscordAPI] [SYSTEM]: Guild ID: 123456789012345678
+    ```
+  </Step>
+  <Step title="Test Player Connection">
+    Have a Discord server member join and check console for:
+    ```
+    [Lofi_DiscordAPI] [INFO]: Player PlayerName (ID: 1) connected | Discord: username#1234 | Roles: 3 | Avatar: Loaded
+    ```
+  </Step>
+</Steps>
+
+## Security Best Practices
+
+<Warning>
+**Never share your bot token publicly!** Anyone with your token can control your bot.
+</Warning>
+
+- Store bot tokens securely
+- Use environment variables for production
+- Regularly rotate bot tokens
+- Monitor bot activity in Discord
+- Use minimal required permissions
+
+## Need Help?
+
+If you're having configuration issues:
+
+- Check the [Common Issues](/essentials/lofi-discord-api/common-issues) guide
+- Join our [Discord community](https://discord.gg/lofidev) for live support
+- Verify your bot permissions in Discord
+- Enable debug mode for detailed error messages
+
+<Info>
+Remember to restart your server after making configuration changes!
+</Info>

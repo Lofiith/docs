@@ -1,0 +1,336 @@
+---
+title: 'Common Issues'
+description: 'Troubleshooting guide for common Jungle RZ problems. Solutions for revive issues, weapon restrictions, zone sizing, and reward configuration.'
+icon: 'triangle-exclamation'
+---
+
+This guide covers the most common issues you might encounter with Jungle RZ and how to fix them. Each solution includes step-by-step instructions that are easy to follow, even if you're new to FiveM scripting.
+
+## Player Won't Get Revived When Dead
+
+This is the most common issue and varies depending on what ambulance script your server uses.
+
+### The Problem
+When players die in the redzone, they don't get revived and respawned properly.
+
+### The Solution
+
+<Steps>
+  <Step title="Locate the Server File">
+    Open your `Lofi_JungleRZ` folder and find the `server.lua` file.
+  </Step>
+  <Step title="Find the Revive Trigger">
+    Look for **line 185** in the server.lua file. You'll see this code:
+    
+    ```lua
+    TriggerClientEvent('esx_ambulancejob:revive', src)
+    ```
+  </Step>
+  <Step title="Change Based on Your Framework">
+    Replace the revive trigger based on your server's ambulance system:
+    
+    **For ESX (Default - works with Wasabi and most ESX ambulance scripts):**
+    ```lua
+    TriggerClientEvent('esx_ambulancejob:revive', src)
+    ```
+    
+    **For QBCore:**
+    ```lua
+    TriggerClientEvent('hospital:client:Revive', src)
+    ```
+    
+    **For QBox:**
+    ```lua
+    TriggerClientEvent('qbx_medical:client:revivePlayer', src)
+    ```
+  </Step>
+  <Step title="Save and Restart">
+    Save the file and restart your server for changes to take effect.
+  </Step>
+</Steps>
+
+<Info>
+The default trigger `esx_ambulancejob:revive` works with most ESX-based ambulance systems including Wasabi, esx_ambulancejob, and many others.
+</Info>
+
+## How to Allow Any Weapons in the Redzone
+
+By default, the script restricts players to only use weapons given by the redzone system.
+
+### The Problem
+Players can't use their own weapons and are limited to only the weapons provided by the script.
+
+### The Solution
+
+<Steps>
+  <Step title="Open Config File">
+    Navigate to your `Lofi_JungleRZ` folder and open `config.lua`.
+  </Step>
+  <Step title="Find Inventory Integration Setting">
+    Look for this line (around line 8):
+    
+    ```lua
+    Config.EnableOxInventoryIntegration = true -- Enable/disable inventory restrictions
+    ```
+  </Step>
+  <Step title="Disable Restrictions">
+    Change `true` to `false`:
+    
+    ```lua
+    Config.EnableOxInventoryIntegration = false -- Enable/disable inventory restrictions
+    ```
+  </Step>
+  <Step title="Save and Restart">
+    Save the file and restart your server.
+  </Step>
+</Steps>
+
+<Warning>
+When disabled, players will be able to use any weapons they have in their inventory, not just the ones provided by the redzone.
+</Warning>
+
+## How to Remove Weapons Given on Entry
+
+If you don't want the script to give players weapons when they enter the redzone.
+
+### The Problem
+Players automatically receive weapons when entering the redzone, but you want them to use their own weapons.
+
+### The Solution
+
+<Steps>
+  <Step title="Open Config File">
+    Open the `config.lua` file in your `Lofi_JungleRZ` folder.
+  </Step>
+  <Step title="Find Your Zone Configuration">
+    Look for the `Config.Zones` section and find your zone (around line 35):
+    
+    ```lua
+    Config.Zones = {
+        {
+            name = "JungleRZ",
+            coords = vector4(410.5369, -1513.8037, 29.2915, 60),
+            exitCoords = {
+                vector3(425.2147, -1448.5138, 29.3411),
+                vector3(431.3346, -1451.1184, 29.3419) 
+            },
+            items = {
+                { type = "weapon", name = "weapon_pistol", ammo = 100 } -- This line gives weapons
+            },
+            startingReward = 500,
+            rewardIncrement = 500
+        }
+    }
+    ```
+  </Step>
+  <Step title="Remove or Comment Out Items">
+    You have two options:
+    
+    **Option 1 - Delete the items section:**
+    ```lua
+    Config.Zones = {
+        {
+            name = "JungleRZ",
+            coords = vector4(410.5369, -1513.8037, 29.2915, 60),
+            exitCoords = {
+                vector3(425.2147, -1448.5138, 29.3411),
+                vector3(431.3346, -1451.1184, 29.3419) 
+            },
+            -- items section removed completely
+            startingReward = 500,
+            rewardIncrement = 500
+        }
+    }
+    ```
+    
+    **Option 2 - Comment it out (recommended):**
+    ```lua
+    Config.Zones = {
+        {
+            name = "JungleRZ",
+            coords = vector4(410.5369, -1513.8037, 29.2915, 60),
+            exitCoords = {
+                vector3(425.2147, -1448.5138, 29.3411),
+                vector3(431.3346, -1451.1184, 29.3419) 
+            },
+            --[[items = {
+                { type = "weapon", name = "weapon_pistol", ammo = 100 }
+            },--]]
+            startingReward = 500,
+            rewardIncrement = 500
+        }
+    }
+    ```
+  </Step>
+</Steps>
+
+<Info>
+Commenting out (Option 2) is recommended because you can easily re-enable weapons later by removing the comment markers `--[[` and `--]]`.
+</Info>
+
+## How to Change the Size of the Zone
+
+The zone size determines how large the redzone area is on your map.
+
+### Understanding Zone Coordinates
+The zone coordinates use this format:
+```lua
+coords = vector4(x, y, z, radius)
+```
+
+- **x, y, z** = The center point of your zone
+- **radius** = How big the zone is (in GTA units)
+
+### The Solution
+
+<Steps>
+  <Step title="Open Config File">
+    Open `config.lua` and find your zone configuration.
+  </Step>
+  <Step title="Locate the Coordinates">
+    Find the coords line in your zone:
+    
+    ```lua
+    coords = vector4(410.5369, -1513.8037, 29.2915, 60), -- x, y, z, radius
+    ```
+  </Step>
+  <Step title="Change the Radius">
+    The **4th number (60)** is the radius. Change this to make your zone bigger or smaller:
+    
+    ```lua
+    -- Small zone (30 units radius)
+    coords = vector4(410.5369, -1513.8037, 29.2915, 30),
+    
+    -- Medium zone (60 units radius) - Default
+    coords = vector4(410.5369, -1513.8037, 29.2915, 60),
+    
+    -- Large zone (100 units radius)
+    coords = vector4(410.5369, -1513.8037, 29.2915, 100),
+    ```
+  </Step>
+</Steps>
+
+### Radius Size Guide
+- **20-40** = Small zone (good for specific buildings)
+- **50-80** = Medium zone (good for neighborhoods) 
+- **100-150** = Large zone (good for entire districts)
+- **200+** = Very large zone (use carefully)
+
+## How to Change Kill Rewards
+
+Kill rewards are the money/items players receive when they eliminate someone in the redzone.
+
+### Understanding the Reward System
+The script has two types of rewards:
+- **Starting Reward** - Money for the first kill
+- **Reward Increment** - Additional money added for each consecutive kill
+
+### Changing Money Rewards
+
+<Steps>
+  <Step title="Open Config File">
+    Open `config.lua` and find your zone configuration.
+  </Step>
+  <Step title="Find Reward Settings">
+    Look for these lines in your zone:
+    
+    ```lua
+    startingReward = 500, -- First kill gives $500
+    rewardIncrement = 500 -- Each additional kill adds $500 more
+    ```
+  </Step>
+  <Step title="Modify the Values">
+    Change the numbers to your preferred amounts:
+    
+    ```lua
+    -- Example: Start with $1000, increase by $250 each kill
+    startingReward = 1000,
+    rewardIncrement = 250
+    
+    -- Kill 1: $1000
+    -- Kill 2: $1250  
+    -- Kill 3: $1500
+    -- Kill 4: $1750
+    ```
+  </Step>
+</Steps>
+
+### Changing to Item Rewards
+
+<Steps>
+  <Step title="Open Server File">
+    Open `server.lua` in your `Lofi_JungleRZ` folder.
+  </Step>
+  <Step title="Find the Reward Section">
+    Look for **lines 115-130** where rewards are given:
+    
+    ```lua
+    -- Award reward using the appropriate framework
+    if Config.Framework == "ox" then
+        local success = exports.ox_inventory:AddItem(src, 'money', reward)
+        if not success then return end
+    elseif Config.Framework == "esx" then
+        if ESX then
+            local xPlayer = ESX.GetPlayerFromId(src)
+            if xPlayer then
+                xPlayer.addMoney(reward) -- This gives money
+            end
+        end
+    elseif Config.Framework == "qbcore" then
+        if QBCore and QBCore.Functions then
+            local Player = QBCore.Functions.GetPlayer(src)
+            if Player then
+                Player.Functions.AddMoney("cash", reward, "redzone-kill")
+            end
+        end
+    end
+    ```
+  </Step>
+  <Step title="Replace with Item Rewards">
+    Replace the money rewards with item rewards:
+    
+    **For ESX:**
+    ```lua
+    elseif Config.Framework == "esx" then
+        if ESX then
+            local xPlayer = ESX.GetPlayerFromId(src)
+            if xPlayer then
+                -- Give items instead of money
+                xPlayer.addInventoryItem('bread', 1) -- Give 1 bread
+                xPlayer.addInventoryItem('water', 1) -- Give 1 water
+                -- xPlayer.addMoney(reward) -- Comment out money
+            end
+        end
+    ```
+    
+    **For QBCore:**
+    ```lua
+    elseif Config.Framework == "qbcore" then
+        if QBCore and QBCore.Functions then
+            local Player = QBCore.Functions.GetPlayer(src)
+            if Player then
+                -- Give items instead of money
+                Player.Functions.AddItem("bread", 1, false, "redzone-kill")
+                Player.Functions.AddItem("water", 1, false, "redzone-kill")
+                -- Player.Functions.AddMoney("cash", reward, "redzone-kill") -- Comment out money
+            end
+        end
+    ```
+  </Step>
+</Steps>
+
+<Warning>
+Always make a backup of your `server.lua` file before making changes. If something goes wrong, you can restore the original file.
+</Warning>
+
+## Need More Help?
+
+If you're still having issues or need help with custom configurations:
+
+- Join our [Discord community](https://discord.gg/lofidev) for live support
+- Check our other documentation pages
+- Contact our support team directly
+
+<Info>
+Remember to always restart your server after making configuration changes for them to take effect!
+</Info>

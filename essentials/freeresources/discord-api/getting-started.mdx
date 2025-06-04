@@ -1,0 +1,42 @@
+---
+title: 'Getting Started'
+description: 'A fully server-sided Discord API integration for FiveM that allows you to fetch player Discord data, check roles, and manage server access based on Discord membership.'
+icon: 'rocket'
+---
+
+## Installation Guide
+
+<Steps>
+  <Step title="Download the Resource">
+    Download the most up to date resource from [GitHub](https://github.com/Lofiith/Lofiith_Discord).
+  </Step>
+  <Step title="Install the Script">
+    Drag the "Lofi_DiscordAPI" folder into your resources directory.
+    
+    <Warning>
+    It is not recommended to rename the folder as this may cause compatibility issues.
+    </Warning>
+  </Step>
+  <Step title="Configure Settings">
+    Open the "config.lua" file and add your Discord bot token and guild ID. See the [configuration guide](/essentials/lofi-discord-api/configuration) for detailed setup.
+  </Step>
+  <Step title="Add to Server">
+    Add the following line to your server.cfg file:
+    
+    ```cfg
+    ensure Lofi_DiscordAPI
+    ```
+  </Step>
+  <Step title="Test & Verify">
+    Restart your server and check the console for successful initialization. For any support, contact us via [Discord](https://discord.gg/lofidev).
+  </Step>
+</Steps>
+
+<Info>
+You'll need to create a Discord bot and get your server's Guild ID before the script will work. Check our [configuration guide](/essentials/lofi-discord-api/configuration) for step-by-step instructions.
+</Info>
+
+<Warning>
+Make sure your Discord bot has the necessary permissions in your server, including "View Server Members" and "Read Message History" at minimum.
+</Warning>
+```
