@@ -50,7 +50,7 @@
             "pages": [
               {
                 "group": "Advanced Shop System",
-                "icon": "cart",
+                "icon": "shopping-cart",
                 "pages": [
                   "essentials/paidresources/shopsystem/getting-started",
                   "essentials/paidresources/shopsystem/configuration-guide",
