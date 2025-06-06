@@ -61,7 +61,7 @@ Open your `config.lua` file and configure these essential settings:
 
 ### Discord API Settings
 
-```C#
+```lua
 Config = {
     bot_token = "PUT_BOT_TOKEN_HERE", -- Your Discord bot token
     guild_id = "PUT_GUILD_ID_HERE", -- Your Discord server (guild) ID
@@ -72,14 +72,14 @@ Config = {
   <Step title="Add Bot Token">
     Replace `"PUT_BOT_TOKEN_HERE"` with your actual bot token:
     
-    ```C#
+    ```lua
     bot_token = "MTIzNDU2Nzg5MDEyMzQ1Njc4.GhIjKl.MnOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWx",
     ```
   </Step>
   <Step title="Add Guild ID">
     Replace `"PUT_GUILD_ID_HERE"` with your Discord server ID:
     
-    ```C#
+    ```lua
     guild_id = "123456789012345678",
     ```
   </Step>
@@ -89,7 +89,7 @@ Config = {
 
 ### Debug Settings
 
-```C#
+```lua
 debug = true, -- Set to false to disable debug messages in the console
 ```
 
@@ -99,7 +99,7 @@ debug = true, -- Set to false to disable debug messages in the console
 
 ### API Timeout
 
-```C#
+```lua
 timeout = 5, -- Timeout in seconds for Discord API requests
 ```
 
@@ -110,7 +110,7 @@ timeout = 5, -- Timeout in seconds for Discord API requests
 
 ### Access Control
 
-```C#
+```lua
 kick_not_in_discord = true, -- Set to true to kick players not in the Discord server
 kick_message = "You must be in our Discord server to play!" -- Message sent to kicked players
 ```
@@ -121,13 +121,13 @@ kick_message = "You must be in our Discord server to play!" -- Message sent to k
 
 ### Custom Kick Messages
 
-```C#
+```lua
 kick_message = "Join our Discord: discord.gg/yourserver before playing!"
 ```
 
 ## Complete Configuration Example
 
-```C#:config.lua
+```lua:config.lua
 -- Fully server-sided, modders cannot dump it.
 Config = {
     -- Required: Your Discord bot token from Discord Developer Portal
@@ -154,7 +154,7 @@ Config = {
 
 ### Public Server (Anyone Can Join)
 
-```C#
+```lua
 Config = {
     bot_token = "YOUR_BOT_TOKEN",
     guild_id = "YOUR_GUILD_ID",
@@ -167,7 +167,7 @@ Config = {
 
 ### Private/Whitelist Server
 
-```C#
+```lua
 Config = {
     bot_token = "YOUR_BOT_TOKEN",
     guild_id = "YOUR_GUILD_ID",
@@ -180,7 +180,7 @@ Config = {
 
 ### Development/Testing Server
 
-```C#
+```lua
 Config = {
     bot_token = "YOUR_BOT_TOKEN",
     guild_id = "YOUR_GUILD_ID",

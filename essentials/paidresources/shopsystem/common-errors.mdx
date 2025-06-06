@@ -1,7 +1,7 @@
 ---
-title: "Common Errors"
-description: "Quick solutions for common Advanced Shop System errors. Fix framework issues, item problems, purchase failures, and UI display errors."
-icon: "alert-triangle"
+title: 'Common Issues'
+description: 'Quick solutions for common Advanced Shop System errors. Fix framework issues, item problems, purchase failures, and UI display errors.'
+icon: 'triangle-exclamation'
 ---
 
 This guide covers the most common errors and their quick solutions for the Advanced Shop System.
@@ -13,23 +13,19 @@ This guide covers the most common errors and their quick solutions for the Advan
 **Problem:** ESX framework not loading properly.
 
 **Solution:**
-
 1. Check your framework setting in config:
-
-```C#
+```lua
 Config.Framework = 'esx'
 ```
 
 2. Make sure ESX is started before your shop script in `server.cfg`:
-
 ```cfg
 ensure es_extended
 ensure advanced-shop-system
 ```
 
 3. Verify ESX export name matches your server:
-
-```c#
+```lua
 -- Try these if default doesn't work
 ESX = exports['es_extended']:getSharedObject()
 ESX = exports['esx']:getSharedObject()
@@ -40,23 +36,19 @@ ESX = exports['esx']:getSharedObject()
 **Problem:** QBCore framework not loading properly.
 
 **Solution:**
-
 1. Check your framework setting:
-
-```C#
+```lua
 Config.Framework = 'qbcore'
 ```
 
 2. Ensure proper load order:
-
 ```cfg
 ensure qb-core
 ensure advanced-shop-system
 ```
 
 3. Verify QBCore export name:
-
-```C#
+```lua
 -- Try these if default doesn't work
 QBCore = exports['qb-core']:GetCoreObject()
 QBCore = exports['qbx_core']:GetCoreObject()
@@ -71,15 +63,13 @@ QBCore = exports['qbx_core']:GetCoreObject()
 **Solutions:**
 
 1. **Check Coordinates:** Make sure you're at the exact location:
-
-```C#
+```lua
 locations = {
     vec3(373.8, 325.8, 102.9), -- Make sure these are correct
 }
 ```
 
 2. **Verify Script Running:** Check F8 console for:
-
 ```
 [script:advanced-shop-system] Resource started
 ```
@@ -93,16 +83,14 @@ locations = {
 **Solutions:**
 
 1. **Check Item Names:** Verify items exist in your server's database:
-
-```C#
+```lua
 -- Make sure these match your items.sql exactly
 { name = 'bread', displayName = 'Bread', ... }  -- ✅ Correct
 { name = 'Bread', displayName = 'Bread', ... }  -- ❌ Wrong case
 ```
 
 2. **Check Categories:** Ensure item categories match:
-
-```C#
+```lua
 categories = { 'All', 'Food', 'Drinks' },
 items = {
     { name = 'bread', category = 'Food', ... },     -- ✅ Matches
@@ -117,46 +105,40 @@ items = {
 **Solutions:**
 
 1. **Check Image Directory Path:**
-
-```C#
+```lua
 -- Common paths - use the one that matches your inventory
 Config.InventoryImageDir = 'nui://ox_inventory/web/images'
 Config.InventoryImageDir = 'nui://qb-inventory/html/images'
-Config.InventoryImageDir = 'nui://qs-inventory/html/images'
 ```
 
 2. **Verify Image Files Exist:** Make sure image files are in the correct folder:
-
 ```
 ox_inventory/web/images/bread.png  ✅
 ox_inventory/web/images/bread.jpg  ❌ Wrong format
 ```
 
 3. **Check Image Names:** Ensure exact filename match:
-
-```C#
+```lua
 { name = 'bread', image = 'bread.png' }     -- ✅ File exists
 { name = 'bread', image = 'Bread.png' }     -- ❌ Wrong case
 ```
 
 ## Purchase Errors
 
-### "You do not have enough money\!" Error
+### "You do not have enough money!" Error
 
 **Problem:** Purchase fails even with enough money.
 
 **Solutions:**
 
 1. **Check Money Type (QBCore):** Make sure using correct money type:
-
-```C#
+```lua
 -- In framework/qbcore.lua, check this line:
 if Player.PlayerData.money['cash'] < totalCost then  -- Should be 'cash' or 'bank'
 ```
 
 2. **Check Money Function (ESX):** Verify money checking:
-
-```C#
+```lua
 -- Should use getMoney() for cash or getBank() for bank
 if xPlayer.getMoney() < totalCost then
 ```
@@ -168,27 +150,24 @@ if xPlayer.getMoney() < totalCost then
 **Solutions:**
 
 1. **Check Item Database:** Verify items exist in your `items` table:
-
 ```sql
 SELECT * FROM items WHERE name = 'bread';
 ```
 
 2. **Match Exact Names:** Item names must match database exactly:
-
-```C#
+```lua
 -- Database has 'WEAPON_PISTOL'
 { name = 'WEAPON_PISTOL', ... }  -- ✅ Correct
 { name = 'weapon_pistol', ... }  -- ❌ Wrong case
 ```
 
-### "Not enough inventory space\!" Error
+### "Not enough inventory space!" Error
 
 **Problem:** Purchase fails due to inventory limits.
 
 **Solutions:**
 
 1. **Check Item Limits (ESX):** Verify item weight/limits in database:
-
 ```sql
 UPDATE items SET weight = 1, limit = 10 WHERE name = 'bread';
 ```
@@ -204,21 +183,18 @@ UPDATE items SET weight = 1, limit = 10 WHERE name = 'bread';
 **Solutions:**
 
 1. **Check License Item Name:**
-
-```C#
+```lua
 -- Make sure license item exists in database
 { name = 'WEAPON_PISTOL', license = 'weaponlicense' }
 ```
 
 2. **Verify Player Has License:** Check player inventory for license item:
-
-```C#
+```lua
 -- Player must have 'weaponlicense' item in inventory
 ```
 
 3. **Case Sensitivity:** License names are case-sensitive:
-
-```C#
+```lua
 license = 'weaponlicense'  -- ✅ Correct
 license = 'WeaponLicense'  -- ❌ Wrong case
 ```
@@ -232,8 +208,7 @@ license = 'WeaponLicense'  -- ❌ Wrong case
 **Solutions:**
 
 1. **Check Blip Configuration:**
-
-```C#
+```lua
 blip = {
     name = "Shop Name",
     id = 59,        -- Valid blip sprite ID
@@ -243,9 +218,9 @@ blip = {
 ```
 
 2. **Verify Blip IDs:** Use valid blip sprite IDs (1-826).
-3. **Check Locations:** Blips only show if locations are defined:
 
-```C#
+3. **Check Locations:** Blips only show if locations are defined:
+```lua
 locations = {
     vec3(373.8, 325.8, 102.9), -- At least one location required
 }
@@ -258,8 +233,7 @@ locations = {
 **Problem:** Shop configuration missing items array.
 
 **Solution:**
-
-```C#
+```lua
 {
     shopType = 'myshop',
     title = 'My Shop',
@@ -273,8 +247,7 @@ locations = {
 **Problem:** Items or categories not configured as arrays.
 
 **Solution:**
-
-```C#
+```lua
 -- ✅ Correct - arrays with {}
 categories = { 'All', 'Food' },
 items = { { name = 'bread', ... } },
@@ -292,15 +265,19 @@ When encountering errors:
   <Step title="Check Console">
     Look at F8 console for specific error messages
   </Step>
+  
   <Step title="Verify Framework">
     Make sure ESX/QBCore is running and configured correctly
   </Step>
+  
   <Step title="Test Basic Shop">
     Try with a simple shop configuration first
   </Step>
+  
   <Step title="Check Item Database">
     Verify all item names exist in your server's item database
   </Step>
+  
   <Step title="Test Purchase">
     Try buying a basic item like bread or water
   </Step>
@@ -310,7 +287,7 @@ When encountering errors:
 
 Add this temporary shop to test basic functionality:
 
-```C#
+```lua
 {
     shopType = 'debug_shop',
     title = 'Debug Shop',
@@ -328,11 +305,11 @@ Add this temporary shop to test basic functionality:
 ```
 
 <Warning>
-  Always check your server console (F8) for specific error messages. They usually point directly to the problem\!
+Always check your server console (F8) for specific error messages. They usually point directly to the problem!
 </Warning>
 
 <Info>
-  Most errors are caused by incorrect item names or framework configuration. Double-check these first before looking elsewhere.
+Most errors are caused by incorrect item names or framework configuration. Double-check these first before looking elsewhere.
 </Info>
 
 ## Getting Help
@@ -345,5 +322,5 @@ If you're still having issues:
 4. **Join Discord:** Get help at [discord.gg/lofidev](https://discord.gg/lofidev)
 
 <Warning>
-  When asking for help, always include the exact error message from your console and your framework type (ESX/QBCore).
+When asking for help, always include the exact error message from your console and your framework type (ESX/QBCore).
 </Warning>
