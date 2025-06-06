@@ -20,12 +20,12 @@ This guide covers all available export functions and how to use them in your scr
 Get a player's Discord profile picture URL.
 
 ### Syntax
-```C#
+```lua
 exports.Lofi_DiscordAPI:GetDiscordAvatar(playerId)
 ```
 
 ### Example
-```C#
+```lua
 local playerId = 1
 local avatarUrl = exports.Lofi_DiscordAPI:GetDiscordAvatar(playerId)
 
@@ -41,12 +41,12 @@ end
 Get all Discord role IDs that a player has.
 
 ### Syntax
-```C#
+```lua
 exports.Lofi_DiscordAPI:GetDiscordRoles(playerId)
 ```
 
 ### Example
-```C#
+```lua
 local playerId = 1
 local roles = exports.Lofi_DiscordAPI:GetDiscordRoles(playerId)
 
@@ -61,12 +61,12 @@ end
 Get a player's Discord username with discriminator.
 
 ### Syntax
-```C#
+```lua
 exports.Lofi_DiscordAPI:GetDiscordUsername(playerId)
 ```
 
 ### Example
-```C#
+```lua
 local playerId = 1
 local discordName = exports.Lofi_DiscordAPI:GetDiscordUsername(playerId)
 
@@ -82,12 +82,12 @@ end
 Check if a player has a specific Discord role.
 
 ### Syntax
-```C#
+```lua
 exports.Lofi_DiscordAPI:HasDiscordRole(playerId, roleId)
 ```
 
 ### Example
-```C#
+```lua
 local playerId = 1
 local vipRoleId = "123456789012345678"
 
@@ -101,7 +101,7 @@ end
 ## Practical Examples
 
 ### Admin Command System
-```C#
+```lua
 local adminRoleId = "123456789012345678"
 
 RegisterCommand('ban', function(source, args, rawCommand)
@@ -115,7 +115,7 @@ end, false)
 ```
 
 ### VIP Vehicle Access
-```C#
+```lua
 local vipRoleId = "987654321098765432"
 
 RegisterNetEvent('vehicle:spawn')
@@ -135,7 +135,7 @@ end)
 ```
 
 ### Chat Integration
-```C#
+```lua
 RegisterNetEvent('chat:server:SendMessage')
 AddEventHandler('chat:server:SendMessage', function(message)
     local src = source
@@ -161,7 +161,7 @@ Discord data takes 3-5 seconds to load after a player connects. Add delays when 
 </Warning>
 
 ### Wait for Data to Load
-```C#
+```lua
 AddEventHandler('playerJoining', function()
     local src = source
     
@@ -184,7 +184,7 @@ ensure your_other_script
 ```
 
 ### Always Check for nil
-```C#
+```lua
 -- Always check if data exists
 local avatar = exports.Lofi_DiscordAPI:GetDiscordAvatar(playerId)
 if avatar then

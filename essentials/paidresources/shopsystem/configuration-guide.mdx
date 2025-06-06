@@ -1,255 +1,291 @@
 ---
-title: "Configuration Guide"
-description: "Complete configuration documentation for Lofi_DiscordAPI script. Set up Discord bot integration, role checking, and server access controls."
-icon: "gear"
+title: 'Configuration'
+description: 'Complete configuration guide for Advanced Shop System. Learn how to customize shops, items, categories, locations, and framework settings.'
+icon: 'gear'
 ---
 
-This guide covers all configuration options for the Lofi_DiscordAPI script. If you need help with anything not covered here, reach out to us via [Discord](https://discord.gg/lofidev)\!
+This guide covers all configuration options available in the Advanced Shop System. Customize shops, items, categories, and more to fit your server's needs.
 
-## Discord Bot Setup
+## Basic Settings
 
-Before configuring the script, you need to create a Discord bot and get your server's Guild ID.
+### Framework Configuration
 
-<Steps>
-  <Step title="Create Discord Application">
-    1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
-    2. Click "New Application"
-    3. Give your bot a name and click "Create"
-  </Step>
-  <Step title="Create Bot User">
-    1. Go to the "Bot" section in the left sidebar
-    2. Click "Add Bot"
-    3. Under "Token", click "Copy" to get your bot token
+Set your server's framework in `config.lua`:
 
-    <Warning>
-      Keep your bot token secret\! Never share it publicly or commit it to version control.
-    </Warning>
-  </Step>
-  <Step title="Set Bot Permissions">
-    Your bot needs these permissions in your Discord server:
+```lua
+-- Choose your framework
+Config.Framework = 'esx'     -- For ESX servers
+Config.Framework = 'qbcore'  -- For QBCore servers
+```
 
-    - View Channels
-    - View Server Members
-    - Read Message History
+### Inventory Images
 
-    <Info>
-      Administrator permission works too, but it's not recommended for security reasons.
-    </Info>
-  </Step>
-  <Step title="Invite Bot to Server">
-    1. Go to "OAuth2" → "URL Generator"
-    2. Select "bot" scope
-    3. Select the required permissions
-    4. Copy the generated URL and open it in your browser
-    5. Select your Discord server and authorize the bot
-  </Step>
-</Steps>
+Configure the path to your inventory item images:
 
-## Getting Your Guild ID
+```lua
+-- Common inventory systems
+Config.InventoryImageDir = 'nui://ox_inventory/web/images'        -- ox_inventory
+Config.InventoryImageDir = 'nui://qb-inventory/html/images'       -- qb-inventory  
+Config.InventoryImageDir = 'nui://your_inventory/images'          -- Custom inventory
+```
 
-<Steps>
-  <Step title="Enable Developer Mode">
-    In Discord, go to User Settings → Advanced → Enable "Developer Mode"
-  </Step>
-  <Step title="Copy Server ID">
-    Right-click on your Discord server icon and select "Copy Server ID"
-  </Step>
-</Steps>
+## Shop Configuration
 
-## Basic Configuration
+Each shop in `Config.Shops` has these properties:
 
-Open your `config.lua` file and configure these essential settings:
+### Basic Shop Properties
 
-### Discord API Settings
-
-```C#
-Config = {
-    bot_token = "PUT_BOT_TOKEN_HERE", -- Your Discord bot token
-    guild_id = "PUT_GUILD_ID_HERE", -- Your Discord server (guild) ID
+```lua
+{
+    shopType = 'unique_shop_id',        -- Unique identifier for the shop
+    title = 'Shop Name',                -- Display name in UI
+    subtitle = 'SHOP CATEGORY',         -- Subtitle text in UI
+    description = 'Shop description',   -- Description text in UI
+    categories = { 'All', 'Category1', 'Category2' }, -- Item categories
+    items = { ... },                    -- Shop items (see below)
+    blip = { ... },                     -- Map blip settings (see below)
+    locations = { ... }                 -- Shop coordinates (see below)
 }
 ```
 
-<Steps>
-  <Step title="Add Bot Token">
-    Replace `"PUT_BOT_TOKEN_HERE"` with your actual bot token:
+### Shop Items
 
-    ```C#
-    bot_token = "MTIzNDU2Nzg5MDEyMzQ1Njc4.GhIjKl.MnOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWx",
-    ```
-  </Step>
-  <Step title="Add Guild ID">
-    Replace `"PUT_GUILD_ID_HERE"` with your Discord server ID:
+Each item in the `items` array has these properties:
 
-    ```C#
-    guild_id = "123456789012345678",
-    ```
-  </Step>
-</Steps>
-
-## Advanced Configuration Options
-
-### Debug Settings
-
-```C#
-debug = true, -- Set to false to disable debug messages in the console
-```
-
-**When to use:**
-
-- `true` - During setup and troubleshooting
-- `false` - For production servers (reduces console spam)
-
-### API Timeout
-
-```C#
-timeout = 5, -- Timeout in seconds for Discord API requests
-```
-
-**Recommended values:**
-
-- `3-5` seconds for most servers
-- `10+` seconds if you have connection issues
-- Lower values = faster responses but more timeouts
-
-### Access Control
-
-```C#
-kick_not_in_discord = true, -- Set to true to kick players not in the Discord server
-kick_message = "You must be in our Discord server to play!" -- Message sent to kicked players
-```
-
-**Options:**
-
-- `true` - Kicks players who aren't in your Discord server
-- `false` - Allows anyone to join (Discord data won't be available for non-members)
-
-### Custom Kick Messages
-
-```C#
-kick_message = "Join our Discord: discord.gg/yourserver before playing!"
-```
-
-## Complete Configuration Example
-
-```C#:config.lua
--- Fully server-sided, modders cannot dump it.
-Config = {
-    -- Required: Your Discord bot token from Discord Developer Portal
-    bot_token = "MTIzNDU2Nzg5MDEyMzQ1Njc4.GhIjKl.MnOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWx",
-    
-    -- Required: Your Discord server (guild) ID
-    guild_id = "123456789012345678",
-    
-    -- Optional: Enable debug messages (recommended during setup)
-    debug = true,
-    
-    -- Optional: API request timeout in seconds
-    timeout = 5,
-    
-    -- Optional: Kick players not in Discord server
-    kick_not_in_discord = true,
-    
-    -- Optional: Custom kick message
-    kick_message = "You must join our Discord server to play! discord.gg/yourserver"
+```lua
+{
+    name = 'item_name',           -- Item name (must match server database)
+    displayName = 'Display Name', -- Name shown in UI
+    category = 'Category',        -- Item category (must match categories list)
+    price = 100,                  -- Item price
+    image = 'item_image.png',     -- Image filename
+    license = 'license_name'      -- Optional: required license to purchase
 }
 ```
 
-## Configuration for Different Server Types
+#### Item Examples
 
-### Public Server (Anyone Can Join)
+```lua
+-- Basic item (no license required)
+{ name = 'bread', displayName = 'Bread', category = 'Food', price = 5, image = 'bread.png' }
 
-```C#
-Config = {
-    bot_token = "YOUR_BOT_TOKEN",
-    guild_id = "YOUR_GUILD_ID",
-    debug = false,
-    timeout = 5,
-    kick_not_in_discord = false, -- Allow non-Discord members
-    kick_message = "Consider joining our Discord for the full experience!"
-}
+-- Licensed item (requires license)
+{ name = 'WEAPON_PISTOL', displayName = 'Pistol', category = 'Handguns', price = 12500, image = 'WEAPON_PISTOL.png', license = 'weaponlicense' }
+
+-- Expensive item
+{ name = 'diamond_ring', displayName = 'Diamond Ring', category = 'Jewelry', price = 50000, image = 'diamond_ring.png' }
 ```
 
-### Private/Whitelist Server
+### Categories
 
-```C#
-Config = {
-    bot_token = "YOUR_BOT_TOKEN",
-    guild_id = "YOUR_GUILD_ID",
-    debug = false,
-    timeout = 3,
-    kick_not_in_discord = true, -- Only Discord members allowed
-    kick_message = "This server requires Discord membership. Join: discord.gg/yourserver"
-}
+Categories help organize items in the shop UI:
+
+```lua
+categories = { 'All', 'Food', 'Drinks', 'Tools' }
 ```
-
-### Development/Testing Server
-
-```c#
-Config = {
-    bot_token = "YOUR_BOT_TOKEN",
-    guild_id = "YOUR_GUILD_ID",
-    debug = true, -- Enable detailed logging
-    timeout = 10, -- Higher timeout for testing
-    kick_not_in_discord = false, -- Allow testing without Discord
-    kick_message = "Development server - Discord integration testing"
-}
-```
-
-## Troubleshooting Configuration
-
-### Common Issues
-
-| Issue                              | Solution                                                              |
-| ---------------------------------- | --------------------------------------------------------------------- |
-| "MISSING BOT TOKEN" error          | Make sure you've replaced `PUT_BOT_TOKEN_HERE` with your actual token |
-| "MISSING GUILD ID" error           | Make sure you've replaced `PUT_GUILD_ID_HERE` with your server ID     |
-| Players getting kicked immediately | Check if your bot is in the Discord server and has proper permissions |
-| No Discord data loading            | Verify bot permissions include "View Server Members"                  |
-
-### Testing Your Configuration
-
-<Steps>
-  <Step title="Start Server">
-    Start your FiveM server and check the console for initialization messages.
-  </Step>
-  <Step title="Check Console Output">
-    Look for these messages:
-
-    ```
-    [Lofi_DiscordAPI] [SYSTEM]: API initialized successfully
-    [Lofi_DiscordAPI] [SYSTEM]: Guild ID: 123456789012345678
-    ```
-  </Step>
-  <Step title="Test Player Connection">
-    Have a Discord server member join and check console for:
-
-    ```
-    [Lofi_DiscordAPI] [INFO]: Player PlayerName (ID: 1) connected | Discord: username#1234 | Roles: 3 | Avatar: Loaded
-    ```
-  </Step>
-</Steps>
-
-## Security Best Practices
-
-<Warning>
-  **Never share your bot token publicly\!** Anyone with your token can control your bot.
-</Warning>
-
-- Store bot tokens securely
-- Use environment variables for production
-- Regularly rotate bot tokens
-- Monitor bot activity in Discord
-- Use minimal required permissions
-
-## Need Help?
-
-If you're having configuration issues:
-
-- Check the [Common Issues](/essentials/lofi-discord-api/common-issues) guide
-- Join our [Discord community](https://discord.gg/lofidev) for live support
-- Verify your bot permissions in Discord
-- Enable debug mode for detailed error messages
 
 <Info>
-  Remember to restart your server after making configuration changes\!
+Always include 'All' as the first category - it shows all items regardless of their individual category.
+</Info>
+
+### Map Blips
+
+Configure how shops appear on the map:
+
+```lua
+blip = {
+    name = "Shop Name",    -- Blip label
+    id = 59,              -- Blip sprite ID
+    colour = 83,          -- Blip color
+    scale = 0.65          -- Blip size
+}
+```
+
+#### Common Blip IDs
+
+| Shop Type | Blip ID | Description |
+|-----------|---------|-------------|
+| General Store | 59 | Shopping bag |
+| Ammunation | 110 | Gun |
+| Clothing | 73 | T-shirt |
+| Car Dealer | 326 | Car |
+| Mechanic | 446 | Wrench |
+| Hospital | 61 | Cross |
+
+#### Common Blip Colors
+
+| Color ID | Color Name |
+|----------|------------|
+| 2 | Green |
+| 3 | Blue |
+| 5 | Yellow |
+| 6 | Red |
+| 83 | Light Blue |
+
+### Shop Locations
+
+Add multiple locations for each shop:
+
+```lua
+locations = {
+    vec3(373.8, 325.8, 102.9),      -- Location 1
+    vec3(25.8, -1347.9, 29.9),      -- Location 2
+    vec3(-48.5, -1757.5, 29.4)      -- Location 3
+}
+```
+
+## Example Shop Configurations
+
+### Electronics Store
+
+```lua
+{
+    shopType = 'electronics',
+    title = 'Electronics Store',
+    subtitle = 'TECH',
+    description = 'Latest gadgets and electronics for your daily needs',
+    categories = { 'All', 'Phones', 'Computers', 'Accessories' },
+    items = {
+        { name = 'phone', displayName = 'Smartphone', category = 'Phones', price = 800, image = 'phone.png' },
+        { name = 'laptop', displayName = 'Laptop', category = 'Computers', price = 1500, image = 'laptop.png' },
+        { name = 'headphones', displayName = 'Headphones', category = 'Accessories', price = 200, image = 'headphones.png' },
+        { name = 'charger', displayName = 'Phone Charger', category = 'Accessories', price = 25, image = 'charger.png' }
+    },
+    blip = { name = "Electronics", id = 521, colour = 5, scale = 0.7 },
+    locations = {
+        vec3(-656.9, -857.9, 24.5),
+        vec3(-1820.5, 792.5, 138.1)
+    }
+}
+```
+
+### Medical Supplies
+
+```lua
+{
+    shopType = 'medical',
+    title = 'Medical Supplies',
+    subtitle = 'HEALTH',
+    description = 'Essential medical supplies and first aid equipment',
+    categories = { 'All', 'First Aid', 'Medicine', 'Equipment' },
+    items = {
+        { name = 'bandage', displayName = 'Bandage', category = 'First Aid', price = 15, image = 'bandage.png' },
+        { name = 'medkit', displayName = 'Medical Kit', category = 'First Aid', price = 150, image = 'medkit.png' },
+        { name = 'painkillers', displayName = 'Painkillers', category = 'Medicine', price = 50, image = 'painkillers.png' },
+        { name = 'thermometer', displayName = 'Thermometer', category = 'Equipment', price = 75, image = 'thermometer.png' }
+    },
+    blip = { name = "Medical Supplies", id = 61, colour = 2, scale = 0.8 },
+    locations = {
+        vec3(90.5, -229.1, 54.7),
+        vec3(-1636.9, -1014.4, 13.1)
+    }
+}
+```
+
+### Hardware Store
+
+```lua
+{
+    shopType = 'hardware',
+    title = 'Hardware Store',
+    subtitle = 'TOOLS & SUPPLIES',
+    description = 'Everything you need for construction and repairs',
+    categories = { 'All', 'Tools', 'Materials', 'Safety' },
+    items = {
+        { name = 'hammer', displayName = 'Hammer', category = 'Tools', price = 45, image = 'hammer.png' },
+        { name = 'screwdriver', displayName = 'Screwdriver', category = 'Tools', price = 25, image = 'screwdriver.png' },
+        { name = 'wood_plank', displayName = 'Wood Plank', category = 'Materials', price = 10, image = 'wood_plank.png' },
+        { name = 'safety_helmet', displayName = 'Safety Helmet', category = 'Safety', price = 85, image = 'safety_helmet.png' }
+    },
+    blip = { name = "Hardware Store", id = 446, colour = 6, scale = 0.7 },
+    locations = {
+        vec3(2747.2, 3472.9, 55.7),
+        vec3(-329.8, 6150.1, 32.3)
+    }
+}
+```
+
+## License System
+
+Some items can require licenses to purchase:
+
+### Setting Up Licensed Items
+
+```lua
+-- Item with license requirement
+{ 
+    name = 'WEAPON_PISTOL', 
+    displayName = 'Pistol', 
+    category = 'Handguns', 
+    price = 12500, 
+    image = 'WEAPON_PISTOL.png', 
+    license = 'weaponlicense'  -- Player must have this item in inventory
+}
+```
+
+### Common License Items
+
+| License Item | Used For |
+|--------------|----------|
+| `weaponlicense` | Weapons and ammo |
+| `driverlicense` | Vehicle purchases |
+| `huntinglicense` | Hunting equipment |
+| `fishinglicense` | Fishing equipment |
+
+## Advanced Configuration
+
+### Multiple Shop Types
+
+You can have multiple shops of the same type with different items:
+
+```lua
+-- Downtown 24/7
+{
+    shopType = '247_downtown',
+    title = '24/7 Downtown',
+    -- ... premium items, higher prices
+},
+
+-- Suburban 24/7  
+{
+    shopType = '247_suburban',
+    title = '24/7 Suburban', 
+    -- ... basic items, lower prices
+}
+```
+
+### Seasonal Items
+
+Create shops with seasonal or special items:
+
+```lua
+{
+    shopType = 'holiday_shop',
+    title = 'Holiday Store',
+    subtitle = 'SEASONAL',
+    description = 'Special holiday items and decorations',
+    categories = { 'All', 'Decorations', 'Gifts', 'Food' },
+    items = {
+        { name = 'christmas_tree', displayName = 'Christmas Tree', category = 'Decorations', price = 500, image = 'christmas_tree.png' },
+        { name = 'gift_box', displayName = 'Gift Box', category = 'Gifts', price = 25, image = 'gift_box.png' }
+    },
+    blip = { name = "Holiday Store", id = 280, colour = 2, scale = 0.8 },
+    locations = {
+        vec3(-1487.5, -379.1, 40.2)
+    }
+}
+```
+
+## Configuration Tips
+
+<Warning>
+**Item Names:** Make sure item names in your config exactly match your server's item database, including capitalization.
+</Warning>
+
+<Info>
+**Image Files:** Place item images in your inventory's image directory. Most inventories use `.png` format.
+</Info>
+
+<Info>
+After making configuration changes, restart your server for changes to take effect.
 </Info>
