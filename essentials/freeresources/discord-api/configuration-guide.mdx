@@ -1,6 +1,6 @@
 ---
 title: 'Configuration Guide'
-description: 'Complete configuration documentation for Lofi_DiscordAPI script. Set up Discord bot integration, role checking, and server access controls.'
+description: 'Complete configuration documentation for Lofi_DiscordAPI script. Set up Discord bot integration, role checking, and player data access.'
 icon: 'gear'
 ---
 
@@ -62,133 +62,111 @@ Open your `config.lua` file and configure these essential settings:
 ### Discord API Settings
 
 ```lua
-Config = {
-    bot_token = "PUT_BOT_TOKEN_HERE", -- Your Discord bot token
-    guild_id = "PUT_GUILD_ID_HERE", -- Your Discord server (guild) ID
-}
+Config = {}
+
+Config.BotToken = "YOUR_BOT_TOKEN_HERE"
+Config.GuildId = "YOUR_GUILD_ID_HERE"
+
+Config.VersionCheck = true
 ```
 
 <Steps>
   <Step title="Add Bot Token">
-    Replace `"PUT_BOT_TOKEN_HERE"` with your actual bot token:
+    Replace `"YOUR_BOT_TOKEN_HERE"` with your actual bot token:
     
     ```lua
-    bot_token = "MTIzNDU2Nzg5MDEyMzQ1Njc4.GhIjKl.MnOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWx",
+    Config.BotToken = "MTIzNDU2Nzg5MDEyMzQ1Njc4.GhIjKl.MnOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWx"
     ```
   </Step>
   <Step title="Add Guild ID">
-    Replace `"PUT_GUILD_ID_HERE"` with your Discord server ID:
+    Replace `"YOUR_GUILD_ID_HERE"` with your Discord server ID:
     
     ```lua
-    guild_id = "123456789012345678",
+    Config.GuildId = "123456789012345678"
     ```
   </Step>
 </Steps>
 
-## Advanced Configuration Options
+## Configuration Options
 
-### Debug Settings
+### Version Check
 
 ```lua
-debug = true, -- Set to false to disable debug messages in the console
+Config.VersionCheck = true -- Set to false to disable version checking
 ```
 
 **When to use:**
-- `true` - During setup and troubleshooting
-- `false` - For production servers (reduces console spam)
-
-### API Timeout
-
-```lua
-timeout = 5, -- Timeout in seconds for Discord API requests
-```
-
-**Recommended values:**
-- `3-5` seconds for most servers
-- `10+` seconds if you have connection issues
-- Lower values = faster responses but more timeouts
-
-### Access Control
-
-```lua
-kick_not_in_discord = true, -- Set to true to kick players not in the Discord server
-kick_message = "You must be in our Discord server to play!" -- Message sent to kicked players
-```
-
-**Options:**
-- `true` - Kicks players who aren't in your Discord server
-- `false` - Allows anyone to join (Discord data won't be available for non-members)
-
-### Custom Kick Messages
-
-```lua
-kick_message = "Join our Discord: discord.gg/yourserver before playing!"
-```
+- `true` - Automatically checks for script updates on server start
+- `false` - Disables update notifications
 
 ## Complete Configuration Example
 
 ```lua:config.lua
--- Fully server-sided, modders cannot dump it.
-Config = {
-    -- Required: Your Discord bot token from Discord Developer Portal
-    bot_token = "MTIzNDU2Nzg5MDEyMzQ1Njc4.GhIjKl.MnOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWx",
-    
-    -- Required: Your Discord server (guild) ID
-    guild_id = "123456789012345678",
-    
-    -- Optional: Enable debug messages (recommended during setup)
-    debug = true,
-    
-    -- Optional: API request timeout in seconds
-    timeout = 5,
-    
-    -- Optional: Kick players not in Discord server
-    kick_not_in_discord = true,
-    
-    -- Optional: Custom kick message
-    kick_message = "You must join our Discord server to play! discord.gg/yourserver"
-}
+Config = {}
+
+-- Required: Your Discord bot token from Discord Developer Portal
+Config.BotToken = "MTIzNDU2Nzg5MDEyMzQ1Njc4.GhIjKl.MnOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWx"
+
+-- Required: Your Discord server (guild) ID
+Config.GuildId = "123456789012345678"
+
+-- Optional: Enable automatic version checking
+Config.VersionCheck = true
 ```
 
-## Configuration for Different Server Types
+## Testing Your Configuration
 
-### Public Server (Anyone Can Join)
+<Steps>
+  <Step title="Start Server">
+    Start your FiveM server and check the console for initialization messages.
+  </Step>
+  <Step title="Check Version Status">
+    Look for these messages:
+    ```
+    [Lofi_DiscordAPI] Version 1.0.0 - You're running the latest version!
+    ```
+    Or if outdated:
+    ```
+    [Lofi_DiscordAPI] Version 1.0.0 - Update available! Latest: 1.0.1
+    ```
+  </Step>
+  <Step title="Test Player Connection">
+    Have a Discord server member join and check console for:
+    ```
+    [Lofi_DiscordAPI] PlayerName joined (username#1234 | 3 roles)
+    ```
+  </Step>
+</Steps>
 
-```lua
-Config = {
-    bot_token = "YOUR_BOT_TOKEN",
-    guild_id = "YOUR_GUILD_ID",
-    debug = false,
-    timeout = 5,
-    kick_not_in_discord = false, -- Allow non-Discord members
-    kick_message = "Consider joining our Discord for the full experience!"
-}
-```
+## Available Exports
 
-### Private/Whitelist Server
-
-```lua
-Config = {
-    bot_token = "YOUR_BOT_TOKEN",
-    guild_id = "YOUR_GUILD_ID",
-    debug = false,
-    timeout = 3,
-    kick_not_in_discord = true, -- Only Discord members allowed
-    kick_message = "This server requires Discord membership. Join: discord.gg/yourserver"
-}
-```
-
-### Development/Testing Server
+Once configured, you can use these exports in your scripts:
 
 ```lua
-Config = {
-    bot_token = "YOUR_BOT_TOKEN",
-    guild_id = "YOUR_GUILD_ID",
-    debug = true, -- Enable detailed logging
-    timeout = 10, -- Higher timeout for testing
-    kick_not_in_discord = false, -- Allow testing without Discord
-    kick_message = "Development server - Discord integration testing"
-}
+-- Get player's Discord avatar URL
+exports.Lofi_DiscordAPI:getAvatar(source)
+
+-- Get player's Discord username
+exports.Lofi_DiscordAPI:getUsername(source)
+
+-- Check if player has specific role
+exports.Lofi_DiscordAPI:hasRole(source, "roleId")
+
+-- Check multiple roles
+exports.Lofi_DiscordAPI:hasRole(source, {"roleId1", "roleId2"}, false) -- has any
+exports.Lofi_DiscordAPI:hasRole(source, {"roleId1", "roleId2"}, true)  -- has all
+
+-- Get Discord server member count
+exports.Lofi_DiscordAPI:getGuildMemberCount()
+
+-- Get online Discord members in-game count
+exports.Lofi_DiscordAPI:getOnlineDiscordMembers()
+
+-- Get player's role list
+exports.Lofi_DiscordAPI:getUserRoles(source)
+
+-- Get player's role count
+exports.Lofi_DiscordAPI:getRoleCount(source)
 ```
 
 ## Troubleshooting Configuration
@@ -197,31 +175,22 @@ Config = {
 
 | Issue | Solution |
 |-------|----------|
-| "MISSING BOT TOKEN" error | Make sure you've replaced `PUT_BOT_TOKEN_HERE` with your actual token |
-| "MISSING GUILD ID" error | Make sure you've replaced `PUT_GUILD_ID_HERE` with your server ID |
-| Players getting kicked immediately | Check if your bot is in the Discord server and has proper permissions |
-| No Discord data loading | Verify bot permissions include "View Server Members" |
+| "Invalid Bot Token or Guild ID" error | Double-check your bot token and guild ID are correct |
+| No Discord data loading | Verify bot is in your Discord server with proper permissions |
+| Player shows "Discord not linked" | Player needs to link Discord account to FiveM |
+| Version check not working | Ensure GitHub repository URL is accessible |
 
-### Testing Your Configuration
+### API Error Messages
 
-<Steps>
-  <Step title="Start Server">
-    Start your FiveM server and check the console for initialization messages.
-  </Step>
-  <Step title="Check Console Output">
-    Look for these messages:
-    ```
-    [Lofi_DiscordAPI] [SYSTEM]: API initialized successfully
-    [Lofi_DiscordAPI] [SYSTEM]: Guild ID: 123456789012345678
-    ```
-  </Step>
-  <Step title="Test Player Connection">
-    Have a Discord server member join and check console for:
-    ```
-    [Lofi_DiscordAPI] [INFO]: Player PlayerName (ID: 1) connected | Discord: username#1234 | Roles: 3 | Avatar: Loaded
-    ```
-  </Step>
-</Steps>
+If you see this error:
+```
+[Lofi_DiscordAPI] Invalid Bot Token or Guild ID in config.lua - Get help at discord.gg/lofidev
+```
+
+This means either:
+- Your bot token is incorrect or expired
+- Your guild ID is wrong
+- The bot isn't in your Discord server
 
 ## Security Best Practices
 
@@ -230,19 +199,26 @@ Config = {
 </Warning>
 
 - Store bot tokens securely
-- Use environment variables for production
+- Never commit tokens to version control
 - Regularly rotate bot tokens
 - Monitor bot activity in Discord
 - Use minimal required permissions
 
+## Performance Features
+
+The script includes built-in optimizations:
+- **5-minute cache system** - Reduces API calls
+- **Server-side only** - No client exposure
+- **Efficient data storage** - Minimal memory usage
+- **Smart request handling** - Prevents API spam
+
 ## Need Help?
 
 If you're having configuration issues:
-
-- Check the [Common Issues](/essentials/lofi-discord-api/common-issues) guide
+- Check the console for error messages
+- Verify your bot has proper permissions
+- Ensure players have Discord linked to FiveM
 - Join our [Discord community](https://discord.gg/lofidev) for live support
-- Verify your bot permissions in Discord
-- Enable debug mode for detailed error messages
 
 <Info>
 Remember to restart your server after making configuration changes!
