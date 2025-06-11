@@ -10,24 +10,27 @@ This guide covers all available export functions and how to use them in your scr
 
 | Function | Description | Returns |
 |----------|-------------|---------|
-| `GetDiscordAvatar` | Get player's Discord avatar URL | string/nil |
-| `GetDiscordRoles` | Get player's Discord role IDs | table |
-| `GetDiscordUsername` | Get player's Discord username#discriminator | string/nil |
-| `HasDiscordRole` | Check if player has specific role | boolean |
+| `getAvatar` | Get player's Discord avatar URL | string/nil |
+| `getUsername` | Get player's Discord username | string/nil |
+| `hasRole` | Check if player has specific role(s) | boolean |
+| `getUserRoles` | Get player's Discord role IDs | table |
+| `getRoleCount` | Get number of roles player has | number |
+| `getGuildMemberCount` | Get total Discord server members | number |
+| `getOnlineDiscordMembers` | Get Discord members currently in-game | number |
 
-## GetDiscordAvatar
+## getAvatar
 
 Get a player's Discord profile picture URL.
 
 ### Syntax
 ```lua
-exports.Lofi_DiscordAPI:GetDiscordAvatar(playerId)
+exports.Lofi_DiscordAPI:getAvatar(playerId)
 ```
 
 ### Example
 ```lua
 local playerId = 1
-local avatarUrl = exports.Lofi_DiscordAPI:GetDiscordAvatar(playerId)
+local avatarUrl = exports.Lofi_DiscordAPI:getAvatar(playerId)
 
 if avatarUrl then
     print("Player's avatar: " .. avatarUrl)
@@ -36,39 +39,19 @@ else
 end
 ```
 
-## GetDiscordRoles
+## getUsername
 
-Get all Discord role IDs that a player has.
+Get a player's Discord username.
 
 ### Syntax
 ```lua
-exports.Lofi_DiscordAPI:GetDiscordRoles(playerId)
+exports.Lofi_DiscordAPI:getUsername(playerId)
 ```
 
 ### Example
 ```lua
 local playerId = 1
-local roles = exports.Lofi_DiscordAPI:GetDiscordRoles(playerId)
-
-print("Player has " .. #roles .. " Discord roles")
-for i, roleId in ipairs(roles) do
-    print("Role: " .. roleId)
-end
-```
-
-## GetDiscordUsername
-
-Get a player's Discord username with discriminator.
-
-### Syntax
-```lua
-exports.Lofi_DiscordAPI:GetDiscordUsername(playerId)
-```
-
-### Example
-```lua
-local playerId = 1
-local discordName = exports.Lofi_DiscordAPI:GetDiscordUsername(playerId)
+local discordName = exports.Lofi_DiscordAPI:getUsername(playerId)
 
 if discordName then
     print("Player's Discord: " .. discordName)
@@ -77,13 +60,14 @@ else
 end
 ```
 
-## HasDiscordRole
+## hasRole
 
 Check if a player has a specific Discord role.
 
 ### Syntax
 ```lua
-exports.Lofi_DiscordAPI:HasDiscordRole(playerId, roleId)
+exports.Lofi_DiscordAPI:hasRole(playerId, roleId)
+exports.Lofi_DiscordAPI:hasRole(playerId, roleIds, requireAll)
 ```
 
 ### Example
@@ -91,10 +75,41 @@ exports.Lofi_DiscordAPI:HasDiscordRole(playerId, roleId)
 local playerId = 1
 local vipRoleId = "123456789012345678"
 
-if exports.Lofi_DiscordAPI:HasDiscordRole(playerId, vipRoleId) then
+if exports.Lofi_DiscordAPI:hasRole(playerId, vipRoleId) then
     print("Player is VIP!")
 else
     print("Player is not VIP")
+end
+
+-- Check multiple roles (has any)
+if exports.Lofi_DiscordAPI:hasRole(playerId, {"roleId1", "roleId2"}, false) then
+    print("Player has at least one role")
+end
+
+-- Check multiple roles (has all)
+if exports.Lofi_DiscordAPI:hasRole(playerId, {"roleId1", "roleId2"}, true) then
+    print("Player has all required roles")
+end
+```
+
+## getUserRoles
+
+Get all Discord role IDs that a player has.
+
+### Syntax
+```lua
+exports.Lofi_DiscordAPI:getUserRoles(playerId)
+```
+
+### Example
+```lua
+local playerId = 1
+local roles = exports.Lofi_DiscordAPI:getUserRoles(playerId)
+
+print("Player has " .. #roles .. " Discord roles")
+
+for i, roleId in ipairs(roles) do
+    print("Role: " .. roleId)
 end
 ```
 
@@ -105,7 +120,7 @@ end
 local adminRoleId = "123456789012345678"
 
 RegisterCommand('ban', function(source, args, rawCommand)
-    if exports.Lofi_DiscordAPI:HasDiscordRole(source, adminRoleId) then
+    if exports.Lofi_DiscordAPI:hasRole(source, adminRoleId) then
         -- Execute ban command
         print("Admin command executed")
     else
@@ -123,7 +138,7 @@ AddEventHandler('vehicle:spawn', function(vehicleModel)
     local src = source
     
     if vehicleModel == "adder" then -- Expensive car
-        if not exports.Lofi_DiscordAPI:HasDiscordRole(src, vipRoleId) then
+        if not exports.Lofi_DiscordAPI:hasRole(src, vipRoleId) then
             -- Kick player from vehicle
             print("Player needs VIP for this vehicle")
             return
@@ -140,7 +155,7 @@ RegisterNetEvent('chat:server:SendMessage')
 AddEventHandler('chat:server:SendMessage', function(message)
     local src = source
     local playerName = GetPlayerName(src)
-    local discordName = exports.Lofi_DiscordAPI:GetDiscordUsername(src)
+    local discordName = exports.Lofi_DiscordAPI:getUsername(src)
     
     local displayName = playerName
     if discordName then
@@ -169,13 +184,14 @@ AddEventHandler('playerJoining', function()
     Citizen.CreateThread(function()
         Citizen.Wait(5000) -- Wait 5 seconds
         
-        local hasVIP = exports.Lofi_DiscordAPI:HasDiscordRole(src, vipRoleId)
+        local hasVIP = exports.Lofi_DiscordAPI:hasRole(src, vipRoleId)
         -- Now this will work correctly
     end)
 end)
 ```
 
 ### Script Load Order
+
 Make sure Lofi_DiscordAPI loads first in your server.cfg:
 
 ```cfg
@@ -186,7 +202,7 @@ ensure your_other_script
 ### Always Check for nil
 ```lua
 -- Always check if data exists
-local avatar = exports.Lofi_DiscordAPI:GetDiscordAvatar(playerId)
+local avatar = exports.Lofi_DiscordAPI:getAvatar(playerId)
 if avatar then
     -- Use avatar
 else
@@ -197,4 +213,3 @@ end
 <Info>
 All functions return nil/false if Discord data isn't loaded yet or if the player doesn't have Discord linked.
 </Info>
-```
