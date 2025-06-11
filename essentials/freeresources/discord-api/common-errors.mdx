@@ -8,7 +8,7 @@ This guide covers the most common issues you might encounter with Lofi_DiscordAP
 
 ## Bot Token Issues
 
-### "MISSING BOT TOKEN IN CONFIG.LUA!" Error
+### "Invalid Bot Token or Guild ID" Error
 
 This is the most common error when first setting up the script.
 
@@ -22,7 +22,7 @@ You haven't properly configured your Discord bot token in the config file.
     Open `config.lua` and look for this line:
     
     ```lua
-    bot_token = "PUT_BOT_TOKEN_HERE",
+    Config.BotToken = "YOUR_BOT_TOKEN_HERE"
     ```
   </Step>
   <Step title="Replace with Real Token">
@@ -30,10 +30,10 @@ You haven't properly configured your Discord bot token in the config file.
     
     ```lua
     -- ❌ Wrong - still has placeholder
-    bot_token = "PUT_BOT_TOKEN_HERE",
+    Config.BotToken = "YOUR_BOT_TOKEN_HERE"
     
     -- ✅ Correct - actual bot token
-    bot_token = "MTIzNDU2Nzg5MDEyMzQ1Njc4.GhIjKl.MnOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWx",
+    Config.BotToken = "MTIzNDU2Nzg5MDEyMzQ1Njc4.GhIjKl.MnOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWx"
     ```
   </Step>
   <Step title="Verify Token Format">
@@ -67,10 +67,10 @@ Your bot token is incorrect or has been regenerated.
 
 ## Guild ID Issues
 
-### "MISSING GUILD ID IN CONFIG.LUA!" Error
+### "Invalid Bot Token or Guild ID" Error
 
 #### The Problem
-You haven't configured your Discord server's Guild ID.
+You haven't configured your Discord server's Guild ID correctly.
 
 #### The Solution
 
@@ -86,17 +86,17 @@ You haven't configured your Discord server's Guild ID.
     
     ```lua
     -- ❌ Wrong
-    guild_id = "PUT_GUILD_ID_HERE",
+    Config.GuildId = "YOUR_GUILD_ID_HERE"
     
     -- ✅ Correct
-    guild_id = "123456789012345678",
+    Config.GuildId = "123456789012345678"
     ```
   </Step>
 </Steps>
 
 ## Bot Permission Issues
 
-### Players Getting Kicked Immediately
+### Players Showing "No Discord" or "Discord not linked"
 
 #### The Problem
 Your bot doesn't have the required permissions in your Discord server.
@@ -139,22 +139,14 @@ Your server is making too many requests to Discord's API.
 #### The Solution
 
 <Steps>
-  <Step title="Increase Timeout">
-    In `config.lua`, increase the timeout value:
-    
-    ```lua
-    timeout = 10, -- Increase from 5 to 10 seconds
-    ```
+  <Step title="Wait It Out">
+    The script has built-in caching to prevent this. Wait a few minutes for the rate limit to reset.
   </Step>
   <Step title="Check for Loops">
     Make sure you're not calling Discord API functions in loops or timers.
   </Step>
-  <Step title="Reduce Debug Logging">
-    Set debug to false to reduce API calls:
-    
-    ```lua
-    debug = false,
-    ```
+  <Step title="Use Caching">
+    The script automatically caches data for 5 minutes. Don't bypass this.
   </Step>
 </Steps>
 
@@ -168,10 +160,10 @@ These are usually temporary Discord issues. Wait a few minutes and try again.
 
 ## Player Connection Issues
 
-### "Discord not detected" Kicks
+### "Discord not linked" Message
 
 #### The Problem
-Players are getting kicked because Discord isn't detected.
+Players haven't linked their Discord to FiveM.
 
 #### The Solution
 
@@ -180,13 +172,6 @@ Players are getting kicked because Discord isn't detected.
     Players need to:
     1. Have Discord running on their computer
     2. Have Discord linked to their FiveM account
-  </Step>
-  <Step title="Disable Strict Mode (Temporary)">
-    If you want to allow players without Discord:
-    
-    ```lua
-    kick_not_in_discord = false,
-    ```
   </Step>
   <Step title="Help Players Link Discord">
     Guide players to link Discord:
@@ -241,7 +226,7 @@ Other scripts can't get Discord data using exports.
     -- Wait for Discord data to load
     Citizen.CreateThread(function()
         Citizen.Wait(5000) -- Wait 5 seconds
-        local avatar = exports['Lofi_DiscordAPI']:GetDiscordAvatar(playerId)
+        local avatar = exports.Lofi_DiscordAPI:getAvatar(playerId)
     end)
     ```
   </Step>
@@ -252,23 +237,19 @@ Other scripts can't get Discord data using exports.
 
 ## Console Spam Issues
 
-### Too Many Debug Messages
+### Too Many Authentication Errors
 
 #### The Problem
-Your console is flooded with debug messages.
+You're seeing repeated "Invalid Bot Token or Guild ID" messages.
 
 #### The Solution
 
 <Steps>
-  <Step title="Disable Debug Mode">
-    In `config.lua`:
-    
-    ```lua
-    debug = false, -- Turn off debug messages
-    ```
+  <Step title="Fix Configuration">
+    The error will only show once per session. Fix your bot token and guild ID.
   </Step>
   <Step title="Restart Server">
-    Restart your server to apply changes.
+    Restart your server after fixing the configuration.
   </Step>
 </Steps>
 
@@ -282,15 +263,11 @@ The script is causing lag when multiple players connect at once.
 #### The Solution
 
 <Steps>
-  <Step title="Increase Timeout">
-    Give API requests more time:
-    
-    ```lua
-    timeout = 10, -- Increase timeout
-    ```
+  <Step title="Built-in Caching">
+    The script has a 5-minute cache system. This should prevent most performance issues.
   </Step>
-  <Step title="Reduce Concurrent Requests">
-    This is handled automatically, but you can monitor console for rate limiting.
+  <Step title="Check Other Resources">
+    Make sure other resources aren't also making Discord API calls.
   </Step>
 </Steps>
 
@@ -307,7 +284,7 @@ When having issues, check these in order:
   </Step>
   <Step title="Console Messages">
     - [ ] Check for error messages in server console
-    - [ ] Look for "API initialized successfully" message
+    - [ ] Look for version check message on start
     - [ ] Monitor player connection messages
   </Step>
   <Step title="Discord Setup">
@@ -326,10 +303,9 @@ When having issues, check these in order:
 
 If you're still having issues:
 
-1. **Enable Debug Mode** - Set `debug = true` in config
-2. **Check Console** - Look for specific error messages
-3. **Join Discord** - Get help at [discord.gg/lofidev](https://discord.gg/lofidev)
-4. **Provide Details** - Share console errors and your configuration (without bot token!)
+1. **Check Console** - Look for specific error messages
+2. **Join Discord** - Get help at [discord.gg/lofidev](https://discord.gg/lofidev)
+3. **Provide Details** - Share console errors and your configuration (without bot token!)
 
 <Warning>
 Never share your bot token when asking for help! Remove it from any code you share.
@@ -338,4 +314,3 @@ Never share your bot token when asking for help! Remove it from any code you sha
 <Info>
 Most issues are caused by incorrect bot permissions or configuration. Double-check these first!
 </Info>
-```
