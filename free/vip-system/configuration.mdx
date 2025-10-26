@@ -1,0 +1,468 @@
+---
+title: 'Configuration'
+description: 'Complete configuration guide for VIP System'
+icon: 'gear'
+---
+
+# Configuration
+
+Customize every aspect of the VIP System to match your server's needs.
+
+<Info>
+  All configuration is in `shared/config.lua`. Restart the resource after making changes.
+</Info>
+
+---
+
+## Discord Role Configuration
+
+Configure which Discord roles grant VIP access.
+
+<Steps>
+  <Step title="Get Role IDs">
+    Enable Developer Mode in Discord → Right-click roles → Copy ID
+  </Step>
+  <Step title="Add to Config">
+    Paste role IDs into the config file
+  </Step>
+  <Step title="Assign Roles">
+    First role = VIP, Second role = VIP+
+  </Step>
+</Steps>
+
+```lua shared/config.lua
+Config.Discord = {
+    vipRoles = {
+        '123456789012345678', -- VIP role ID
+        '987654321098765432'  -- VIP+ role ID
+    }
+}
+```
+
+<Warning>
+  If you only have one VIP tier, use the same role ID twice.
+</Warning>
+
+---
+
+## Framework Settings
+
+Choose your framework or let the system auto-detect it.
+
+```lua shared/config.lua
+Config.Framework = 'auto' -- 'auto', 'esx', 'qbcore', 'standalone'
+```
+
+<Tabs>
+  <Tab title="Auto-Detect" icon="wand-magic-sparkles">
+    **Recommended** - Automatically detects your framework
+
+    ```lua
+    Config.Framework = 'auto'
+    ```
+
+    Detection order: ESX → QBCore → QBX → Standalone
+  </Tab>
+
+  <Tab title="Manual" icon="hand">
+    Manually specify your framework:
+
+    ```lua
+    -- For ESX
+    Config.Framework = 'esx'
+
+    -- For QBCore/QBX
+    Config.Framework = 'qbcore'
+
+    -- For no framework
+    Config.Framework = 'standalone'
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Skin Menu Settings
+
+Configure which skin/clothing menu to use.
+
+```lua shared/config.lua
+Config.SkinMenu = 'auto' -- Auto-detect or specify manually
+```
+
+**Supported Menus**:
+- illenium-appearance
+- qb-clothing
+- esx_skin
+- skinchanger
+- fivem-appearance
+- codem-appearance
+- ag_appearance
+
+<Tip>
+  Leave as `'auto'` to automatically detect available skin menus.
+</Tip>
+
+---
+
+## VIP Features Configuration
+
+Customize each VIP feature's price, cooldown, and required tier.
+
+### Feature Structure
+
+```lua
+Config.Features = {
+    feature_name = {
+        enabled = true,           -- Enable/disable feature
+        price = 500,             -- Cost in money
+        cooldown = 300,          -- Cooldown in seconds
+        vipLevel = 'vip',        -- 'vip' or 'vip_plus'
+        title = 'Feature Name',  -- Display name
+        description = 'Text',    -- Description shown in menu
+        icon = 'heart'           -- Font Awesome icon
+    }
+}
+```
+
+### Available Features
+
+<AccordionGroup>
+  <Accordion title="Health Restoration" icon="heart">
+    ```lua
+    heal = {
+        enabled = true,
+        price = 500,
+        cooldown = 300,      -- 5 minutes
+        vipLevel = 'vip',
+        title = 'Full Heal',
+        description = 'Restore health to 100%',
+        icon = 'heart'
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Armor Restoration" icon="shield-halved">
+    ```lua
+    armor = {
+        enabled = true,
+        price = 750,
+        cooldown = 300,
+        vipLevel = 'vip',
+        title = 'Full Armor',
+        description = 'Restore armor to 100%',
+        icon = 'shield-alt'
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Vehicle Repair" icon="wrench">
+    ```lua
+    vehicle_repair = {
+        enabled = true,
+        price = 1000,
+        cooldown = 600,      -- 10 minutes
+        vipLevel = 'vip',
+        title = 'Repair Vehicle',
+        description = 'Fully repair current vehicle',
+        icon = 'wrench'
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Vehicle Wash" icon="droplet">
+    ```lua
+    vehicle_wash = {
+        enabled = true,
+        price = 200,
+        cooldown = 120,      -- 2 minutes
+        vipLevel = 'vip',
+        title = 'Wash Vehicle',
+        description = 'Clean current vehicle',
+        icon = 'soap'
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Clothing Menu" icon="shirt">
+    ```lua
+    clothing_menu = {
+        enabled = true,
+        price = 0,           -- Free
+        cooldown = 60,
+        vipLevel = 'vip',
+        title = 'Clothing Menu',
+        description = 'Access clothing customization',
+        icon = 'tshirt'
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="God Mode (VIP+ Only)" icon="shield">
+    ```lua
+    god_mode = {
+        enabled = true,
+        price = 2000,
+        cooldown = 1800,     -- 30 minutes
+        duration = 300,      -- 5 minutes of god mode
+        vipLevel = 'vip_plus',
+        title = 'God Mode',
+        description = 'Temporary invincibility',
+        icon = 'star'
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Invisibility (VIP+ Only)" icon="eye-slash">
+    ```lua
+    invisible = {
+        enabled = true,
+        price = 1000,
+        cooldown = 1200,     -- 20 minutes
+        duration = 180,      -- 3 minutes of invisibility
+        vipLevel = 'vip_plus',
+        title = 'Invisibility',
+        description = 'Become invisible to other players',
+        icon = 'eye-slash'
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  **Cooldown Tips**:
+  - Set higher cooldowns to prevent spam
+  - Consider setting prices to 0 for cosmetic features
+  - Use `vipLevel = 'vip_plus'` for exclusive features
+</Tip>
+
+---
+
+## VIP Shop Configuration
+
+Configure the exclusive VIP shop with custom items and pricing.
+
+```lua shared/config.lua
+Config.Shop = {
+    enabled = true,
+    title = 'VIP Shop',
+    subtitle = 'Exclusive items for VIP members',
+    currency = 'money',  -- 'money', 'bank', 'black_money'
+    items = {
+        vip = {
+            -- VIP tier items
+        },
+        vip_plus = {
+            -- VIP+ tier items
+        }
+    }
+}
+```
+
+### Adding Shop Items
+
+<Tabs>
+  <Tab title="VIP Items" icon="star">
+    Items available to VIP members:
+
+    ```lua
+    vip = {
+        {name = 'bread', label = 'Bread', price = 25, count = 5, icon = 'bread-slice'},
+        {name = 'water', label = 'Water Bottle', price = 15, count = 3, icon = 'tint'},
+        {name = 'bandage', label = 'Bandage', price = 150, count = 2, icon = 'band-aid'}
+    }
+    ```
+  </Tab>
+
+  <Tab title="VIP+ Items" icon="crown">
+    Items for VIP+ members (better prices + exclusive):
+
+    ```lua
+    vip_plus = {
+        -- Discounted versions
+        {name = 'bread', label = 'Bread (VIP+ Discount)', price = 12, count = 10, icon = 'bread-slice'},
+        {name = 'water', label = 'Water (VIP+ Discount)', price = 8, count = 5, icon = 'tint'},
+        
+        -- Exclusive items
+        {name = 'lockpick', label = 'Lockpick (VIP+ Exclusive)', price = 500, count = 3, vipLevel = 'vip_plus', icon = 'key'},
+        {name = 'repairkit', label = 'Repair Kit (VIP+ Exclusive)', price = 750, count = 1, vipLevel = 'vip_plus', icon = 'tools'}
+    }
+    ```
+  </Tab>
+</Tabs>
+
+**Item Structure**:
+- `name` - Item spawn name (must exist in your inventory)
+- `label` - Display name in shop
+- `price` - Cost to purchase
+- `count` - How many you get
+- `icon` - Font Awesome icon name
+- `vipLevel` - (Optional) Required VIP tier
+
+<Warning>
+  Make sure all items exist in your framework's inventory system!
+</Warning>
+
+---
+
+## Quick Travel Configuration
+
+Set up teleport locations for VIP+ members.
+
+```lua shared/config.lua
+Config.QuickTravel = {
+    enabled = true,
+    vipLevel = 'vip_plus',  -- Required tier
+    locations = {
+        {name = 'Hospital', coords = vector3(295.87, -1446.94, 29.97), price = 200},
+        {name = 'City Hall', coords = vector3(-544.85, -204.13, 38.22), price = 200},
+        {name = 'Airport', coords = vector3(-1037.17, -2737.73, 20.17), price = 300},
+        {name = 'Beach', coords = vector3(-1393.84, -1020.32, 7.68), price = 250}
+    }
+}
+```
+
+### Adding Locations
+
+<Steps>
+  <Step title="Get Coordinates">
+    Stand at the location in-game and run `/getcoords` (or similar)
+  </Step>
+  <Step title="Add to Config">
+    ```lua
+    {name = 'Location Name', coords = vector3(x, y, z), price = 200}
+    ```
+  </Step>
+  <Step title="Set Price">
+    Adjust price based on location desirability
+  </Step>
+</Steps>
+
+<Tip>
+  Popular locations can have higher prices. Consider making spawn points cheaper.
+</Tip>
+
+---
+
+## Menu Configuration
+
+Customize the VIP menu appearance and keybind.
+
+```lua shared/config.lua
+Config.Menu = {
+    title = 'VIP Menu',
+    subtitle = 'Exclusive features for VIP members',
+    position = 'top-right',  -- 'top-right', 'top-left', etc.
+    keybind = {
+        name = 'vip_menu',
+        key = 'F5',          -- Keybind to open menu
+        description = 'Open VIP Menu'
+    }
+}
+```
+
+**Position Options**:
+- `top-right`
+- `top-left`
+- `center`
+
+**Common Keybinds**:
+- `F5`, `F6`, `F7` (function keys)
+- `HOME`, `INSERT` (special keys)
+
+---
+
+## Example Configurations
+
+<Tabs>
+  <Tab title="Standard Setup" icon="server">
+    **Best for**: Most roleplay servers
+
+    ```lua
+    -- Features with moderate prices
+    heal = { price = 500, cooldown = 300 }
+    armor = { price = 750, cooldown = 300 }
+    vehicle_repair = { price = 1000, cooldown = 600 }
+
+    -- Shop with basic items
+    vip = {
+        {name = 'bread', price = 25, count = 5},
+        {name = 'water', price = 15, count = 3}
+    }
+    ```
+  </Tab>
+
+  <Tab title="Economy Focused" icon="dollar-sign">
+    **Best for**: Servers wanting to monetize VIP
+
+    ```lua
+    -- Higher prices, longer cooldowns
+    heal = { price = 2000, cooldown = 600 }
+    armor = { price = 3000, cooldown = 600 }
+    god_mode = { price = 5000, cooldown = 3600 }
+
+    -- Premium shop prices
+    vip = {
+        {name = 'lockpick', price = 1000, count = 1}
+    }
+    ```
+  </Tab>
+
+  <Tab title="Casual/Fun" icon="face-smile">
+    **Best for**: Casual servers, community rewards
+
+    ```lua
+    -- Low/free prices, short cooldowns
+    heal = { price = 0, cooldown = 120 }
+    armor = { price = 0, cooldown = 120 }
+    god_mode = { price = 500, cooldown = 900 }
+
+    -- Generous shop
+    vip = {
+        {name = 'bread', price = 5, count = 10}
+    }
+    ```
+  </Tab>
+
+  <Tab title="PvP Server" icon="crosshairs">
+    **Best for**: PvP-focused servers
+
+    ```lua
+    -- Combat-focused features
+    heal = { price = 100, cooldown = 180 }
+    armor = { price = 150, cooldown = 180 }
+    god_mode = { enabled = false } -- Disabled for fairness
+
+    -- Combat items in shop
+    vip = {
+        {name = 'bandage', price = 50, count = 5},
+        {name = 'armor', price = 100, count = 2}
+    }
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Testing Your Configuration
+
+After configuring:
+
+<Steps>
+  <Step title="Save Config">
+    Save `shared/config.lua`
+  </Step>
+  <Step title="Restart Resource">
+    Run `restart jx_vip` in console
+  </Step>
+  <Step title="Test Features">
+    Join server, press F5, test each feature
+  </Step>
+  <Step title="Adjust as Needed">
+    Fine-tune prices and cooldowns based on feedback
+  </Step>
+</Steps>
+
+<Tip>
+  Start with higher prices and lower them based on player feedback. It's easier to reduce prices than increase them!
+</Tip>

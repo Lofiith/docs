@@ -1,0 +1,669 @@
+---
+title: 'Troubleshooting Guide'
+description: 'Common issues and solutions for JX Discord API'
+---
+
+# Troubleshooting Guide
+
+This page covers common issues you might encounter with JX Discord API and how to resolve them. We'll walk through symptoms, causes, and step-by-step solutions.
+
+---
+
+## Installation Issues
+
+### "Resource jx_discord not found"
+
+**Symptoms**:
+- Console shows `Could not find resource jx_discord` when starting server
+- Resource doesn't appear in resource list
+
+**Causes**:
+- Resource folder is named incorrectly
+- Resource is in the wrong directory
+- server.cfg has a typo
+
+**Solutions**:
+
+1. **Check folder name**:
+   - Open your `resources` folder
+   - Ensure the folder is named exactly `jx_discord` (all lowercase, with underscore)
+   - Rename if necessary
+
+2. **Verify location**:
+   - Resource should be in `resources/jx_discord/`
+   - Not in a subdirectory like `resources/[discord]/jx_discord/` (unless you're ensuring the folder)
+
+3. **Check server.cfg**:
+   ```cfg
+   ensure jx_discord  # Correct
+   # Not: ensure jx-discord
+   # Not: ensure JX_Discord
+   ```
+
+---
+
+### "Invalid Bot Token" / HTTP 401 Error
+
+**Symptoms**:
+- Console shows `HTTP Error: 401 Unauthorized`
+- Red `[JX_Discord]` error messages about authentication
+- Players can join but Discord features don't work
+
+**Causes**:
+- Bot token is incorrect or missing
+- Bot token has been regenerated
+- Extra spaces in config
+- Token not enclosed in quotes
+
+**Solutions**:
+
+1. **Verify bot token**:
+   - Go to [Discord Developer Portal](https://discord.com/developers/applications)
+   - Select your application
+   - Go to "Bot" section
+   - Click "Reset Token" (you'll need to copy the new one)
+   - Copy the token carefully
+
+2. **Update config correctly**:
+   ```lua
+   -- Correct
+   Config.Token = 'MTIzNDU2Nzg5MDEyMzQ1Njc4OQ.GhJkLm.N0pQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWxYz'
+   
+   -- Wrong (no quotes)
+   Config.Token = MTIzNDU2Nzg5MDEyMzQ1Njc4OQ.GhJkLm.N0pQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWxYz
+   
+   -- Wrong (extra spaces)
+   Config.Token = ' MTIzNDU2Nzg5MDEyMzQ1Njc4OQ.GhJkLm.N0pQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWxYz '
+   ```
+
+3. **Restart the resource**:
+   ```
+   restart jx_discord
+   ```
+
+---
+
+### "Cannot Find Guild" / HTTP 403 Error
+
+**Symptoms**:
+- Console shows `HTTP Error: 403 Forbidden`
+- Errors about missing guild or permissions
+- Bot can't see server members
+
+**Causes**:
+- Guild ID is incorrect
+- Bot isn't in the Discord server
+- Bot is missing required intents
+- Bot has insufficient permissions
+
+**Solutions**:
+
+1. **Verify Guild ID**:
+   - Enable Developer Mode in Discord (Settings → Advanced → Developer Mode)
+   - Right-click your server icon
+   - Click "Copy Server ID"
+   - Should be 18-19 digits (e.g., `123456789012345678`)
+   
+   ```lua
+   -- Correct
+   Config.Guild = '123456789012345678'
+   
+   -- Wrong (this is a channel ID or user ID)
+   Config.Guild = '12345678901234'
+   ```
+
+2. **Ensure bot is in server**:
+   - Open your Discord server
+   - Check the member list
+   - Look for your bot (it should be listed even if offline)
+   - If missing, re-invite using the OAuth2 URL generator
+
+3. **Check bot intents**:
+   - Go to Discord Developer Portal
+   - Select your application → Bot
+   - Scroll to "Privileged Gateway Intents"
+   - Enable:
+     - ✅ SERVER MEMBERS INTENT (required)
+     - ✅ PRESENCE INTENT (recommended)
+   - Click "Save Changes"
+
+4. **Verify bot permissions**:
+   - In Discord, right-click your bot → Roles
+   - Ensure it has at least these permissions:
+     - View Channels
+     - Read Message History
+
+5. **Re-invite bot with correct scopes**:
+   - Go to OAuth2 → URL Generator
+   - Select scopes: `bot`
+   - Select permissions: `Read Messages/View Channels`, `Read Message History`
+   - Use generated URL to invite bot
+
+---
+
+## Player Connection Issues
+
+### Players Getting Kicked: "No Discord Linked"
+
+**Symptoms**:
+- Players are kicked immediately on join
+- Kick message says they need Discord
+- Players insist they have Discord linked
+
+**Causes**:
+- Discord isn't actually linked to FiveM
+- Players need to restart FiveM
+- Discord is down or having issues
+- Config is set to require Discord
+
+**Solutions**:
+
+1. **Verify Discord is actually linked**:
+   - Tell players to:
+     - Open Discord
+     - Go to User Settings (gear icon)
+     - Go to "Connections"
+     - Look for FiveM connection
+     - If not there, click "Add" and select FiveM
+     - Follow linking process
+
+2. **Have players restart FiveM**:
+   - Completely close FiveM (check Task Manager)
+   - Close Discord
+   - Start Discord first
+   - Then start FiveM
+   - Try connecting again
+
+3. **Check if linking is required**:
+   ```lua
+   -- If you don't want to require Discord:
+   Config.RequireDiscord = false
+   ```
+
+4. **Check Discord status**:
+   - Visit [Discord Status](https://discordstatus.com/)
+   - If Discord is having issues, the API might not work
+
+---
+
+### Players Getting Kicked: "Not in Discord Server"
+
+**Symptoms**:
+- Players with Discord linked are kicked
+- Kick message says they must join Discord server
+- Players say they ARE in the server
+
+**Causes**:
+- Player recently joined and cache hasn't updated
+- Player left and rejoined Discord server
+- Bot can't see the member (permissions issue)
+- Wrong Guild ID in config
+
+**Solutions**:
+
+1. **Have player leave and rejoin Discord server**:
+   - Sometimes Discord's cache gets stuck
+   - Leaving and rejoining usually fixes it
+
+2. **Wait a moment after joining Discord**:
+   - After joining your Discord server, wait 30 seconds
+   - Then try connecting to FiveM
+
+3. **Verify bot can see members**:
+   - In your Discord server, look at your member list
+   - If you can't see members, neither can the bot
+   - Fix: Ensure bot has "View Channels" permission
+
+4. **Check Guild ID**:
+   ```lua
+   -- Make sure this matches your server
+   Config.Guild = 'YOUR_SERVER_ID'
+   ```
+
+5. **Temporary workaround**:
+   ```lua
+   -- Allow people to join without being in Discord server
+   Config.RequireInGuild = false
+   ```
+
+---
+
+## Role Detection Issues
+
+### Roles Not Being Detected
+
+**Symptoms**:
+- `HasPlayerRole` always returns `false`
+- Player has the role in Discord but exports don't recognize it
+- `GetPlayerRoles` returns empty table or wrong roles
+
+**Causes**:
+- Role name doesn't match exactly (case-sensitive)
+- Cached data is outdated
+- Player just got the role and cache hasn't refreshed
+- Role permissions prevent bot from seeing it
+
+**Solutions**:
+
+1. **Check role name spelling**:
+   ```lua
+   -- These are different:
+   "VIP"  vs  "vip"     -- Different case
+   "VIP"  vs  "VIP "    -- Extra space
+   "VIP"  vs  "V I P"   -- Spaces in name
+   ```
+
+2. **Use role ID instead**:
+   - Right-click role in Discord → Copy ID
+   ```lua
+   -- More reliable
+   exports.jx_discord:HasPlayerRole(source, "123456789012345678", function(hasRole) end)
+   ```
+
+3. **Force cache refresh**:
+   ```lua
+   -- Enable this in config
+   Config.RefreshCacheOnConnect = true
+   ```
+   - Then have player reconnect to server
+
+4. **Clear cache manually**:
+   - Restart the resource: `restart jx_discord`
+   - Cache is cleared on resource restart
+
+5. **Wait for cache to expire**:
+   - Cache expires after 5 minutes
+   - Wait and try again
+
+6. **Check if role is assignable**:
+   - Some roles (like @everyone or managed roles) might not be returned by the API
+   - Try creating a custom role for testing
+
+---
+
+### "Server Members Intent" Error
+
+**Symptoms**:
+- Console shows errors about intents
+- Can't fetch member data
+- Roles and usernames don't work
+
+**Causes**:
+- Privileged Gateway Intents not enabled
+- Required for bots in servers with 100+ members
+- Required for fetching member-specific data
+
+**Solutions**:
+
+1. **Enable intents in Developer Portal**:
+   - Go to [Discord Developer Portal](https://discord.com/developers/applications)
+   - Select your application
+   - Go to "Bot" section
+   - Scroll to "Privileged Gateway Intents"
+   - Enable:
+     - ✅ SERVER MEMBERS INTENT
+     - ✅ PRESENCE INTENT (optional)
+   - Click "Save Changes"
+
+2. **Restart the resource**:
+   ```
+   restart jx_discord
+   ```
+
+---
+
+## Webhook Issues
+
+### Webhooks Not Sending
+
+**Symptoms**:
+- No connection logs appearing in Discord
+- Webhook is configured but nothing happens
+- No errors in console
+
+**Causes**:
+- Webhook URL is incorrect
+- Webhook was deleted in Discord
+- Discord webhook rate limits
+- Channel permissions changed
+
+**Solutions**:
+
+1. **Verify webhook exists**:
+   - Go to Discord → Server Settings → Integrations
+   - Check if webhook still exists
+   - If deleted, create a new one
+
+2. **Check webhook URL**:
+   ```lua
+   -- Correct format
+   Config.LogWebhookURL = 'https://discord.com/api/webhooks/123456789/AbCdEfGhIjKlMnOpQrStUvWxYz'
+   
+   -- Wrong (missing parts)
+   Config.LogWebhookURL = 'discord.com/webhooks/123456789'
+   ```
+
+3. **Test webhook manually**:
+   ```bash
+   # Use curl to test webhook
+   curl -X POST -H "Content-Type: application/json" \
+   -d '{"content":"Test message"}' \
+   YOUR_WEBHOOK_URL
+   ```
+
+4. **Check rate limits**:
+   - Discord webhooks have rate limits
+   - If many players connect at once, some logs might be dropped
+   - Solution: Add a delay or queue system
+
+5. **Disable and re-enable**:
+   ```lua
+   -- Temporarily disable
+   Config.LogWebhookURL = ''
+   ```
+   - Restart resource
+   - Re-add webhook URL
+   - Restart again
+
+---
+
+### Webhook Embeds Look Broken
+
+**Symptoms**:
+- Webhook messages appear but formatting is wrong
+- Missing avatar or username
+- Data shows as "nil" or blank
+
+**Causes**:
+- Player Discord data not available
+- API response changed
+- Discord cache issues
+
+**Solutions**:
+
+1. **Ensure player data is loaded**:
+   - The script waits for data before sending webhook
+   - If data isn't available, some fields may be blank
+   - This is normal for players without Discord linked
+
+2. **Check console for errors**:
+   - Look for red `[JX_Discord]` messages
+   - They'll tell you what data is missing
+
+3. **Update resource**:
+   - Ensure you have the latest version
+   - Discord API sometimes changes
+
+---
+
+## Performance Issues
+
+### High Server Latency After Installing
+
+**Symptoms**:
+- Server tick rate drops
+- Players experience lag
+- Server console shows performance warnings
+
+**Causes**:
+- Too many simultaneous API calls
+- Cache not working properly
+- Webhook spam
+- Export being called in loops
+
+**Solutions**:
+
+1. **Check for export loops**:
+   ```lua
+   -- Bad (calls every frame)
+   CreateThread(function()
+       while true do
+           Wait(0)
+           exports.jx_discord:GetPlayerInfo(source, function(success, data) end)
+       end
+   end)
+   
+   -- Good (calls once)
+   exports.jx_discord:GetPlayerInfo(source, function(success, data)
+       -- Cache the result
+   end)
+   ```
+
+2. **Enable caching**:
+   ```lua
+   Config.RefreshCacheOnConnect = true
+   ```
+
+3. **Reduce webhook frequency**:
+   - If you're sending webhooks in loops or frequently, add delays
+
+4. **Monitor console**:
+   - Look for excessive `[JX_Discord]` messages
+   - Shouldn't see hundreds per second
+
+---
+
+### Cache Not Updating
+
+**Symptoms**:
+- Role changes don't reflect in-game
+- Player gets role in Discord but script doesn't detect it
+- Data is hours old
+
+**Causes**:
+- Cache refresh disabled
+- Cache expire time too long
+- Resource not restarting properly
+
+**Solutions**:
+
+1. **Enable cache refresh on connect**:
+   ```lua
+   Config.RefreshCacheOnConnect = true
+   ```
+
+2. **Have player reconnect**:
+   - Reconnecting refreshes their cache
+
+3. **Restart resource to clear all cache**:
+   ```
+   restart jx_discord
+   ```
+
+4. **Wait for cache expiry**:
+   - Default cache expires after 5 minutes
+   - Wait and try again
+
+---
+
+## Export-Specific Issues
+
+### Exports Return `nil` or `false`
+
+**Symptoms**:
+- Exports don't return expected data
+- Callbacks give `nil` values
+- `success` is always `false`
+
+**Causes**:
+- Player doesn't have Discord linked
+- Discord API is down
+- Rate limited
+- Player not in Discord server
+
+**Solutions**:
+
+1. **Check if player has Discord**:
+   ```lua
+   local discordId = exports.jx_discord:GetPlayerDiscordId(source)
+   if not discordId then
+       -- Player doesn't have Discord linked
+   end
+   ```
+
+2. **Always check success status**:
+   ```lua
+   exports.jx_discord:GetPlayerInfo(source, function(success, data)
+       if not success or not data then
+           -- Handle failure
+           return
+       end
+       
+       -- Use data
+   end)
+   ```
+
+3. **Add error handling**:
+   ```lua
+   exports.jx_discord:HasPlayerRole(source, "VIP", function(hasRole)
+       if hasRole == nil then
+           -- Export failed, not just "doesn't have role"
+           print("Discord export failed for player " .. source)
+       elseif hasRole == false then
+           -- Player doesn't have the role
+       else
+           -- Player has the role
+       end
+   end)
+   ```
+
+---
+
+### Callbacks Never Execute
+
+**Symptoms**:
+- Code inside callback never runs
+- Seems like export doesn't do anything
+- No errors in console
+
+**Causes**:
+- Syntax error in callback function
+- Export called with wrong parameters
+- Discord API timeout
+
+**Solutions**:
+
+1. **Check callback syntax**:
+   ```lua
+   -- Correct
+   exports.jx_discord:GetPlayerAvatar(source, function(success, avatar)
+       print("Callback executed!")
+   end)
+   
+   -- Wrong (missing 'function' keyword)
+   exports.jx_discord:GetPlayerAvatar(source, (success, avatar)
+       print("This won't work")
+   end)
+   ```
+
+2. **Add debug prints**:
+   ```lua
+   print("Before export call")
+   exports.jx_discord:GetPlayerInfo(source, function(success, data)
+       print("Callback executed! Success: " .. tostring(success))
+   end)
+   print("After export call")
+   ```
+
+3. **Check parameters**:
+   ```lua
+   -- Make sure 'source' is a valid player ID
+   if not source or source == 0 then
+       print("Invalid source!")
+       return
+   end
+   ```
+
+---
+
+## Error Messages Explained
+
+### "Player not found in cache"
+
+**Meaning**: The player's Discord data hasn't been loaded yet.
+
+**Solutions**:
+- Wait a moment after player connects
+- Ensure `Config.RequireDiscord` is enabled if you want data guaranteed
+- Add delay before calling exports:
+  ```lua
+  AddEventHandler('playerConnecting', function()
+      Wait(100) -- Give time for Discord data to load
+      -- Now call exports
+  end)
+  ```
+
+---
+
+### "Discord API rate limited"
+
+**Meaning**: You're making too many requests to Discord's API.
+
+**Solutions**:
+- Stop calling exports in loops
+- Use caching more effectively
+- Reduce webhook frequency
+- Wait before retrying
+
+---
+
+### "HTTP Error: 429"
+
+**Meaning**: Same as rate limited.
+
+**Solutions**:
+- This means you've hit Discord's rate limit (too many requests)
+- Wait 1-2 minutes
+- Fix code that's making excessive requests
+- Enable caching
+
+---
+
+## Still Having Issues?
+
+If you've tried everything and still can't resolve your issue:
+
+### Before Asking for Help
+
+1. **Check console output** for specific error messages
+2. **Note your configuration** (framework, version, etc.)
+3. **List what you've already tried**
+4. **Provide error messages** (full text, not just "it doesn't work")
+
+### Where to Get Help
+
+1. **Discord Support**: Join our Discord at [discord.gg/VuMcnbmEby](https://discord.gg/VuMcnbmEby)
+2. **Documentation**: Re-read the installation and configuration guides
+3. **Common Patterns**: Check the exports page for correct usage examples
+
+### Information to Provide
+
+When asking for help, include:
+
+- FiveM server version
+- Framework (ESX, QBCore, Standalone)
+- Your config (with token/webhooks removed)
+- Full error messages from console
+- What you've already tried
+- When the issue started (after update, fresh install, etc.)
+
+---
+
+## Preventing Issues
+
+### Best Practices
+
+1. **Always use latest version** of the resource
+2. **Don't modify core files** unless you know what you're doing
+3. **Test in development** before deploying to production
+4. **Keep backups** of your working configuration
+5. **Read update notes** when updating the resource
+6. **Use role IDs** instead of role names for stability
+7. **Enable cache refresh** unless you have performance issues
+8. **Monitor console** for warnings and errors
+
+---
+
+**Last Updated**: January 2025
+
+Most issues are solved by double-checking configuration and ensuring Discord bot permissions are correct. Take your time, read error messages carefully, and don't hesitate to ask for help!

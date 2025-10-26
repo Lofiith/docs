@@ -1,0 +1,468 @@
+---
+title: 'Installation Guide'
+description: 'Step-by-step guide to install JX VIP System'
+---
+
+# Installation Guide
+
+This guide will walk you through installing and configuring JX VIP System from start to finish. Follow each step carefully to ensure everything works properly.
+
+---
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- ✅ FiveM server with the latest artifacts
+- ✅ Basic knowledge of FiveM resource installation
+- ✅ Access to your server files and server.cfg
+- ✅ Discord server (for VIP role integration)
+
+---
+
+## Step 1: Install Dependencies
+
+JX VIP System requires two dependencies to function properly.
+
+### 1.1 - Install ox_lib
+
+**ox_lib** is a modern utility library used for the UI and caching system.
+
+1. Download the latest release from [Overextended GitHub](https://github.com/overextended/ox_lib/releases)
+2. Extract the `ox_lib` folder to your `resources` directory
+3. Add to your `server.cfg` **before** jx_vip:
+   ```cfg
+   ensure ox_lib
+   ```
+
+### 1.2 - Install JX Discord API
+
+**JX Discord API** is required for Discord role verification.
+
+1. Download JX Discord API (from our releases)
+2. Extract the `jx_discord` folder to your `resources` directory
+3. Follow the [JX Discord API installation guide](../discord-api/installation) to set it up
+4. **Important**: Configure your Discord bot and add your VIP role IDs
+5. Add to your `server.cfg` **after** ox_lib but **before** jx_vip:
+   ```cfg
+   ensure jx_discord
+   ```
+
+**Note**: JX Discord API must be fully configured and working before JX VIP System will function!
+
+---
+
+## Step 2: Download JX VIP System
+
+1. Download the latest version of JX VIP System
+2. Extract the ZIP file
+3. You should see a folder named `jx_vip` or `JX_VIP`
+4. Rename it to exactly `jx_vip` (lowercase, with underscore)
+5. Place the `jx_vip` folder in your `resources` directory
+
+**Important**: The folder **must** be named `jx_vip` exactly. The script won't work if renamed!
+
+---
+
+## Step 3: Configure Discord Roles
+
+Now we need to tell the VIP system which Discord roles grant VIP access.
+
+### 3.1 - Get Your Role IDs
+
+1. Open Discord
+2. Go to **User Settings** → **Advanced**
+3. Enable **Developer Mode**
+4. Go to your Discord server
+5. Right-click your VIP role → **Copy ID**
+6. Repeat for VIP+ role (or create one if you don't have it)
+
+### 3.2 - Add Role IDs to Config
+
+1. Open `jx_vip/shared/config.lua`
+2. Find the `Config.Discord` section:
+
+```lua
+Config.Discord = {
+    vipRoles = {
+        '1348940524089905174', -- Regular VIP role ID
+        '1348940524089905174'  -- VIP+ role ID
+    }
+}
+```
+
+3. Replace with your actual role IDs:
+
+```lua
+Config.Discord = {
+    vipRoles = {
+        '123456789012345678', -- Your VIP role ID
+        '987654321098765432'  -- Your VIP+ role ID
+    }
+}
+```
+
+**Important**: The first role ID is considered "VIP" and the second is considered "VIP+". If you only have one VIP tier, you can use the same ID twice.
+
+---
+
+## Step 4: Framework Configuration
+
+JX VIP System supports ESX, QBCore, QBX, and standalone modes.
+
+### 4.1 - Auto-Detection (Recommended)
+
+By default, the system will automatically detect your framework:
+
+```lua
+Config.Framework = 'auto'
+```
+
+The detection priority is: ESX → QBCore → QBX → Standalone
+
+### 4.2 - Manual Selection (Optional)
+
+If auto-detection doesn't work, manually specify your framework:
+
+```lua
+-- For ESX
+Config.Framework = 'esx'
+
+-- For QBCore
+Config.Framework = 'qbcore'
+
+-- For standalone (no framework)
+Config.Framework = 'standalone'
+```
+
+---
+
+## Step 5: Configure Items (Optional)
+
+If you're using a framework with inventory, you may need to configure items.
+
+### 5.1 - Check Default Items
+
+The VIP shop comes pre-configured with these items:
+- `bread` (food)
+- `water` (drink)
+- `bandage` (medical)
+- `lockpick` (VIP+ exclusive)
+- `repairkit` (VIP+ exclusive)
+
+### 5.2 - Verify Items Exist
+
+Make sure these items exist in your inventory/database:
+
+**ESX**: Check `items` table in database  
+**QBCore**: Check `qb-core/shared/items.lua`  
+**Standalone**: Items won't work without a framework
+
+### 5.3 - Customize Items (Optional)
+
+To change shop items, edit the `Config.Shop.items` section in `config.lua`:
+
+```lua
+Config.Shop = {
+    enabled = true,
+    currency = 'money', -- or 'bank' or 'black_money'
+    items = {
+        vip = {
+            {name = 'sandwich', label = 'Sandwich', price = 50, count = 5, icon = 'bread-slice'},
+            -- Add more items...
+        },
+        vip_plus = {
+            {name = 'sandwich', label = 'Sandwich (VIP+)', price = 25, count = 10, icon = 'bread-slice'},
+            -- Add more items...
+        }
+    }
+}
+```
+
+---
+
+## Step 6: Skin Menu Configuration (Optional)
+
+If you want the clothing menu feature to work, configure your skin system.
+
+### 6.1 - Auto-Detection (Recommended)
+
+Default setting automatically detects your skin menu:
+
+```lua
+Config.SkinMenu = 'auto'
+```
+
+Supported systems (in detection order):
+- illenium-appearance
+- qb-clothing
+- esx_skin
+- skinchanger
+- fivem-appearance
+- codem-appearance
+- ag_appearance
+
+### 6.2 - Manual Selection (Optional)
+
+If you have multiple skin systems or auto-detection fails:
+
+```lua
+-- For illenium-appearance
+Config.SkinMenu = 'illenium-appearance'
+
+-- For qb-clothing
+Config.SkinMenu = 'qb-clothing'
+
+-- For esx_skin
+Config.SkinMenu = 'esx_skin'
+
+-- etc.
+```
+
+### 6.3 - Disable Clothing Feature
+
+If you don't have a skin system or don't want this feature:
+
+```lua
+Config.Features.clothing_menu = {
+    enabled = false, -- Disable the feature
+    -- ... rest of config
+}
+```
+
+---
+
+## Step 7: Add to server.cfg
+
+Now we need to ensure the resource starts properly.
+
+### Correct Start Order
+
+Add these lines to your `server.cfg` in this exact order:
+
+```cfg
+# 1. Start framework (if using one)
+ensure es_extended  # or qb-core
+
+# 2. Start oxmysql (if using database)
+ensure oxmysql
+
+# 3. Start ox_lib (required)
+ensure ox_lib
+
+# 4. Start JX Discord API (required)
+ensure jx_discord
+
+# 5. Start JX VIP System
+ensure jx_vip
+
+# 6. Your other resources
+ensure your_other_resources
+```
+
+**Important**: ox_lib and jx_discord **must** start before jx_vip!
+
+---
+
+## Step 8: Start Your Server
+
+1. Save all configuration files
+2. Start (or restart) your FiveM server
+3. Watch the console for startup messages
+
+### Successful Installation
+
+You should see green messages like:
+```
+[JX_VIP] Successfully loaded!
+[JX_VIP] Framework: ESX
+[JX_VIP] Skin Menu: illenium-appearance
+[JX_VIP] VIP features initialized
+```
+
+### Installation Errors
+
+If you see red error messages:
+- Check that all dependencies are installed
+- Verify resource name is exactly `jx_vip`
+- Make sure ox_lib and jx_discord started first
+- Review console errors for specific issues
+
+---
+
+## Step 9: Test the System
+
+### 9.1 - Give Yourself VIP Role
+
+1. Go to your Discord server
+2. Give yourself one of the VIP roles you configured
+3. Make sure you're in the Discord server
+
+### 9.2 - Join Server
+
+1. Join your FiveM server
+2. Wait a few seconds for Discord data to load
+
+### 9.3 - Open VIP Menu
+
+1. Press **F5** (default keybind)
+2. VIP menu should open
+3. You should see your VIP status and available features
+
+### 9.4 - Test a Feature
+
+1. Try using "Full Heal" or another cheap feature
+2. You should receive a notification on success
+3. Check console for any errors
+
+---
+
+## Step 10: Customize (Optional)
+
+Now that the basic system is working, you can customize:
+
+### Features
+
+Edit feature prices, cooldowns, and requirements in `config.lua`:
+
+```lua
+Config.Features = {
+    heal = {
+        enabled = true,
+        price = 500,      -- Change price
+        cooldown = 300,   -- Change cooldown (seconds)
+        vipLevel = 'vip', -- Change required level
+        -- ...
+    }
+}
+```
+
+### Shop
+
+Add, remove, or modify shop items:
+
+```lua
+Config.Shop.items.vip = {
+    {name = 'newitem', label = 'New Item', price = 100, count = 1, icon = 'box'},
+    -- Add your items...
+}
+```
+
+### Teleport Locations
+
+Add custom teleport destinations:
+
+```lua
+Config.QuickTravel.locations = {
+    {name = 'My Custom Location', coords = vector3(x, y, z), price = 200},
+    -- Add more locations...
+}
+```
+
+### UI Colors
+
+Change the primary color scheme:
+
+```lua
+Config.Menu = {
+    title = 'VIP Menu',
+    subtitle = 'Exclusive features',
+    position = 'top-right', -- or 'top-left', 'center'
+    keybind = {
+        key = 'F5' -- Change keybind
+    }
+}
+```
+
+---
+
+## Common Installation Issues
+
+### "Resource not found"
+
+**Problem**: Server can't find jx_vip resource
+
+**Solution**:
+- Ensure folder is named exactly `jx_vip`
+- Check it's in the `resources` directory
+- Verify `ensure jx_vip` in server.cfg
+
+---
+
+### "Dependency missing: jx_discord"
+
+**Problem**: JX Discord API not installed or not started
+
+**Solution**:
+- Install JX Discord API first
+- Add `ensure jx_discord` before `ensure jx_vip` in server.cfg
+- Restart server
+
+---
+
+### "ox_lib not found"
+
+**Problem**: ox_lib not installed or not started
+
+**Solution**:
+- Download and install ox_lib
+- Add `ensure ox_lib` before `ensure jx_vip` in server.cfg
+- Make sure it's named exactly `ox_lib`
+
+---
+
+### VIP Menu Doesn't Open
+
+**Problem**: Pressing F5 does nothing
+
+**Solutions**:
+1. Check console for errors
+2. Try `/vipmenu` command instead
+3. Verify player has VIP role in Discord
+4. Wait 10 seconds after joining for Discord data to load
+5. Check if another resource is using F5 keybind
+
+---
+
+### "No VIP Roles Detected"
+
+**Problem**: Script says player has no VIP roles
+
+**Solutions**:
+1. Verify role IDs are correct in config
+2. Make sure player has the role in Discord
+3. Ensure player is in the Discord server
+4. Check JX Discord API is working (use exports to test)
+5. Try leaving and rejoining the FiveM server
+
+---
+
+### Features Don't Work
+
+**Problem**: Features show in menu but don't work
+
+**Solutions**:
+1. Check server console for errors
+2. Verify framework is detected correctly
+3. For vehicle features, ensure player is in a vehicle
+4. Check if player has enough money
+5. Look for cooldown timer
+
+---
+
+## Next Steps
+
+Now that JX VIP System is installed:
+
+1. **Configure Features**: Customize prices, cooldowns, and permissions
+2. **Set Up Shop**: Add items your players will love
+3. **Add Teleport Locations**: Create convenient quick-travel destinations
+4. **Test Everything**: Make sure all features work as expected
+5. **Announce to Players**: Let your community know about VIP benefits!
+
+Need more help? Check out:
+- [Configuration Reference](configuration): Detailed explanation of all config options
+- [Exports Reference](exports): Integrate VIP system with your resources
+- [Troubleshooting](troubleshooting): Common issues and solutions
+
+Welcome to JX VIP System! Your players are going to love it. 🎉

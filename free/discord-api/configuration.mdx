@@ -1,0 +1,507 @@
+---
+title: 'Configuration Reference'
+description: 'Complete configuration guide for JX Discord API'
+icon: 'gear'
+---
+
+# Configuration Reference
+
+This page provides a complete reference for all configuration options available in JX Discord API. Every option is explained in detail with examples and use cases.
+
+<Info>
+All configuration changes require a resource restart to take effect. Use `restart jx_discord` in your server console.
+</Info>
+
+## Configuration File Location
+
+All configuration is done in the `config.lua` file located in the root of the `jx_discord` folder.
+
+<CodeGroup>
+
+```bash File Structure
+jx_discord/
+├── config.lua          ← Configuration file
+├── server.lua
+└── fxmanifest.lua
+```
+
+</CodeGroup>
+
+## Complete Configuration
+
+Here's the full configuration file with all available options:
+
+<CodeGroup>
+
+```lua config.lua
+Config = {}
+
+-- Discord Bot Configuration (Server-Side Only)
+Config.Token = '' -- Your Discord Bot Token
+Config.Guild = '' -- Your Discord Guild/Server ID
+
+-- Configurations
+Config.RequireDiscord = true -- Kick players without Discord
+Config.RequireInGuild = true -- Kick players not in the Discord server
+Config.KickMessage = 'You must be in our Discord server to play. Join: discord.gg/yourserver'
+Config.RefreshCacheOnConnect = true -- Refresh player data when they connect
+
+-- Webhook Configuration
+Config.LogWebhookURL = '' -- Discord Webhook URL for connection logs
+```
+
+</CodeGroup>
+
+---
+
+## Discord Bot Settings
+
+### Config.Token
+
+<ParamField path="Config.Token" type="string" required>
+  Your Discord bot's authentication token obtained from the Discord Developer Portal.
+</ParamField>
+
+<Steps>
+  <Step title="Access Discord Developer Portal">
+    Go to [Discord Developer Portal](https://discord.com/developers/applications)
+  </Step>
+  <Step title="Select Your Application">
+    Choose your bot application from the list
+  </Step>
+  <Step title="Navigate to Bot Section">
+    Click on "Bot" in the left sidebar
+  </Step>
+  <Step title="Get Your Token">
+    Click "Reset Token" or "Copy" to get your bot token
+  </Step>
+  <Step title="Add to Config">
+    Paste the token into your config file
+  </Step>
+</Steps>
+
+<CodeGroup>
+
+```lua Example
+Config.Token = 'MTIzNDU2Nzg5MDEyMzQ1Njc4OQ.GhJkLm.N0pQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWxYz'
+```
+
+</CodeGroup>
+
+<Warning>
+**Security Warning**: Never share your bot token publicly! Treat it like a password. Anyone with this token can control your bot.
+</Warning>
+
+---
+
+### Config.Guild
+
+**Type**: `string`  
+**Required**: Yes  
+**Default**: `''` (empty)
+
+Your Discord server's unique Guild ID. This tells the script which Discord server to check for player membership and roles.
+
+**How to Get**:
+1. Enable Developer Mode in Discord (Settings → Advanced → Developer Mode)
+2. Right-click your Discord server icon
+3. Click "Copy Server ID"
+4. Paste the ID here
+
+**Example**:
+```lua
+Config.Guild = '123456789012345678'
+```
+
+<Note>
+The Guild ID is different from an invite code! It should be a long number (18-19 digits).
+</Note>
+
+---
+
+## Player Requirements
+
+### Config.RequireDiscord
+
+**Type**: `boolean`  
+**Default**: `true`  
+**Options**: `true` or `false`
+
+Determines whether players must have Discord linked to their FiveM account to join your server.
+
+**When `true`**:
+- Players without Discord linked will be kicked
+- Kick message will be shown (see `Config.KickMessage`)
+- All Discord exports will work properly
+
+**When `false`**:
+- Players can join without Discord
+- Discord exports will return `nil` or `false` for players without Discord
+- Useful for testing or if Discord isn't mandatory
+
+**Example Usage**:
+
+```lua
+-- Require Discord (strict)
+Config.RequireDiscord = true
+```
+
+```lua
+-- Allow players without Discord (lenient)
+Config.RequireDiscord = false
+```
+
+**Recommended**: `true` for most servers that use Discord integration features.
+
+---
+
+### Config.RequireInGuild
+
+**Type**: `boolean`  
+**Default**: `true`  
+**Options**: `true` or `false`
+
+Determines whether players must be a member of your Discord server to join the FiveM server.
+
+**When `true`**:
+- Players not in your Discord server will be kicked
+- Players need both Discord linked AND server membership
+- Kick message will be shown (see `Config.KickMessage`)
+
+**When `false`**:
+- Players can join as long as they have Discord linked (if `RequireDiscord` is true)
+- They don't need to be in your Discord server
+- Exports will still work, but role checks will always return false
+
+**Example Usage**:
+
+```lua
+-- Require Discord server membership (recommended)
+Config.RequireInGuild = true
+```
+
+```lua
+-- Don't require Discord server membership
+Config.RequireInGuild = false
+```
+
+**Recommended**: `true` to build an active Discord community and enable role-based features.
+
+---
+
+### Config.KickMessage
+
+**Type**: `string`  
+**Default**: `'You must be in our Discord server to play. Join: discord.gg/yourserver'`
+
+The message displayed to players when they're kicked for not meeting Discord requirements.
+
+**Customization Tips**:
+- Include your Discord invite link
+- Keep it friendly and informative
+- Mention what they need to do (link Discord, join server, etc.)
+- You can use line breaks with `\n`
+
+**Example Usage**:
+
+```lua
+-- Simple message
+Config.KickMessage = 'Join our Discord to play! discord.gg/myserver'
+```
+
+```lua
+-- Detailed message with instructions
+Config.KickMessage = 'Discord Required!\n\n1. Link Discord to FiveM\n2. Join discord.gg/myserver\n3. Reconnect to the server'
+```
+
+```lua
+-- Multilingual message
+Config.KickMessage = 'Discord Required / Discord Requis\nJoin: discord.gg/myserver'
+```
+
+**Variables You Can Use**:
+The kick message is static, but you can customize it however you like. Consider including:
+- Your Discord invite link
+- Steps to link Discord to FiveM
+- Support contact information
+
+---
+
+## Cache Management
+
+### Config.RefreshCacheOnConnect
+
+**Type**: `boolean`  
+**Default**: `true`  
+**Options**: `true` or `false`
+
+Controls whether player Discord data is refreshed every time they connect to the server.
+
+**When `true`**:
+- Player data is refreshed on each connection
+- Ensures role changes are immediately recognized
+- Slightly increases connection time (negligible)
+- **Recommended for most servers**
+
+**When `false`**:
+- Uses cached data from previous sessions
+- Faster connection times
+- Role changes may not be recognized until cache expires (5 minutes)
+- Good for very high-traffic servers
+
+**How Caching Works**:
+
+1. When a player connects, their Discord data is fetched
+2. Data is cached for **5 minutes** automatically
+3. During those 5 minutes, exports use the cached data (no API calls)
+4. After 5 minutes, the next export call refreshes the cache
+5. If `RefreshCacheOnConnect` is true, cache is refreshed on every connect regardless
+
+**Example Usage**:
+
+```lua
+-- Always refresh on connect (recommended)
+Config.RefreshCacheOnConnect = true
+```
+
+```lua
+-- Use cached data (faster, but may be outdated)
+Config.RefreshCacheOnConnect = false
+```
+
+**Performance Impact**:
+- Refreshing on connect adds ~100-300ms to connection time
+- This is barely noticeable and worth it for accurate data
+- Cache system prevents API spam during gameplay
+
+---
+
+## Webhook Logging
+
+### Config.LogWebhookURL
+
+**Type**: `string`  
+**Default**: `''` (empty)  
+**Optional**: Yes
+
+A Discord webhook URL where player connection logs will be sent. If left empty, no logs are sent.
+
+**What Gets Logged**:
+When a player connects, a rich embed is sent containing:
+- Player's Discord avatar (thumbnail)
+- Discord username
+- FiveM player name
+- List of all role names (comma-separated)
+- List of all role IDs (for debugging)
+- Total number of roles
+- Discord ID
+- Connection timestamp
+
+**How to Get a Webhook URL**:
+
+1. Go to your Discord server
+2. Right-click the channel where you want logs (e.g., #connection-logs)
+3. Click "Edit Channel"
+4. Click "Integrations" in the left sidebar
+5. Click "Create Webhook" (or "View Webhooks" if you have existing ones)
+6. Click "New Webhook"
+7. Give it a name (e.g., "FiveM Connection Logs")
+8. Optionally, set an avatar
+9. Click "Copy Webhook URL"
+10. Paste it into the config
+
+**Example Usage**:
+
+```lua
+-- Enable connection logging
+Config.LogWebhookURL = 'https://discord.com/api/webhooks/123456789/AbCdEfGhIjKlMnOpQrStUvWxYz'
+```
+
+```lua
+-- Disable connection logging
+Config.LogWebhookURL = ''
+```
+
+**Security Note**:
+- Webhook URLs should be kept private
+- Anyone with the URL can send messages to that channel
+- You can regenerate webhook URLs if they're compromised
+
+**Customization**:
+The webhook embed is pre-styled and cannot be customized through the config. If you need custom webhook formatting, you'll need to modify the server-side code.
+
+---
+
+## Configuration Examples
+
+Choose the configuration that best fits your server's needs:
+
+<Tabs>
+  <Tab title="Strict Server" icon="shield">
+    **Best for**: Roleplay servers, community-focused servers, servers with VIP/staff systems
+    
+    This configuration enforces Discord membership and keeps data fresh.
+
+    ```lua config.lua
+    Config = {}
+
+    Config.Token = 'YOUR_BOT_TOKEN_HERE'
+    Config.Guild = 'YOUR_SERVER_ID_HERE'
+
+    Config.RequireDiscord = true
+    Config.RequireInGuild = true
+    Config.KickMessage = 'You must be in our Discord server to play!\n\nJoin: discord.gg/yourserver\n\nNeed help? Ask in #support'
+    Config.RefreshCacheOnConnect = true
+
+    Config.LogWebhookURL = 'https://discord.com/api/webhooks/YOUR_WEBHOOK_URL'
+    ```
+
+    <Check>Recommended for most production servers</Check>
+  </Tab>
+
+  <Tab title="Lenient Mode" icon="users">
+    **Best for**: Public servers, testing environments, servers transitioning to Discord
+    
+    Requires Discord linking but not server membership.
+
+    ```lua config.lua
+    Config = {}
+
+    Config.Token = 'YOUR_BOT_TOKEN_HERE'
+    Config.Guild = 'YOUR_SERVER_ID_HERE'
+
+    Config.RequireDiscord = true
+    Config.RequireInGuild = false
+    Config.KickMessage = 'Please link Discord to FiveM to play!'
+    Config.RefreshCacheOnConnect = true
+
+    Config.LogWebhookURL = ''
+    ```
+
+    <Info>Players can join without being in your Discord server</Info>
+  </Tab>
+
+  <Tab title="Development" icon="code">
+    **Best for**: Development servers, testing environments, optional Discord features
+    
+    Discord is completely optional for testing purposes.
+
+    ```lua config.lua
+    Config = {}
+
+    Config.Token = 'YOUR_BOT_TOKEN_HERE'
+    Config.Guild = 'YOUR_SERVER_ID_HERE'
+
+    Config.RequireDiscord = false
+    Config.RequireInGuild = false
+    Config.KickMessage = 'Discord is optional but recommended! Join: discord.gg/yourserver'
+    Config.RefreshCacheOnConnect = false
+
+    Config.LogWebhookURL = ''
+    ```
+
+    <Warning>Not recommended for production servers</Warning>
+  </Tab>
+
+  <Tab title="High Performance" icon="gauge-high">
+    **Best for**: High-traffic servers (100+ players), servers with slow Discord API response
+    
+    Optimized for minimal connection delays.
+
+    ```lua config.lua
+    Config = {}
+
+    Config.Token = 'YOUR_BOT_TOKEN_HERE'
+    Config.Guild = 'YOUR_SERVER_ID_HERE'
+
+    Config.RequireDiscord = true
+    Config.RequireInGuild = true
+    Config.KickMessage = 'Discord Required: discord.gg/yourserver'
+    Config.RefreshCacheOnConnect = false -- Use cached data for faster connections
+
+    Config.LogWebhookURL = '' -- Disable webhooks to reduce API calls
+    ```
+
+    <Tip>Use this if you experience slow player connections</Tip>
+  </Tab>
+</Tabs>
+
+---
+
+## Best Practices
+
+### Security
+
+1. **Never commit your config** with real tokens to public repositories
+2. **Use environment variables** if running multiple servers with the same bot
+3. **Regenerate tokens** if you suspect they've been compromised
+4. **Limit webhook channel permissions** to prevent abuse
+
+### Performance
+
+1. **Enable `RefreshCacheOnConnect`** unless you have performance issues
+2. **Don't make excessive export calls** in loops - cache the results
+3. **Use role IDs instead of names** for role checking when possible
+4. **Monitor webhook rate limits** if you have high player turnover
+
+### User Experience
+
+1. **Write clear kick messages** with actionable steps
+2. **Include your Discord invite** in all Discord-related messages
+3. **Test your configuration** in a development environment first
+4. **Provide support** for players having trouble linking Discord
+
+---
+
+## Troubleshooting Configuration
+
+### Bot Token Issues
+
+**Problem**: "HTTP 401 Unauthorized" errors
+
+**Solutions**:
+- Verify the token is correct (copy it again from Discord Developer Portal)
+- Ensure there are no extra spaces before or after the token
+- Make sure the token is inside quotes: `Config.Token = 'YOUR_TOKEN'`
+- Try resetting your bot token and updating the config
+
+### Guild ID Issues
+
+**Problem**: Players not being recognized as in the server
+
+**Solutions**:
+- Verify the Guild ID is correct (it should be 18-19 digits)
+- Make sure you copied the Server ID, not a Channel ID or Role ID
+- Ensure your bot is actually in the Discord server (check member list)
+
+### Kick Message Not Showing
+
+**Problem**: Players are kicked but see a different message
+
+**Solutions**:
+- Some FiveM clients may not display multi-line messages properly
+- Keep messages under 256 characters for best compatibility
+- Avoid special characters that might break formatting
+
+### Cache Issues
+
+**Problem**: Role changes not being recognized
+
+**Solutions**:
+- Enable `Config.RefreshCacheOnConnect = true`
+- Use the `/viprefresh` command (if using JX VIP System)
+- Wait 5 minutes for cache to expire naturally
+- Restart the resource to clear all caches
+
+---
+
+## Need More Help?
+
+If you're still having trouble with configuration:
+
+1. **Check the installation guide** for setup steps
+2. **Review common errors** in the troubleshooting section
+3. **Join our Discord** for community support
+4. **Check console output** for specific error messages
+
+Remember: Most configuration issues are simple typos or missing steps. Double-check everything before asking for help!

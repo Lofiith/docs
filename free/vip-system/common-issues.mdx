@@ -1,0 +1,543 @@
+---
+title: 'Common Issues'
+description: 'Quick solutions to VIP System problems'
+icon: 'circle-exclamation'
+---
+
+# Common Issues
+
+Quick fixes for the most common VIP System problems.
+
+---
+
+## Menu Issues
+
+<AccordionGroup>
+  <Accordion title="VIP Menu Won't Open" icon="rectangle-xmark">
+    **Symptoms**: Pressing F5 (or keybind) does nothing
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Check VIP Role">
+        Ensure you have a VIP role in Discord
+      </Step>
+      <Step title="Wait for Data">
+        Wait 10 seconds after joining for Discord data to load
+      </Step>
+      <Step title="Try Command">
+        Use `/vipmenu` command instead of keybind
+      </Step>
+      <Step title="Check Keybind Conflict">
+        Another resource might be using F5 - change keybind in config
+      </Step>
+      <Step title="Restart Resource">
+        Run `restart jx_vip`
+      </Step>
+    </Steps>
+
+    <Tip>
+      Check F8 console for errors when pressing the keybind
+    </Tip>
+  </Accordion>
+
+  <Accordion title="'No VIP Access' Message" icon="ban">
+    **Symptoms**: Menu shows "You don't have VIP access"
+
+    **Why This Happens**:
+    - Discord role not configured correctly
+    - Player doesn't have the Discord role
+    - JX Discord API not working
+
+    **Fix**:
+
+    <Tabs>
+      <Tab title="Check Role IDs">
+        Verify role IDs in config:
+
+        ```lua shared/config.lua
+        Config.Discord = {
+            vipRoles = {
+                '123456789012345678', -- Verify this is correct
+                '987654321098765432'
+            }
+        }
+        ```
+
+        Get role ID by right-clicking role in Discord → Copy ID
+      </Tab>
+
+      <Tab title="Check Player Has Role">
+        1. Open Discord
+        2. Find the player
+        3. Check if they have one of the VIP roles
+        4. If not, assign the role
+      </Tab>
+
+      <Tab title="Test Discord API">
+        Test if Discord integration works:
+
+        ```lua
+        -- In server console
+        /refresh
+
+        -- Or try the Discord API directly
+        exports.jx_discord:GetPlayerRoles(playerId, function(success, roles)
+            print("Roles:", json.encode(roles))
+        end)
+        ```
+      </Tab>
+    </Tabs>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Feature Issues
+
+<AccordionGroup>
+  <Accordion title="Features Not Working" icon="ban">
+    **Symptoms**: Click a feature but nothing happens
+
+    **Common Causes**:
+
+    <Tabs>
+      <Tab title="Not Enough Money">
+        **Check Balance**: Do you have enough money for the feature?
+
+        Default prices:
+        - Heal: $500
+        - Armor: $750
+        - Vehicle Repair: $1,000
+
+        Check your money in-game or adjust prices in config
+      </Tab>
+
+      <Tab title="On Cooldown">
+        **Cooldown Active**: Feature was recently used
+
+        - Check menu for cooldown timer
+        - Wait for cooldown to expire
+        - Adjust cooldowns in config if too long
+      </Tab>
+
+      <Tab title="Wrong VIP Tier">
+        **VIP+ Required**: Some features need VIP+ role
+
+        Features requiring VIP+:
+        - God Mode
+        - Invisibility
+        - Quick Travel
+
+        Solution: Get VIP+ role or disable these features
+      </Tab>
+
+      <Tab title="Server Error">
+        **Check Console**: Look for red errors in F8
+
+        Common errors:
+        - Framework not detected
+        - Missing dependencies
+        - Config syntax error
+      </Tab>
+    </Tabs>
+  </Accordion>
+
+  <Accordion title="Vehicle Features Not Working" icon="car">
+    **Symptoms**: Vehicle repair/wash doesn't work
+
+    **Requirements**:
+    - Must be in a vehicle
+    - Must be in driver's seat
+
+    **Fix**:
+
+    <Steps>
+      <Step title="Get in Vehicle">
+        Enter a vehicle as the driver
+      </Step>
+      <Step title="Try Feature Again">
+        Open menu and use vehicle repair/wash
+      </Step>
+      <Step title="Check Framework">
+        Ensure framework is detected:
+
+        ```lua
+        Config.Framework = 'auto' -- or 'esx', 'qbcore'
+        ```
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Clothing Menu Not Opening" icon="shirt">
+    **Symptoms**: Clothing menu feature does nothing
+
+    **Why**:
+    - No skin menu detected
+    - Skin menu not supported
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="Check Skin Menu">
+        Verify you have a supported skin menu installed:
+        - illenium-appearance
+        - qb-clothing
+        - esx_skin
+        - skinchanger
+        - fivem-appearance
+        - codem-appearance
+        - ag_appearance
+      </Tab>
+
+      <Tab title="Manual Config">
+        Manually specify your skin menu:
+
+        ```lua shared/config.lua
+        Config.SkinMenu = 'illenium-appearance' -- Replace with your menu
+        ```
+      </Tab>
+
+      <Tab title="Disable Feature">
+        If you don't have a skin menu:
+
+        ```lua shared/config.lua
+        Config.Features.clothing_menu = {
+            enabled = false
+        }
+        ```
+      </Tab>
+    </Tabs>
+  </Accordion>
+
+  <Accordion title="God Mode/Invisibility Won't Deactivate" icon="shield">
+    **Symptoms**: God mode or invisibility stays on forever
+
+    **This is a Bug If**:
+    - Lasted longer than configured duration
+    - Survived resource restart
+
+    **Fix**:
+
+    <Steps>
+      <Step title="Restart Resource">
+        Run `restart jx_vip` - this clears all active effects
+      </Step>
+      <Step title="Respawn Character">
+        Die and respawn to reset character state
+      </Step>
+      <Step title="Relog">
+        Leave and rejoin the server
+      </Step>
+    </Steps>
+
+    <Info>
+      Effects automatically deactivate on resource stop/restart
+    </Info>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Shop Issues
+
+<AccordionGroup>
+  <Accordion title="Shop Items Not Working" icon="cart-shopping">
+    **Symptoms**: Buy item but don't receive it
+
+    **Causes**:
+
+    <Tabs>
+      <Tab title="Item Doesn't Exist">
+        **Item Not in Database**: Item doesn't exist in your framework
+
+        **Fix**:
+        1. Check if item exists in your inventory system
+        2. Add item to database if missing
+        3. Or replace with existing item in config
+      </Tab>
+
+      <Tab title="Wrong Framework">
+        **Framework Not Detected**: ESX/QBCore not detected properly
+
+        **Fix**:
+
+        ```lua shared/config.lua
+        Config.Framework = 'esx' -- or 'qbcore'
+        ```
+      </Tab>
+
+      <Tab title="Inventory Full">
+        **No Space**: Player inventory is full
+
+        **Solution**: Clear inventory space and try again
+      </Tab>
+    </Tabs>
+  </Accordion>
+
+  <Accordion title="Shop Prices Wrong" icon="dollar-sign">
+    **Symptoms**: Prices don't match what you configured
+
+    **Check**:
+
+    1. Which tier are you? VIP or VIP+?
+    2. VIP+ has different (usually lower) prices
+    3. Make sure you edited the right tier in config
+
+    ```lua shared/config.lua
+    Config.Shop.items = {
+        vip = {
+            -- Prices for VIP tier
+        },
+        vip_plus = {
+            -- Prices for VIP+ tier (usually cheaper)
+        }
+    }
+    ```
+
+    <Tip>
+      VIP+ prices can be completely different or have exclusive items
+    </Tip>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Installation Issues
+
+<AccordionGroup>
+  <Accordion title="Resource Won't Start" icon="circle-xmark">
+    **Symptoms**: `ensure jx_vip` does nothing
+
+    **Checklist**:
+
+    <Steps>
+      <Step title="Check Folder Name">
+        Must be named exactly `jx_vip` (lowercase, underscore)
+      </Step>
+      <Step title="Verify Location">
+        Should be in `resources/jx_vip/`
+      </Step>
+      <Step title="Check Files">
+        Ensure `fxmanifest.lua` exists
+      </Step>
+      <Step title="Check server.cfg">
+        Line should be `ensure jx_vip`
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Missing Dependency Errors" icon="puzzle-piece">
+    **Symptoms**: Errors about missing ox_lib or jx_discord
+
+    **Required Dependencies**:
+    1. ox_lib
+    2. jx_discord
+
+    **Fix**:
+
+    <Tabs>
+      <Tab title="Install ox_lib">
+        1. Download from [Overextended GitHub](https://github.com/overextended/ox_lib)
+        2. Extract to `resources/ox_lib/`
+        3. Add `ensure ox_lib` to server.cfg **before** jx_vip
+      </Tab>
+
+      <Tab title="Install JX Discord API">
+        1. Download JX Discord API
+        2. Extract to `resources/jx_discord/`
+        3. Configure it (see Discord API docs)
+        4. Add `ensure jx_discord` to server.cfg **before** jx_vip
+      </Tab>
+
+      <Tab title="Start Order">
+        Correct order in server.cfg:
+
+        ```cfg
+        ensure ox_lib
+        ensure jx_discord
+        ensure jx_vip
+        ```
+      </Tab>
+    </Tabs>
+  </Accordion>
+
+  <Accordion title="Config Syntax Errors" icon="code">
+    **Symptoms**: `syntax error near...` in console
+
+    **Common Mistakes**:
+
+    <Tabs>
+      <Tab title="Missing Quotes">
+        ```lua
+        -- ❌ Wrong
+        Config.Position = top-right
+
+        -- ✅ Correct
+        Config.Position = 'top-right'
+        ```
+      </Tab>
+
+      <Tab title="Missing Commas">
+        ```lua
+        -- ❌ Wrong
+        vipRoles = {
+            '123456789012345678'
+            '987654321098765432'
+        }
+
+        -- ✅ Correct
+        vipRoles = {
+            '123456789012345678',
+            '987654321098765432'
+        }
+        ```
+      </Tab>
+
+      <Tab title="Wrong Brackets">
+        ```lua
+        -- ❌ Wrong
+        Config.Features = (
+            heal = {
+                price = 500
+            )
+        )
+
+        -- ✅ Correct
+        Config.Features = {
+            heal = {
+                price = 500
+            }
+        }
+        ```
+      </Tab>
+    </Tabs>
+
+    <Tip>
+      Use a Lua syntax checker or editor with syntax highlighting to catch errors
+    </Tip>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Performance Issues
+
+<AccordionGroup>
+  <Accordion title="FPS Drops When Opening Menu" icon="gauge-simple-low">
+    **Symptoms**: Game lags when VIP menu opens
+
+    **This is Rare**: ox_lib is optimized for performance
+
+    **If it happens**:
+
+    <Steps>
+      <Step title="Update ox_lib">
+        Make sure you have the latest version of ox_lib
+      </Step>
+      <Step title="Check Other Resources">
+        Disable other resources to find conflicts
+      </Step>
+      <Step title="Simplify Config">
+        Reduce number of shop items if you have many
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Server Lag" icon="server">
+    **Symptoms**: Server performance drops
+
+    **Causes**:
+    - Usually not from VIP System
+    - Check for loops in modified code
+    - Verify Discord API isn't being spammed
+
+    **Check**:
+
+    ```lua
+    -- Don't call VIP checks in loops
+    -- ❌ Bad
+    CreateThread(function()
+        while true do
+            Wait(0)
+            local hasVIP = exports.jx_vip:hasVipAccess(source, 'vip')
+        end
+    end)
+
+    -- ✅ Good
+    local hasVIP = exports.jx_vip:hasVipAccess(source, 'vip')
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Discord Integration Issues
+
+<AccordionGroup>
+  <Accordion title="Roles Not Syncing" icon="sync">
+    **Symptoms**: Player has VIP role but system doesn't recognize it
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Check Discord API">
+        Ensure JX Discord API is working:
+
+        ```lua
+        -- Test in server console
+        exports.jx_discord:GetPlayerRoles(playerId, function(success, roles)
+            print("Success:", success)
+            print("Roles:", json.encode(roles))
+        end)
+        ```
+      </Step>
+
+      <Step title="Refresh Cache">
+        Have player reconnect or use `/viprefresh` if available
+      </Step>
+
+      <Step title="Enable Cache Refresh">
+        In Discord API config:
+
+        ```lua config.lua
+        Config.RefreshCacheOnConnect = true
+        ```
+      </Step>
+
+      <Step title="Restart Both Resources">
+        ```
+        restart jx_discord
+        restart jx_vip
+        ```
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Still Having Issues?
+
+<CardGroup cols={2}>
+  <Card title="Installation Guide" icon="download" href="./installation">
+    Review step-by-step installation
+  </Card>
+  <Card title="Configuration Guide" icon="gear" href="./configuration">
+    Double-check your configuration
+  </Card>
+  <Card title="Discord API Issues" icon="discord" href="../discord-api/common-issues">
+    Check Discord API troubleshooting
+  </Card>
+  <Card title="Join Discord" icon="message-question" href="https://discord.gg/VuMcnbmEby">
+    Get help from the community
+  </Card>
+</CardGroup>
+
+<Tip>
+  **When Asking for Help**:
+  - Provide full error messages
+  - Share your config (remove sensitive data)
+  - Mention your framework
+  - List what you've already tried
+</Tip>

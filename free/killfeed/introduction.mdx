@@ -1,0 +1,114 @@
+---
+title: 'Introduction'
+description: 'Lightweight real-time killfeed system for FiveM'
+icon: 'book'
+---
+
+# Killfeed
+
+A lightweight killfeed system that displays real-time PvP kill notifications on your FiveM server.
+
+<Note>
+  **Free & Open Source** - Completely free to use and modify for your server.
+</Note>
+
+## What It Does
+
+Display kill notifications showing:
+- Killer and victim names
+- Weapon used
+- Auto-cleanup of old entries
+- Customizable screen position
+- Optional sound notifications
+
+## Requirements
+
+- FiveM server
+- Basic knowledge of resource installation
+
+---
+
+## Quick Start
+
+<Steps>
+  <Step title="Download" icon="download">
+    Download the latest version of JX Killfeed
+  </Step>
+  <Step title="Install" icon="folder">
+    Extract and rename to `jx_killfeed`, place in resources folder
+  </Step>
+  <Step title="Configure" icon="gear">
+    Edit `config.lua` to customize position and settings
+  </Step>
+  <Step title="Start" icon="play">
+    Add `ensure jx_killfeed` to server.cfg and restart
+  </Step>
+</Steps>
+
+<Check>
+  The killfeed works immediately with default settings - no additional setup required!
+</Check>
+
+---
+
+## Configuration
+
+All settings are in `config.lua`:
+
+<Tabs>
+  <Tab title="Position" icon="arrows-up-down-left-right">
+    Choose where the killfeed appears:
+
+    ```lua config.lua
+    Config.Position = 'center-right' -- Default
+    -- Options: 'top-center', 'center-left', 'center-right'
+    ```
+  </Tab>
+
+  <Tab title="Max Entries" icon="list">
+    Control how many kills show at once:
+
+    ```lua config.lua
+    Config.MaxEntries = 5 -- Shows 5 kills at a time
+    ```
+
+    <Tip>
+      Recommended: 3-7 entries for best visibility
+    </Tip>
+  </Tab>
+
+  <Tab title="Sounds" icon="volume">
+    Enable or disable kill sounds:
+
+    ```lua config.lua
+    Config.EnableSound = false -- true to enable sounds
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Common Use Cases
+
+<CardGroup cols={2}>
+  <Card title="PvP Servers" icon="crossed-swords">
+    Track competitive action across the map
+  </Card>
+  <Card title="Roleplay Events" icon="masks-theater">
+    Display kills during gang wars or police shootouts
+  </Card>
+  <Card title="Deathmatch Modes" icon="gun">
+    Create arcade-style kill tracking
+  </Card>
+  <Card title="Tournaments" icon="trophy">
+    Show eliminations during organized events
+  </Card>
+</CardGroup>
+
+---
+
+## Need Help?
+
+<Card title="Join Our Discord" icon="discord" href="https://discord.gg/VuMcnbmEby" horizontal>
+  Get support and share feedback with the community
+</Card>

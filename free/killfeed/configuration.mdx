@@ -1,0 +1,247 @@
+---
+title: 'Configuration'
+description: 'Configure killfeed settings'
+icon: 'gear'
+---
+
+# Configuration
+
+Customize the killfeed to match your server's style and needs.
+
+<Info>
+  All configuration changes require a resource restart: `restart jx_killfeed`
+</Info>
+
+---
+
+## Configuration File
+
+All settings are in `config.lua`:
+
+```lua config.lua
+Config = {}
+
+-- UI Position: 'top-center', 'center-left', 'center-right'
+Config.Position = 'center-right'
+
+-- Maximum number of killfeed entries displayed at once
+Config.MaxEntries = 5
+
+-- Enable or disable kill notification sound
+Config.EnableSound = false
+```
+
+---
+
+## Config Options
+
+### Config.Position
+
+<ParamField path="Config.Position" type="string" default="'center-right'">
+  Controls where the killfeed appears on the screen
+</ParamField>
+
+**Available Options**:
+
+<Tabs>
+  <Tab title="center-right" icon="arrow-right">
+    **Default position** - Right side of screen
+
+    ```lua config.lua
+    Config.Position = 'center-right'
+    ```
+
+    <Check>Recommended for most servers</Check>
+  </Tab>
+
+  <Tab title="top-center" icon="arrow-up">
+    **Call of Duty style** - Top center of screen
+
+    ```lua config.lua
+    Config.Position = 'top-center'
+    ```
+
+    <Info>Popular for FPS-style servers</Info>
+  </Tab>
+
+  <Tab title="center-left" icon="arrow-left">
+    **Left side** - Center left of screen
+
+    ```lua config.lua
+    Config.Position = 'center-left'
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+### Config.MaxEntries
+
+<ParamField path="Config.MaxEntries" type="number" default="5">
+  Maximum number of kill notifications shown simultaneously
+</ParamField>
+
+**Examples**:
+
+```lua config.lua
+-- Show only 3 kills at a time (minimal)
+Config.MaxEntries = 3
+
+-- Show 5 kills (default, recommended)
+Config.MaxEntries = 5
+
+-- Show up to 10 kills (busy servers)
+Config.MaxEntries = 10
+```
+
+<Tip>
+  **Recommended Range**: 3-7 entries
+  - Too few: Miss kills on busy servers
+  - Too many: Screen clutter
+</Tip>
+
+---
+
+### Config.EnableSound
+
+<ParamField path="Config.EnableSound" type="boolean" default="false">
+  Enable or disable sound notifications when new kills appear
+</ParamField>
+
+**Options**:
+
+<Tabs>
+  <Tab title="Disabled (Default)" icon="volume-xmark">
+    No sounds play when kills occur
+
+    ```lua config.lua
+    Config.EnableSound = false
+    ```
+
+    <Info>Recommended for most servers to avoid audio spam</Info>
+  </Tab>
+
+  <Tab title="Enabled" icon="volume">
+    Play sound when each kill appears
+
+    ```lua config.lua
+    Config.EnableSound = true
+    ```
+
+    <Warning>Can be annoying on high-activity servers</Warning>
+  </Tab>
+</Tabs>
+
+---
+
+## Example Configurations
+
+<Tabs>
+  <Tab title="Minimal Setup" icon="minimize">
+    **Best for**: Clean, unobtrusive killfeed
+
+    ```lua config.lua
+    Config.Position = 'center-right'
+    Config.MaxEntries = 3
+    Config.EnableSound = false
+    ```
+  </Tab>
+
+  <Tab title="Standard Setup" icon="equals">
+    **Best for**: Most servers (default)
+
+    ```lua config.lua
+    Config.Position = 'center-right'
+    Config.MaxEntries = 5
+    Config.EnableSound = false
+    ```
+  </Tab>
+
+  <Tab title="Deathmatch Style" icon="crosshairs">
+    **Best for**: High-action PvP servers
+
+    ```lua config.lua
+    Config.Position = 'top-center'
+    Config.MaxEntries = 7
+    Config.EnableSound = true
+    ```
+  </Tab>
+
+  <Tab title="Roleplay Events" icon="masks-theater">
+    **Best for**: Organized events, tournaments
+
+    ```lua config.lua
+    Config.Position = 'top-center'
+    Config.MaxEntries = 4
+    Config.EnableSound = false
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Advanced Customization
+
+<Warning>
+  The following customizations require editing client files. Make backups before modifying!
+</Warning>
+
+### Changing Colors
+
+To customize the killfeed appearance, edit `client/html/style.css`:
+
+```css client/html/style.css
+/* Background color */
+.killfeed-entry {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+/* Text colors */
+.killer-name {
+    color: #ff4444;
+}
+
+.victim-name {
+    color: #ffffff;
+}
+```
+
+### Changing Sounds
+
+To use custom kill sounds:
+
+<Steps>
+  <Step title="Add Sound File">
+    Place your sound file in `client/sounds/`
+  </Step>
+  <Step title="Update Reference">
+    Edit `client/main.lua` to reference your sound file
+  </Step>
+  <Step title="Enable Sounds">
+    Set `Config.EnableSound = true`
+  </Step>
+</Steps>
+
+**Supported formats**: `.ogg`, `.mp3`, `.wav`
+
+---
+
+## Testing Your Configuration
+
+After making changes:
+
+<Steps>
+  <Step title="Save Config">
+    Save your `config.lua` file
+  </Step>
+  <Step title="Restart Resource">
+    Run `restart jx_killfeed` in server console
+  </Step>
+  <Step title="Test In-Game">
+    Join the server and test a kill to verify position and settings
+  </Step>
+</Steps>
+
+<Tip>
+  If you don't see changes, try a full server restart instead of just restarting the resource.
+</Tip>

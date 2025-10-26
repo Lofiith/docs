@@ -1,0 +1,474 @@
+---
+title: 'Exports'
+description: 'Integrate VIP checks into your resources'
+icon: 'code'
+---
+
+# Exports Reference
+
+Use these exports to integrate VIP checks into your own resources.
+
+<Info>
+  All exports are **server-side** only for security reasons.
+</Info>
+
+---
+
+## hasVipAccess
+
+Check if a player has the required VIP access level.
+
+### Syntax
+
+```lua
+local hasAccess = exports.jx_vip:hasVipAccess(playerId, level)
+```
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `playerId` | number | Yes | Server ID of the player |
+| `level` | string | Yes | Required VIP level: `'vip'` or `'vip_plus'` |
+
+### Returns
+
+| Type | Description |
+|------|-------------|
+| `boolean` | `true` if player has access, `false` otherwise |
+
+### Examples
+
+<Tabs>
+  <Tab title="Basic VIP Check" icon="check">
+    Check if a player has any VIP access:
+
+    ```lua
+    RegisterCommand('vipcar', function(source, args)
+        local hasVIP = exports.jx_vip:hasVipAccess(source, 'vip')
+        
+        if hasVIP then
+            -- Give VIP vehicle
+            TriggerClientEvent('garage:spawnVIPCar', source)
+        else
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {"You need VIP access for this command!"}
+            })
+        end
+    end)
+    ```
+  </Tab>
+
+  <Tab title="VIP+ Check" icon="crown">
+    Check if a player has VIP+ access:
+
+    ```lua
+    RegisterCommand('vipplus', function(source, args)
+        local hasVIPPlus = exports.jx_vip:hasVipAccess(source, 'vip_plus')
+        
+        if hasVIPPlus then
+            -- Give VIP+ exclusive item
+            TriggerClientEvent('inventory:giveItem', source, 'special_item', 1)
+        else
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {"VIP+ membership required!"}
+            })
+        end
+    end)
+    ```
+  </Tab>
+
+  <Tab title="Tiered Pricing" icon="dollar-sign">
+    Different prices based on VIP tier:
+
+    ```lua
+    RegisterNetEvent('shop:buyItem')
+    AddEventHandler('shop:buyItem', function(itemName)
+        local source = source
+        local basePrice = 1000
+        local finalPrice = basePrice
+        
+        -- Check VIP tiers for discounts
+        if exports.jx_vip:hasVipAccess(source, 'vip_plus') then
+            finalPrice = basePrice * 0.5  -- 50% off for VIP+
+        elseif exports.jx_vip:hasVipAccess(source, 'vip') then
+            finalPrice = basePrice * 0.75 -- 25% off for VIP
+        end
+        
+        -- Process purchase with final price
+        TriggerClientEvent('shop:showPrice', source, finalPrice)
+    end)
+    ```
+  </Tab>
+
+  <Tab title="Event Access" icon="calendar">
+    Restrict event access to VIP members:
+
+    ```lua
+    RegisterNetEvent('event:joinTournament')
+    AddEventHandler('event:joinTournament', function()
+        local source = source
+        
+        if not exports.jx_vip:hasVipAccess(source, 'vip') then
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {"This tournament is VIP-only!"}
+            })
+            return
+        end
+        
+        -- Add player to tournament
+        TriggerEvent('tournament:addPlayer', source)
+    end)
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## updatePlayerVipState
+
+Manually update a player's VIP state. Useful after role changes.
+
+### Syntax
+
+```lua
+exports.jx_vip:updatePlayerVipState(playerId)
+```
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `playerId` | number | Yes | Server ID of the player |
+
+### Returns
+
+None (updates internal cache)
+
+### Examples
+
+<Tabs>
+  <Tab title="After Role Change">
+    Update VIP status after manually changing Discord role:
+
+    ```lua
+    RegisterCommand('refreshvip', function(source, args)
+        exports.jx_vip:updatePlayerVipState(source)
+        TriggerClientEvent('chat:addMessage', source, {
+            args = {"VIP status refreshed!"}
+        })
+    end)
+    ```
+  </Tab>
+
+  <Tab title="Admin Command">
+    Admin command to refresh a player's VIP:
+
+    ```lua
+    RegisterCommand('adminrefreshvip', function(source, args)
+        if not IsPlayerAdmin(source) then return end
+        
+        local targetId = tonumber(args[1])
+        if not targetId then
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {"Usage: /adminrefreshvip [playerid]"}
+            })
+            return
+        end
+        
+        exports.jx_vip:updatePlayerVipState(targetId)
+        TriggerClientEvent('chat:addMessage', source, {
+            args = {string.format("Refreshed VIP for player %d", targetId)}
+        })
+    end, true)
+    ```
+  </Tab>
+
+  <Tab title="Automatic Refresh">
+    Refresh VIP status periodically:
+
+    ```lua
+    -- Refresh all online players every 10 minutes
+    CreateThread(function()
+        while true do
+            Wait(600000) -- 10 minutes
+            
+            local players = GetPlayers()
+            for _, playerId in ipairs(players) do
+                exports.jx_vip:updatePlayerVipState(tonumber(playerId))
+            end
+            
+            print(string.format("Refreshed VIP status for %d players", #players))
+        end
+    end)
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+  Only use this if you need to manually refresh VIP status. The system automatically updates on player connect.
+</Warning>
+
+---
+
+## Common Integration Patterns
+
+### VIP-Only Zones
+
+Restrict areas to VIP members:
+
+```lua
+-- Server-side zone check
+RegisterNetEvent('zone:checkAccess')
+AddEventHandler('zone:checkAccess', function(zoneName)
+    local source = source
+    
+    if zoneName == 'vip_lounge' then
+        if not exports.jx_vip:hasVipAccess(source, 'vip') then
+            TriggerClientEvent('zone:kick', source, 'VIP access required!')
+            return
+        end
+    end
+    
+    TriggerClientEvent('zone:enter', source, zoneName)
+end)
+```
+
+### VIP Commands
+
+Create VIP-exclusive commands:
+
+```lua
+-- VIP-only vehicle spawn
+RegisterCommand('vipvehicle', function(source, args)
+    if not exports.jx_vip:hasVipAccess(source, 'vip') then
+        TriggerClientEvent('chat:addMessage', source, {
+            args = {"VIP membership required"}
+        })
+        return
+    end
+    
+    local model = args[1] or 'adder'
+    TriggerClientEvent('vehicle:spawn', source, model)
+end)
+
+-- VIP+ only helicopter
+RegisterCommand('vipheli', function(source, args)
+    if not exports.jx_vip:hasVipAccess(source, 'vip_plus') then
+        TriggerClientEvent('chat:addMessage', source, {
+            args = {"VIP+ membership required"}
+        })
+        return
+    end
+    
+    TriggerClientEvent('vehicle:spawn', source, 'buzzard')
+end)
+```
+
+### VIP Multipliers
+
+Apply multipliers for VIP members:
+
+```lua
+-- Salary multiplier
+RegisterNetEvent('paycheck:receive')
+AddEventHandler('paycheck:receive', function(baseAmount)
+    local source = source
+    local multiplier = 1.0
+    
+    if exports.jx_vip:hasVipAccess(source, 'vip_plus') then
+        multiplier = 1.5  -- 50% bonus for VIP+
+    elseif exports.jx_vip:hasVipAccess(source, 'vip') then
+        multiplier = 1.25 -- 25% bonus for VIP
+    end
+    
+    local finalAmount = baseAmount * multiplier
+    
+    -- Give money to player
+    TriggerEvent('giveMoney', source, finalAmount)
+end)
+```
+
+### VIP Whitelist
+
+Create VIP-only servers or events:
+
+```lua
+-- VIP-only server
+AddEventHandler('playerConnecting', function(name, setKickReason, deferrals)
+    local source = source
+    deferrals.defer()
+    
+    Wait(100) -- Let Discord data load
+    
+    if not exports.jx_vip:hasVipAccess(source, 'vip') then
+        deferrals.done("This server is VIP-only! Purchase VIP at our store.")
+    else
+        deferrals.done()
+    end
+end)
+```
+
+### VIP Spawn Points
+
+Custom spawn locations for VIP:
+
+```lua
+RegisterNetEvent('spawn:getLocation')
+AddEventHandler('spawn:getLocation', function()
+    local source = source
+    local spawnPoint
+    
+    if exports.jx_vip:hasVipAccess(source, 'vip_plus') then
+        spawnPoint = vector3(100, 200, 30) -- VIP+ spawn
+    elseif exports.jx_vip:hasVipAccess(source, 'vip') then
+        spawnPoint = vector3(150, 250, 25) -- VIP spawn
+    else
+        spawnPoint = vector3(200, 300, 20) -- Default spawn
+    end
+    
+    TriggerClientEvent('spawn:setLocation', source, spawnPoint)
+end)
+```
+
+---
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Always Check on Server-Side" icon="server">
+    **Never** check VIP status on the client - it can be spoofed!
+
+    ```lua
+    -- ❌ Bad (client-side check, exploitable)
+    RegisterCommand('vipcar', function()
+        -- DON'T DO THIS ON CLIENT
+        if hasVIP then
+            SpawnCar()
+        end
+    end)
+
+    -- ✅ Good (server-side check)
+    RegisterCommand('vipcar', function(source, args)
+        if exports.jx_vip:hasVipAccess(source, 'vip') then
+            TriggerClientEvent('spawnCar', source)
+        end
+    end)
+    ```
+  </Accordion>
+
+  <Accordion title="Cache Results When Possible" icon="database">
+    Don't spam the export in loops:
+
+    ```lua
+    -- ❌ Bad (calls every second)
+    CreateThread(function()
+        while true do
+            Wait(1000)
+            if exports.jx_vip:hasVipAccess(source, 'vip') then
+                -- Do something
+            end
+        end
+    end)
+
+    -- ✅ Good (call once, cache result)
+    local isVIP = exports.jx_vip:hasVipAccess(source, 'vip')
+    CreateThread(function()
+        while true do
+            Wait(1000)
+            if isVIP then
+                -- Do something
+            end
+        end
+    end)
+    ```
+
+    <Info>
+      Update cache when needed using `updatePlayerVipState`
+    </Info>
+  </Accordion>
+
+  <Accordion title="Provide Clear Feedback" icon="message">
+    Always tell players why they can't access something:
+
+    ```lua
+    -- ❌ Bad (no feedback)
+    if not exports.jx_vip:hasVipAccess(source, 'vip') then
+        return
+    end
+
+    -- ✅ Good (clear message)
+    if not exports.jx_vip:hasVipAccess(source, 'vip') then
+        TriggerClientEvent('chat:addMessage', source, {
+            args = {"You need VIP to use this feature!"}
+        })
+        return
+    end
+    ```
+  </Accordion>
+
+  <Accordion title="Handle Edge Cases" icon="triangle-exclamation">
+    Check if export exists before using:
+
+    ```lua
+    -- Safe export check
+    local function hasVIP(playerId, level)
+        if GetResourceState('jx_vip') ~= 'started' then
+            print('JX VIP not started!')
+            return false
+        end
+        
+        return exports.jx_vip:hasVipAccess(playerId, level)
+    end
+
+    -- Use it
+    if hasVIP(source, 'vip') then
+        -- Give benefits
+    end
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Integration Examples
+
+<CardGroup cols={2}>
+  <Card title="Garage System" icon="warehouse">
+    ```lua
+    -- VIP-only vehicles
+    if exports.jx_vip:hasVipAccess(source, 'vip_plus') then
+        -- Allow supercar
+    end
+    ```
+  </Card>
+
+  <Card title="Housing System" icon="house">
+    ```lua
+    -- Bigger houses for VIP
+    local maxSlots = hasVIP ? 50 : 20
+    ```
+  </Card>
+
+  <Card title="Job System" icon="briefcase">
+    ```lua
+    -- VIP salary bonuses
+    local bonus = hasVIPPlus ? 1.5 : 1.0
+    ```
+  </Card>
+
+  <Card title="Shop System" icon="cart-shopping">
+    ```lua
+    -- VIP discounts
+    local discount = hasVIP ? 0.15 : 0
+    ```
+  </Card>
+</CardGroup>
+
+---
+
+## Need Help?
+
+<Card title="Join Our Discord" icon="discord" href="https://discord.gg/VuMcnbmEby" horizontal>
+  Get integration help and share your implementations
+</Card>

@@ -1,0 +1,873 @@
+---
+title: 'Exports Reference'
+description: 'Complete guide to all JX Discord API exports with examples'
+---
+
+# Exports Reference
+
+JX Discord API provides a comprehensive set of exports that allow other resources to interact with Discord data. This page documents every export with detailed explanations, parameters, return values, and practical examples.
+
+## Understanding Exports
+
+Exports are functions that can be called from other resources to retrieve Discord information. JX Discord API uses two types of return methods:
+
+1. **Immediate Returns**: Functions that return data instantly (synchronous)
+2. **Callback Returns**: Functions that return data via a callback function (asynchronous)
+
+Most exports use **callbacks** because they need to fetch data from Discord's API or check the cache, which takes time.
+
+---
+
+## Basic Player Information
+
+### GetPlayerDiscordId
+
+Returns a player's Discord ID immediately without requiring a callback. This is the fastest export available.
+
+#### Syntax
+
+```lua
+local discordId = exports.jx_discord:GetPlayerDiscordId(source)
+```
+
+#### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `source` | number | Yes | The server ID of the player |
+
+#### Returns
+
+| Type | Description |
+|------|-------------|
+| `string` or `nil` | The player's Discord ID (18-19 digit number), or `nil` if not available |
+
+#### Examples
+
+**Basic Usage**:
+```lua
+RegisterCommand('myid', function(source, args)
+    local discordId = exports.jx_discord:GetPlayerDiscordId(source)
+    
+    if discordId then
+        TriggerClientEvent('chat:addMessage', source, {
+            args = {"Your Discord ID: " .. discordId}
+        })
+    else
+        TriggerClientEvent('chat:addMessage', source, {
+            args = {"Discord not linked!"}
+        })
+    end
+end)
+```
+
+**Database Storage**:
+```lua
+-- Store Discord ID in database when player connects
+AddEventHandler('playerConnecting', function(name, setKickReason, deferrals)
+    local source = source
+    
+    Wait(100) -- Give time for Discord to load
+    
+    local discordId = exports.jx_discord:GetPlayerDiscordId(source)
+    
+    if discordId then
+        -- Store in database
+        MySQL.Async.execute('UPDATE users SET discord_id = @discord_id WHERE identifier = @identifier', {
+            ['@discord_id'] = discordId,
+            ['@identifier'] = GetPlayerIdentifiers(source)[1]
+        })
+    end
+end)
+```
+
+**Linking Check**:
+```lua
+-- Check if player has Discord linked before allowing action
+RegisterNetEvent('myresource:doSomething')
+AddEventHandler('myresource:doSomething', function()
+    local source = source
+    local discordId = exports.jx_discord:GetPlayerDiscordId(source)
+    
+    if not discordId then
+        TriggerClientEvent('chat:addMessage', source, {
+            args = {"You must link Discord to use this feature!"}
+        })
+        return
+    end
+    
+    -- Continue with action
+end)
+```
+
+---
+
+### GetPlayerAvatar
+
+Retrieves a player's Discord avatar URL. This can be used to display player avatars in UIs, scoreboards, or websites.
+
+#### Syntax
+
+```lua
+exports.jx_discord:GetPlayerAvatar(source, function(success, avatarUrl)
+    -- Your code here
+end)
+```
+
+#### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `source` | number | Yes | The server ID of the player |
+| `callback` | function | Yes | Function called with the results |
+
+#### Callback Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `success` | boolean | `true` if the avatar was retrieved successfully |
+| `avatarUrl` | string or nil | The full URL to the player's Discord avatar, or `nil` if they don't have one |
+
+#### Avatar URL Format
+
+Avatar URLs returned are in this format:
+```
+https://cdn.discordapp.com/avatars/{user_id}/{avatar_hash}.png
+```
+
+If the player doesn't have a custom avatar, `avatarUrl` will be `nil`.
+
+#### Examples
+
+**Display in Chat**:
+```lua
+RegisterCommand('myavatar', function(source, args)
+    exports.jx_discord:GetPlayerAvatar(source, function(success, avatarUrl)
+        if success and avatarUrl then
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {"Your avatar: " .. avatarUrl}
+            })
+        else
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {"You don't have a Discord avatar set"}
+            })
+        end
+    end)
+end)
+```
+
+**Send to Client for UI**:
+```lua
+-- Server-side: Fetch avatar and send to client
+RegisterNetEvent('scoreboard:requestPlayerData')
+AddEventHandler('scoreboard:requestPlayerData', function()
+    local source = source
+    
+    exports.jx_discord:GetPlayerAvatar(source, function(success, avatarUrl)
+        local avatar = avatarUrl or 'https://i.imgur.com/default-avatar.png' -- Fallback image
+        
+        TriggerClientEvent('scoreboard:receivePlayerData', source, {
+            name = GetPlayerName(source),
+            avatar = avatar
+        })
+    end)
+end)
+```
+
+**Batch Fetch for All Players**:
+```lua
+-- Get avatars for all online players
+RegisterCommand('getall avatars', function(source, args)
+    local players = GetPlayers()
+    
+    for _, playerId in ipairs(players) do
+        exports.jx_discord:GetPlayerAvatar(playerId, function(success, avatarUrl)
+            if success and avatarUrl then
+                print(GetPlayerName(playerId) .. "'s avatar: " .. avatarUrl)
+            end
+        end)
+    end
+end, true) -- Restrict to server console
+```
+
+**Webhook with Player Avatar**:
+```lua
+-- Send webhook with player's Discord avatar
+function sendWebhookWithAvatar(playerId, message)
+    exports.jx_discord:GetPlayerAvatar(playerId, function(success, avatarUrl)
+        PerformHttpRequest('YOUR_WEBHOOK_URL', function() end, 'POST', json.encode({
+            username = GetPlayerName(playerId),
+            avatar_url = avatarUrl or nil,
+            content = message
+        }), {['Content-Type'] = 'application/json'})
+    end)
+end
+```
+
+---
+
+### GetPlayerUsername
+
+Retrieves a player's Discord username (e.g., "PlayerName" or "PlayerName#1234" for older accounts).
+
+#### Syntax
+
+```lua
+exports.jx_discord:GetPlayerUsername(source, function(success, username)
+    -- Your code here
+end)
+```
+
+#### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `source` | number | Yes | The server ID of the player |
+| `callback` | function | Yes | Function called with the results |
+
+#### Callback Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `success` | boolean | `true` if the username was retrieved successfully |
+| `username` | string or nil | The player's Discord username, or `nil` if not available |
+
+#### Examples
+
+**Display Username**:
+```lua
+RegisterCommand('discord name', function(source, args)
+    exports.jx_discord:GetPlayerUsername(source, function(success, username)
+        if success and username then
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {"Your Discord username: " .. username}
+            })
+        else
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {"Could not fetch Discord username"}
+            })
+        end
+    end)
+end)
+```
+
+**Welcome Message**:
+```lua
+-- Send personalized welcome message using Discord name
+AddEventHandler('playerConnecting', function(name, setKickReason, deferrals)
+    local source = source
+    deferrals.defer()
+    
+    Wait(100)
+    
+    exports.jx_discord:GetPlayerUsername(source, function(success, username)
+        if success and username then
+            deferrals.done()
+            Wait(5000) -- Wait for player to fully connect
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {"Welcome, " .. username .. "!"}
+            })
+        else
+            deferrals.done()
+        end
+    end)
+end)
+```
+
+**Admin Logs**:
+```lua
+-- Log admin actions with Discord username
+RegisterNetEvent('admin:kickPlayer')
+AddEventHandler('admin:kickPlayer', function(targetId, reason)
+    local source = source
+    
+    exports.jx_discord:GetPlayerUsername(source, function(success, adminName)
+        local admin = adminName or GetPlayerName(source)
+        local target = GetPlayerName(targetId)
+        
+        print(string.format("[ADMIN] %s kicked %s (Reason: %s)", admin, target, reason))
+    end)
+end)
+```
+
+---
+
+## Role Management
+
+### GetPlayerRoles
+
+Retrieves all Discord roles a player has in your server. Returns an array of role names.
+
+#### Syntax
+
+```lua
+exports.jx_discord:GetPlayerRoles(source, function(success, roles)
+    -- Your code here
+end)
+```
+
+#### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `source` | number | Yes | The server ID of the player |
+| `callback` | function | Yes | Function called with the results |
+
+#### Callback Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `success` | boolean | `true` if roles were retrieved successfully |
+| `roles` | table or nil | Array of role names (strings), or `nil` if failed |
+
+#### Return Format
+
+```lua
+roles = {
+    "Admin",
+    "VIP",
+    "Member",
+    "Level 50"
+}
+```
+
+#### Examples
+
+**List Player Roles**:
+```lua
+RegisterCommand('myroles', function(source, args)
+    exports.jx_discord:GetPlayerRoles(source, function(success, roles)
+        if success and roles then
+            if #roles > 0 then
+                TriggerClientEvent('chat:addMessage', source, {
+                    args = {"Your roles: " .. table.concat(roles, ", ")}
+                })
+            else
+                TriggerClientEvent('chat:addMessage', source, {
+                    args = {"You have no roles"}
+                })
+            end
+        else
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {"Could not fetch roles"}
+            })
+        end
+    end)
+end)
+```
+
+**Multi-Role VIP Check**:
+```lua
+-- Check if player has any VIP role
+RegisterCommand('vipcar', function(source, args)
+    exports.jx_discord:GetPlayerRoles(source, function(success, roles)
+        if not success or not roles then return end
+        
+        local vipRoles = {"VIP", "Premium", "VIP+", "Donator"}
+        local hasVIP = false
+        
+        for _, playerRole in ipairs(roles) do
+            for _, vipRole in ipairs(vipRoles) do
+                if playerRole == vipRole then
+                    hasVIP = true
+                    break
+                end
+            end
+        end
+        
+        if hasVIP then
+            -- Spawn VIP car
+            TriggerClientEvent('garage:spawnVIPCar', source)
+        else
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {"You need a VIP role to use this!"}
+            })
+        end
+    end)
+end)
+```
+
+**Staff Hierarchy**:
+```lua
+-- Determine staff rank based on roles
+function getStaffRank(playerId, callback)
+    exports.jx_discord:GetPlayerRoles(playerId, function(success, roles)
+        if not success or not roles then
+            callback(nil)
+            return
+        end
+        
+        local rank = nil
+        
+        if table.contains(roles, "Owner") then
+            rank = "owner"
+        elseif table.contains(roles, "Admin") then
+            rank = "admin"
+        elseif table.contains(roles, "Moderator") then
+            rank = "moderator"
+        elseif table.contains(roles, "Support") then
+            rank = "support"
+        end
+        
+        callback(rank)
+    end)
+end
+
+-- Helper function
+function table.contains(table, element)
+    for _, value in pairs(table) do
+        if value == element then
+            return true
+        end
+    end
+    return false
+end
+```
+
+**Role-Based Permissions**:
+```lua
+-- Give different vehicles based on roles
+RegisterNetEvent('garage:spawnCar')
+AddEventHandler('garage:spawnCar', function()
+    local source = source
+    
+    exports.jx_discord:GetPlayerRoles(source, function(success, roles)
+        if not success or not roles then return end
+        
+        local vehicleModel = "blista" -- Default
+        
+        if table.contains(roles, "Admin") then
+            vehicleModel = "t20" -- Admin gets supercar
+        elseif table.contains(roles, "VIP") then
+            vehicleModel = "carbonizzare" -- VIP gets sports car
+        end
+        
+        TriggerClientEvent('garage:receiveVehicle', source, vehicleModel)
+    end)
+end)
+```
+
+---
+
+### HasPlayerRole
+
+Checks if a player has a specific Discord role. This is more efficient than `GetPlayerRoles` when you only need to check for one role.
+
+#### Syntax
+
+```lua
+exports.jx_discord:HasPlayerRole(source, roleNameOrId, function(hasRole)
+    -- Your code here
+end)
+```
+
+#### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `source` | number | Yes | The server ID of the player |
+| `roleNameOrId` | string | Yes | The role name (e.g., "VIP") or role ID (18-19 digits) |
+| `callback` | function | Yes | Function called with the result |
+
+#### Callback Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `hasRole` | boolean | `true` if the player has the role, `false` otherwise |
+
+#### Role Name vs Role ID
+
+**Role Name**:
+- Easier to use and read
+- Example: `"VIP"`, `"Admin"`, `"Staff"`
+- Case-sensitive (must match exactly)
+- Can break if role is renamed
+
+**Role ID**:
+- More reliable (won't break if role is renamed)
+- Example: `"123456789012345678"`
+- Get by right-clicking role in Discord → Copy ID (with Developer Mode enabled)
+- Recommended for production use
+
+#### Examples
+
+**Basic Role Check**:
+```lua
+RegisterCommand('staffmenu', function(source, args)
+    exports.jx_discord:HasPlayerRole(source, "Staff", function(hasRole)
+        if hasRole then
+            TriggerClientEvent('staffmenu:open', source)
+        else
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {"You don't have permission to use this!"}
+            })
+        end
+    end)
+end)
+```
+
+**VIP Check (by role ID)**:
+```lua
+-- Using role ID for reliability
+RegisterCommand('vipzone', function(source, args)
+    local VIP_ROLE_ID = "987654321098765432"
+    
+    exports.jx_discord:HasPlayerRole(source, VIP_ROLE_ID, function(hasRole)
+        if hasRole then
+            TriggerClientEvent('zone:teleportToVIP', source)
+        else
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {"VIP membership required!"}
+            })
+        end
+    end)
+end)
+```
+
+**Whitelist System**:
+```lua
+-- Kick players who don't have whitelist role
+AddEventHandler('playerConnecting', function(name, setKickReason, deferrals)
+    local source = source
+    deferrals.defer()
+    
+    Wait(100)
+    
+    exports.jx_discord:HasPlayerRole(source, "Whitelisted", function(hasRole)
+        if hasRole then
+            deferrals.done()
+        else
+            deferrals.done("You must be whitelisted to join! Apply in our Discord.")
+        end
+    end)
+end)
+```
+
+**Multiple Role Check**:
+```lua
+-- Check for multiple roles (any of them grants access)
+function hasAnyRole(playerId, roleList, callback)
+    local checkedRoles = 0
+    local totalRoles = #roleList
+    local hasAccess = false
+    
+    for _, roleName in ipairs(roleList) do
+        exports.jx_discord:HasPlayerRole(playerId, roleName, function(hasRole)
+            if hasRole then
+                hasAccess = true
+            end
+            
+            checkedRoles = checkedRoles + 1
+            
+            if checkedRoles == totalRoles then
+                callback(hasAccess)
+            end
+        end)
+    end
+end
+
+-- Usage
+RegisterCommand('adminmenu', function(source, args)
+    hasAnyRole(source, {"Admin", "Moderator", "Support"}, function(hasAccess)
+        if hasAccess then
+            TriggerClientEvent('adminmenu:open', source)
+        else
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {"Staff role required!"}
+            })
+        end
+    end)
+end)
+```
+
+**Role-Based Pricing**:
+```lua
+-- Different prices for VIP members
+RegisterNetEvent('shop:buyItem')
+AddEventHandler('shop:buyItem', function(itemName)
+    local source = source
+    local basePrice = 1000
+    
+    exports.jx_discord:HasPlayerRole(source, "VIP", function(isVIP)
+        local finalPrice = isVIP and (basePrice * 0.5) or basePrice -- 50% off for VIP
+        
+        -- Process purchase with finalPrice
+        TriggerClientEvent('chat:addMessage', source, {
+            args = {string.format("Price: $%d %s", finalPrice, isVIP and "(VIP Discount!)" or "")}
+        })
+    end)
+end)
+```
+
+---
+
+## Complete Player Data
+
+### GetPlayerInfo
+
+Retrieves all Discord information for a player in a single call. This is the most efficient way to get multiple pieces of information at once.
+
+#### Syntax
+
+```lua
+exports.jx_discord:GetPlayerInfo(source, function(success, data)
+    -- Your code here
+end)
+```
+
+#### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `source` | number | Yes | The server ID of the player |
+| `callback` | function | Yes | Function called with the results |
+
+#### Callback Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `success` | boolean | `true` if data was retrieved successfully |
+| `data` | table or nil | Table containing all player Discord data, or `nil` if failed |
+
+#### Return Data Structure
+
+```lua
+data = {
+    id = "123456789012345678",           -- Discord ID (string)
+    username = "PlayerName",              -- Discord username (string)
+    avatar = "https://cdn.discordapp...", -- Avatar URL (string or nil)
+    roles = {"Admin", "VIP", "Member"},   -- Array of role names (table)
+    roleCount = 3                         -- Number of roles (number)
+}
+```
+
+#### Examples
+
+**Display All Info**:
+```lua
+RegisterCommand('discordinfo', function(source, args)
+    exports.jx_discord:GetPlayerInfo(source, function(success, data)
+        if success and data then
+            local message = string.format(
+                "Discord Info:\n" ..
+                "Username: %s\n" ..
+                "ID: %s\n" ..
+                "Roles: %s\n" ..
+                "Role Count: %d",
+                data.username,
+                data.id,
+                table.concat(data.roles, ", "),
+                data.roleCount
+            )
+            
+            TriggerClientEvent('chat:addMessage', source, {args = {message}})
+        end
+    end)
+end)
+```
+
+**Complete Player Profile**:
+```lua
+-- Send full player profile to client for UI
+RegisterNetEvent('profile:requestData')
+AddEventHandler('profile:requestData', function()
+    local source = source
+    
+    exports.jx_discord:GetPlayerInfo(source, function(success, discordData)
+        if success and discordData then
+            local profileData = {
+                fivem = {
+                    name = GetPlayerName(source),
+                    id = source
+                },
+                discord = {
+                    username = discordData.username,
+                    id = discordData.id,
+                    avatar = discordData.avatar or "https://i.imgur.com/default.png",
+                    roles = discordData.roles,
+                    roleCount = discordData.roleCount
+                }
+            }
+            
+            TriggerClientEvent('profile:receiveData', source, profileData)
+        end
+    end)
+end)
+```
+
+**Admin Panel Data**:
+```lua
+-- Get data for admin panel
+RegisterCommand('adminpanel', function(source, args)
+    local players = GetPlayers()
+    local playerData = {}
+    local processedPlayers = 0
+    
+    for _, playerId in ipairs(players) do
+        exports.jx_discord:GetPlayerInfo(playerId, function(success, data)
+            if success and data then
+                table.insert(playerData, {
+                    id = playerId,
+                    name = GetPlayerName(playerId),
+                    discord = data
+                })
+            end
+            
+            processedPlayers = processedPlayers + 1
+            
+            if processedPlayers == #players then
+                -- Send all data to admin
+                TriggerClientEvent('adminpanel:receivePlayerData', source, playerData)
+            end
+        end)
+    end
+end)
+```
+
+**Detailed Logging**:
+```lua
+-- Log player connection with full Discord info
+AddEventHandler('playerConnecting', function(name, setKickReason, deferrals)
+    local source = source
+    
+    Wait(100)
+    
+    exports.jx_discord:GetPlayerInfo(source, function(success, data)
+        if success and data then
+            print("=== Player Connected ===")
+            print("FiveM Name: " .. name)
+            print("Discord Username: " .. data.username)
+            print("Discord ID: " .. data.id)
+            print("Roles: " .. table.concat(data.roles, ", "))
+            print("=======================")
+        end
+    end)
+end)
+```
+
+---
+
+## Performance Tips
+
+### Caching Results
+
+Don't call exports repeatedly for the same player in a short time. Cache the results:
+
+```lua
+-- Bad (calls export every second)
+CreateThread(function()
+    while true do
+        Wait(1000)
+        exports.jx_discord:HasPlayerRole(source, "VIP", function(hasRole)
+            -- Do something
+        end)
+    end
+end)
+
+-- Good (calls once, caches result)
+local playerVIPStatus = {}
+
+function checkVIP(playerId, callback)
+    if playerVIPStatus[playerId] ~= nil then
+        callback(playerVIPStatus[playerId])
+    else
+        exports.jx_discord:HasPlayerRole(playerId, "VIP", function(hasRole)
+            playerVIPStatus[playerId] = hasRole
+            callback(hasRole)
+        end)
+    end
+end
+```
+
+### Use GetPlayerInfo for Multiple Data Points
+
+If you need username AND avatar AND roles, use `GetPlayerInfo` instead of calling each export separately:
+
+```lua
+-- Bad (3 separate API checks)
+exports.jx_discord:GetPlayerUsername(source, function(success, username) end)
+exports.jx_discord:GetPlayerAvatar(source, function(success, avatar) end)
+exports.jx_discord:GetPlayerRoles(source, function(success, roles) end)
+
+-- Good (1 API check)
+exports.jx_discord:GetPlayerInfo(source, function(success, data)
+    local username = data.username
+    local avatar = data.avatar
+    local roles = data.roles
+end)
+```
+
+### Use Role IDs Instead of Names
+
+Role IDs are faster to check and won't break if roles are renamed:
+
+```lua
+-- Good
+exports.jx_discord:HasPlayerRole(source, "123456789012345678", function(hasRole) end)
+
+-- Also good, but can break if role renamed
+exports.jx_discord:HasPlayerRole(source, "VIP", function(hasRole) end)
+```
+
+---
+
+## Common Patterns
+
+### Permission Check Function
+
+```lua
+function hasPermission(playerId, requiredRole, callback)
+    exports.jx_discord:HasPlayerRole(playerId, requiredRole, function(hasRole)
+        callback(hasRole)
+    end)
+end
+
+-- Usage
+RegisterCommand('restrictedcommand', function(source, args)
+    hasPermission(source, "Admin", function(allowed)
+        if allowed then
+            -- Execute command
+        else
+            -- Deny
+        end
+    end)
+end)
+```
+
+### VIP Discount System
+
+```lua
+function getPlayerDiscount(playerId, callback)
+    exports.jx_discord:GetPlayerRoles(playerId, function(success, roles)
+        if not success or not roles then
+            callback(0)
+            return
+        end
+        
+        local discount = 0
+        
+        if table.contains(roles, "VIP+") then
+            discount = 0.25 -- 25% off
+        elseif table.contains(roles, "VIP") then
+            discount = 0.10 -- 10% off
+        end
+        
+        callback(discount)
+    end)
+end
+
+-- Usage
+RegisterNetEvent('shop:purchase')
+AddEventHandler('shop:purchase', function(itemPrice)
+    local source = source
+    
+    getPlayerDiscount(source, function(discount)
+        local finalPrice = itemPrice * (1 - discount)
+        -- Process purchase
+    end)
+end)
+```
+
+---
+
+Need more examples or have questions about exports? Join our Discord for support!

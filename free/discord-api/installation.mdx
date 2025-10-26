@@ -1,0 +1,290 @@
+---
+title: 'Installation Guide'
+description: 'Step-by-step guide to install and configure JX Discord API'
+icon: 'download'
+---
+
+# Installation Guide
+
+This guide will walk you through every step of installing JX Discord API, from creating your Discord bot to starting the resource on your FiveM server.
+
+<Info>
+  **Estimated Time**: 10-15 minutes  
+  **Difficulty**: Beginner-Friendly
+</Info>
+
+## Step 1: Download the Resource
+
+<Steps>
+  <Step title="Download JX Discord API" icon="download">
+    Download the latest version from our official source
+  </Step>
+  <Step title="Extract Files" icon="file-zipper">
+    Extract the folder from the ZIP file
+  </Step>
+  <Step title="Rename Folder" icon="pen">
+    Rename the folder to `jx_discord` (lowercase, with underscore)
+  </Step>
+  <Step title="Move to Resources" icon="folder">
+    Place the `jx_discord` folder in your server's `resources` directory
+  </Step>
+</Steps>
+
+<Warning>
+  The resource **must** be named `jx_discord` exactly. Do not rename it to anything else or it will not work!
+</Warning>
+
+## Step 2: Create a Discord Bot
+
+If you've never created a Discord bot before, don't worry - it's easier than you think!
+
+### 2.1 - Access Discord Developer Portal
+
+1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
+2. Log in with your Discord account
+3. Click the **"New Application"** button in the top right
+4. Give your application a name (e.g., "My FiveM Server Bot")
+5. Click **"Create"**
+
+### 2.2 - Create the Bot
+
+1. In your new application, click **"Bot"** in the left sidebar
+2. Click **"Add Bot"** button
+3. Click **"Yes, do it!"** to confirm
+4. You now have a Discord bot!
+
+### 2.3 - Get Your Bot Token
+
+<Warning>
+**Never share your bot token with anyone!** It's like a password for your bot. If someone else gets it, they can control your bot.
+</Warning>
+
+1. Under the bot's username, you'll see a **"TOKEN"** section
+2. Click **"Reset Token"** (or "Copy" if this is a fresh bot)
+3. Click **"Yes, do it!"** to confirm
+4. Click **"Copy"** to copy your bot token
+5. **Save this token** - you'll need it for the configuration
+
+### 2.4 - Configure Bot Permissions
+
+Your bot needs specific permissions to function properly:
+
+1. Scroll down to **"Privileged Gateway Intents"**
+2. Enable the following intents:
+   - ✅ **SERVER MEMBERS INTENT** (required)
+   - ✅ **PRESENCE INTENT** (optional, but recommended)
+   - ✅ **MESSAGE CONTENT INTENT** (optional)
+3. Click **"Save Changes"** at the bottom
+
+### 2.5 - Invite Bot to Your Server
+
+Now we need to add the bot to your Discord server:
+
+1. Click **"OAuth2"** in the left sidebar
+2. Click **"URL Generator"** under OAuth2
+3. Under **"SCOPES"**, check:
+   - ✅ `bot`
+4. Under **"BOT PERMISSIONS"**, check:
+   - ✅ `Read Messages/View Channels`
+   - ✅ `Read Message History`
+5. Copy the generated URL at the bottom
+6. Paste it in your browser and select your Discord server
+7. Click **"Authorize"**
+8. Complete the captcha if prompted
+
+Your bot is now in your server! You should see it in your member list (offline for now).
+
+## Step 3: Get Your Discord Server ID
+
+You need your Discord server's Guild ID for the configuration:
+
+1. Open Discord
+2. Go to **User Settings** (gear icon)
+3. Go to **Advanced** (under "App Settings")
+4. Enable **"Developer Mode"**
+5. Close settings
+6. Right-click your Discord server icon
+7. Click **"Copy Server ID"**
+8. **Save this ID** - you'll need it for configuration
+
+## Step 4: Configure the Script
+
+Now that you have your bot token and server ID, let's configure the script:
+
+1. Open the `jx_discord` folder
+2. Open `config.lua` in a text editor
+3. Find these lines:
+
+```lua
+Config.Token = '' -- Your Discord Bot Token
+Config.Guild = '' -- Your Discord Guild/Server ID
+```
+
+4. Paste your bot token and server ID:
+
+```lua
+Config.Token = 'YOUR_BOT_TOKEN_HERE'
+Config.Guild = 'YOUR_SERVER_ID_HERE'
+```
+
+### Additional Configuration Options
+
+Here are all the configuration options explained:
+
+#### Discord Requirements
+
+```lua
+Config.RequireDiscord = true -- Kick players without Discord linked
+```
+- **true**: Players must have Discord linked to their FiveM account
+- **false**: Players can join without Discord (data won't be available)
+
+```lua
+Config.RequireInGuild = true -- Kick players not in Discord server
+```
+- **true**: Players must be in your Discord server to join
+- **false**: Players don't need to be in the server (but need Discord linked if `RequireDiscord` is true)
+
+```lua
+Config.KickMessage = 'You must be in our Discord server to play. Join: discord.gg/yourserver'
+```
+- Customize the message shown when players are kicked
+- Replace `discord.gg/yourserver` with your actual Discord invite link
+
+#### Auto Cache Management
+
+```lua
+Config.RefreshCacheOnConnect = true
+```
+- **true**: Refresh player Discord data every time they connect (recommended)
+- **false**: Use cached data (faster but may be outdated)
+
+#### Webhook Logging
+
+```lua
+Config.LogWebhookURL = '' -- Discord Webhook URL for connection logs
+```
+
+To enable connection logging:
+
+1. Go to your Discord server
+2. Right-click the channel where you want logs
+3. Click **"Edit Channel"**
+4. Click **"Integrations"**
+5. Click **"Create Webhook"**
+6. Give it a name (e.g., "Connection Logs")
+7. Click **"Copy Webhook URL"**
+8. Paste it in the config:
+
+```lua
+Config.LogWebhookURL = 'https://discord.com/api/webhooks/YOUR_WEBHOOK_URL'
+```
+
+Leave it empty (`''`) if you don't want connection logging.
+
+## Step 5: Add to server.cfg
+
+Almost done! Now we just need to tell your FiveM server to start the resource:
+
+1. Open your `server.cfg` file
+2. Add this line:
+
+```cfg
+ensure jx_discord
+```
+
+**Important**: Make sure this line is added **after** any framework resources (ESX, QBCore, etc.) but can be anywhere else.
+
+Example server.cfg order:
+```cfg
+ensure es_extended  # or qb-core
+ensure oxmysql
+
+ensure jx_discord  # Add here
+
+ensure your_other_resources
+```
+
+## Step 6: Start Your Server
+
+1. Start (or restart) your FiveM server
+2. Watch the console for the JX Discord API startup message
+3. You should see colored `[JX_Discord]` messages indicating successful startup
+
+### Verify Installation
+
+To verify everything is working:
+
+1. Join your FiveM server
+2. Check the server console - you should see your Discord data being loaded
+3. If you configured a webhook, check your Discord channel for a connection log
+
+### Successful Installation Indicators
+
+You'll know it's working if you see:
+- Green `[JX_Discord]` messages in console (not red errors)
+- Player Discord data appearing in console (if enabled)
+- Webhook logs in Discord (if configured)
+- Players without Discord getting kicked (if `RequireDiscord` is enabled)
+
+## Troubleshooting Installation Issues
+
+### "Invalid Bot Token" Error
+
+**Symptoms**: Red error about HTTP 401 or "Unauthorized"
+
+**Solutions**:
+- Double-check your bot token in the config
+- Make sure you copied the entire token (no extra spaces)
+- Try resetting your bot token in the Discord Developer Portal
+- Ensure the token is inside the quotes: `Config.Token = 'YOUR_TOKEN'`
+
+### "Cannot Find Guild" or HTTP 403 Error
+
+**Symptoms**: Errors about missing permissions or guild not found
+
+**Solutions**:
+- Verify your Guild ID is correct
+- Make sure your bot is actually in your Discord server (check the member list)
+- Ensure the bot has the **SERVER MEMBERS** intent enabled
+- Try removing and re-inviting the bot with the correct permissions
+
+### "Player Has No Discord" But They Do
+
+**Symptoms**: Players with Discord linked are being kicked
+
+**Solutions**:
+- Make sure players have Discord linked in FiveM (not just open)
+- Ask players to restart FiveM completely
+- Verify `Config.RequireDiscord` and `Config.RequireInGuild` settings
+- Check if player's Discord account is actually in your server
+
+### Bot Appears Offline
+
+**Symptoms**: Bot shows as offline in Discord
+
+**Solutions**:
+- This is normal! The bot doesn't need to be "online" to work
+- As long as the FiveM server is running, the bot is functional
+- The bot makes API calls without maintaining a persistent connection
+
+### No Webhook Logs Appearing
+
+**Symptoms**: Webhooks configured but no logs showing
+
+**Solutions**:
+- Verify the webhook URL is correct and complete
+- Make sure the webhook channel still exists
+- Check if the webhook was deleted in Discord
+- Ensure the URL starts with `https://discord.com/api/webhooks/`
+
+## Next Steps
+
+Now that JX Discord API is installed and running, you can:
+
+1. **Learn the Exports**: Check out our comprehensive exports documentation
+2. **Build Permission Systems**: Use role checking for staff menus
+3. **Create VIP Features**: Integrate with our JX VIP System
+4. **Customize Further**: Adjust the config to your server's needs
+
+Need more help? Join our Discord community for support!

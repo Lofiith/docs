@@ -1,0 +1,110 @@
+---
+title: 'Introduction'
+description: 'Lightweight Discord integration for FiveM servers'
+icon: 'book'
+---
+
+# Discord API
+
+A lightweight Discord integration script that provides seamless API functionality for your FiveM server. Verify player accounts, check roles, retrieve user information, and enforce Discord-based requirements.
+
+<Note>
+  **Free & Open Source** - Completely free to use and modify for your server.
+</Note>
+
+## What It Does
+
+Bridge your FiveM server with Discord to:
+
+- Verify player Discord accounts are linked
+- Enforce Discord server membership
+- Check player roles for permissions/VIP systems
+- Retrieve usernames, avatars, and role data
+- Log player connections via webhooks
+- Automatic caching for performance
+
+## Common Use Cases
+
+<Tabs>
+  <Tab title="Permission Systems" icon="shield-check">
+    Check Discord roles to grant access to staff menus, admin panels, or restricted commands.
+    
+    ```lua
+    exports.jx_discord:HasPlayerRole(source, "Staff", function(isStaff)
+        if isStaff then
+            TriggerClientEvent('openStaffMenu', source)
+        end
+    end)
+    ```
+  </Tab>
+
+  <Tab title="VIP Features" icon="star">
+    Verify VIP roles to provide exclusive features, vehicles, or discounts.
+    
+    ```lua
+    exports.jx_discord:HasPlayerRole(source, "VIP", function(isVIP)
+        if isVIP then
+            -- Give VIP benefits
+        end
+    end)
+    ```
+  </Tab>
+
+  <Tab title="Whitelist Systems" icon="list-check">
+    Require specific roles for server access during events or testing.
+    
+    ```lua
+    exports.jx_discord:HasPlayerRole(source, "Whitelisted", function(hasRole)
+        if not hasRole then
+            deferrals.done("You must be whitelisted")
+        end
+    end)
+    ```
+  </Tab>
+
+  <Tab title="Custom UI" icon="paintbrush">
+    Display player Discord avatars in scoreboards or custom interfaces.
+    
+    ```lua
+    exports.jx_discord:GetPlayerAvatar(source, function(success, avatarUrl)
+        TriggerClientEvent('updateUI', source, avatarUrl)
+    end)
+    ```
+  </Tab>
+</Tabs>
+
+
+
+## Requirements
+
+Before installing JX Discord API, ensure you have:
+
+- A Discord Bot (free to create - we'll show you how)
+- Your Discord Server/Guild ID
+- Basic understanding of FiveM resource installation
+- Access to your server.cfg file
+
+Don't worry if you've never created a Discord bot before - our installation guide walks you through every step!
+
+## Quick Start Guide
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="./installation">
+    Get JX Discord API up and running in 10 minutes
+  </Card>
+  <Card title="Configuration" icon="gear" href="./configuration">
+    Customize settings to match your server's needs
+  </Card>
+  <Card title="Exports Reference" icon="code" href="./exports">
+    Learn how to use Discord data in your resources
+  </Card>
+  <Card title="Troubleshooting" icon="wrench" href="./troubleshooting">
+    Common issues and solutions
+  </Card>
+</CardGroup>
+
+## Need Help?
+
+<Card title="Join Our Discord" icon="discord" href="https://discord.gg/VuMcnbmEby" horizontal>
+  Get support, share your implementations, and stay updated with the latest releases
+</Card>

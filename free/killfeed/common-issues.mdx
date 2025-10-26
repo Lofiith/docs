@@ -1,0 +1,371 @@
+---
+title: 'Common Issues'
+description: 'Quick solutions to killfeed problems'
+icon: 'circle-exclamation'
+---
+
+# Common Issues
+
+Quick fixes for the most common killfeed problems.
+
+---
+
+## Killfeed Not Showing
+
+<AccordionGroup>
+  <Accordion title="No Kills Appearing" icon="eye-slash">
+    **Symptoms**: Killfeed doesn't show when players are killed
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Check Resource is Started">
+        Run `ensure jx_killfeed` in server.cfg or console
+      </Step>
+      <Step title="Verify Folder Name">
+        Folder must be named exactly `jx_killfeed`
+      </Step>
+      <Step title="Check Console">
+        Look for errors in F8 console (client-side)
+      </Step>
+      <Step title="Restart Resource">
+        Try `restart jx_killfeed` in server console
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Killfeed in Wrong Position" icon="arrows-up-down-left-right">
+    **Symptoms**: Killfeed appears in unexpected location
+
+    **Fix**:
+
+    1. Open `config.lua`
+    2. Check `Config.Position` value:
+
+    ```lua config.lua
+    Config.Position = 'center-right' -- Must be one of the valid options
+    ```
+
+    3. Valid options:
+       - `'top-center'`
+       - `'center-left'`
+       - `'center-right'`
+
+    4. Restart resource after changing
+
+    <Warning>
+      Position value must be in quotes and match exactly (case-sensitive)
+    </Warning>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Display Issues
+
+<AccordionGroup>
+  <Accordion title="Too Many/Few Entries" icon="list">
+    **Symptoms**: Too many or too few kills showing at once
+
+    **Adjust Max Entries**:
+
+    ```lua config.lua
+    Config.MaxEntries = 5 -- Change this number
+    ```
+
+    **Recommendations**:
+    - **3**: Minimal, clean look
+    - **5**: Default, balanced
+    - **7-10**: Busy servers, lots of action
+
+    <Tip>
+      Don't set too high or it will clutter the screen!
+    </Tip>
+  </Accordion>
+
+  <Accordion title="Killfeed Overlaps Other UI" icon="layer-group">
+    **Symptoms**: Killfeed blocks other UI elements
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="Change Position">
+        Try a different position:
+
+        ```lua config.lua
+        Config.Position = 'top-center' -- Try different positions
+        ```
+      </Tab>
+
+      <Tab title="Reduce Entries">
+        Show fewer kills:
+
+        ```lua config.lua
+        Config.MaxEntries = 3 -- Reduce clutter
+        ```
+      </Tab>
+
+      <Tab title="Edit CSS">
+        Advanced: Adjust position in `client/html/style.css`
+
+        <Warning>Requires CSS knowledge and testing</Warning>
+      </Tab>
+    </Tabs>
+  </Accordion>
+
+  <Accordion title="Entries Not Fading Out" icon="clock">
+    **Symptoms**: Old kills stay on screen forever
+
+    **This Usually Means**:
+    - JavaScript error occurred
+    - Resource needs restart
+
+    **Fix**:
+
+    <Steps>
+      <Step title="Check F8 Console">
+        Open F8 and look for JavaScript errors
+      </Step>
+      <Step title="Restart Resource">
+        Run `restart jx_killfeed`
+      </Step>
+      <Step title="Clear Cache">
+        Close FiveM, delete cache, restart
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Sound Issues
+
+<AccordionGroup>
+  <Accordion title="No Sound Playing" icon="volume-xmark">
+    **Symptoms**: Sounds don't play when kills occur
+
+    **Check Configuration**:
+
+    ```lua config.lua
+    Config.EnableSound = true -- Must be true, not false
+    ```
+
+    **Other Checks**:
+
+    <Steps>
+      <Step title="Verify Sound File">
+        Check `client/sounds/` folder has sound file
+      </Step>
+      <Step title="Check Format">
+        Ensure file is .ogg, .mp3, or .wav format
+      </Step>
+      <Step title="Test FiveM Audio">
+        Make sure FiveM audio works in general
+      </Step>
+      <Step title="Restart Resource">
+        Restart after enabling sounds
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Sound Too Loud/Annoying" icon="volume-high">
+    **Symptoms**: Kill sounds are overwhelming
+
+    **Quick Fix**:
+
+    ```lua config.lua
+    Config.EnableSound = false -- Disable sounds
+    ```
+
+    **Or Customize**:
+    - Replace sound file in `client/sounds/` with quieter version
+    - Use audio editing software to lower volume
+    - Choose less intrusive sound effect
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Resource Errors
+
+<AccordionGroup>
+  <Accordion title="Resource Won't Start" icon="circle-xmark">
+    **Symptoms**: `ensure jx_killfeed` does nothing, no errors
+
+    **Checklist**:
+
+    <Steps>
+      <Step title="Folder Name">
+        Must be `jx_killfeed` exactly (lowercase, underscore)
+      </Step>
+      <Step title="Location">
+        Should be in `resources/jx_killfeed/`
+      </Step>
+      <Step title="Files Present">
+        Check `fxmanifest.lua` exists in the folder
+      </Step>
+      <Step title="server.cfg">
+        Ensure line is `ensure jx_killfeed` (not start, not restart)
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Errors in Console" icon="triangle-exclamation">
+    **Symptoms**: Red errors in F8 or server console
+
+    **Common Errors**:
+
+    <Tabs>
+      <Tab title="Lua Syntax Error">
+        **Error**: `syntax error near...`
+
+        **Cause**: Config has typo or missing quote
+
+        **Fix**: Check your config.lua for:
+        - Missing quotes around strings
+        - Missing commas
+        - Typos in option names
+      </Tab>
+
+      <Tab title="File Not Found">
+        **Error**: `failed to load script...`
+
+        **Cause**: Missing files
+
+        **Fix**: Re-download and extract the resource completely
+      </Tab>
+
+      <Tab title="JavaScript Error">
+        **Error**: Error in F8 console (client-side)
+
+        **Cause**: Client files corrupted
+
+        **Fix**:
+        1. Delete resource
+        2. Re-download fresh copy
+        3. Don't modify client files unless you know what you're doing
+      </Tab>
+    </Tabs>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Performance Issues
+
+<AccordionGroup>
+  <Accordion title="FPS Drops" icon="gauge-simple-low">
+    **Symptoms**: Lower FPS when killfeed is active
+
+    **This is Rare**: Killfeed uses minimal resources
+
+    **If it happens**:
+
+    <Steps>
+      <Step title="Reduce Max Entries">
+        ```lua config.lua
+        Config.MaxEntries = 3
+        ```
+      </Step>
+      <Step title="Disable Sounds">
+        ```lua config.lua
+        Config.EnableSound = false
+        ```
+      </Step>
+      <Step title="Check Other Resources">
+        FPS drop is likely from another resource, not killfeed
+      </Step>
+    </Steps>
+
+    <Info>
+      Resource usage: < 0.01ms idle, < 2MB memory
+    </Info>
+  </Accordion>
+
+  <Accordion title="Lag When Many Kills" icon="server">
+    **Symptoms**: Server/client lag when many kills happen quickly
+
+    **Solutions**:
+
+    - Reduce `Config.MaxEntries`
+    - Disable sounds
+    - This is usually not the killfeed's fault - check for combat spam scripts
+
+    <Note>
+      The killfeed itself is very lightweight. Lag is typically from the actual combat/weapon system.
+    </Note>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Customization Issues
+
+<AccordionGroup>
+  <Accordion title="CSS Changes Not Applying" icon="paintbrush">
+    **Symptoms**: Edited CSS but no visual changes
+
+    **Fix**:
+
+    <Steps>
+      <Step title="Save File">
+        Make sure you saved `style.css`
+      </Step>
+      <Step title="Restart Resource">
+        Run `restart jx_killfeed`
+      </Step>
+      <Step title="Clear Cache">
+        Close FiveM, clear cache, rejoin
+      </Step>
+      <Step title="Hard Refresh">
+        Sometimes requires full game restart
+      </Step>
+    </Steps>
+
+    <Tip>
+      CSS is cached heavily. Always restart resource after CSS changes.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="Custom Sounds Not Working" icon="music">
+    **Symptoms**: Replaced sound file but old sound still plays
+
+    **Steps**:
+
+    <Steps>
+      <Step title="Check File Name">
+        Make sure file name matches what's referenced in code
+      </Step>
+      <Step title="Check Format">
+        Use .ogg format for best compatibility
+      </Step>
+      <Step title="Clear Cache">
+        Delete FiveM cache and restart
+      </Step>
+      <Step title="Verify Path">
+        Ensure sound is in `client/sounds/` folder
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Still Having Issues?
+
+<CardGroup cols={2}>
+  <Card title="Join Discord" icon="discord" href="https://discord.gg/VuMcnbmEby">
+    Get help from our community
+  </Card>
+  <Card title="Check Documentation" icon="book">
+    Review installation and configuration guides
+  </Card>
+</CardGroup>
+
+<Tip>
+  **When Asking for Help, Provide**:
+  - Full error message (if any)
+  - Your config.lua contents
+  - FiveM client/server version
+  - What you've already tried
+</Tip>

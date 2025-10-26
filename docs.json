@@ -1,0 +1,82 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "JX Scripts",
+  "colors": {
+    "primary": "#e82546",
+    "light": "#f73b5b",
+    "dark": "#260007"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "introduction",
+              "tos",
+              "cfx"
+            ]
+          },
+          {
+            "group": "Free Resources",
+            "pages": [
+              {
+                "group": "Discord API",
+                "icon": "discord",
+                "pages": [
+                  "free/discord-api/introduction",
+                  "free/discord-api/installation",
+                  "free/discord-api/configuration",
+                  "free/discord-api/exports",
+                  "free/discord-api/common-issues",
+                  "free/discord-api/troubleshooting"
+                ]
+              },
+              {
+                "group": "VIP System",
+                "icon": "star",
+                "pages": [
+                  "free/vip-system/introduction",
+                  "free/vip-system/installation",
+                  "free/vip-system/configuration",
+                  "free/vip-system/exports",
+                  "free/vip-system/common-issues"
+                ]
+              },
+              {
+                "group": "Killfeed",
+                "icon": "skull-crossbones",
+                "pages": [
+                  "free/killfeed/introduction",
+                  "free/killfeed/configuration",
+                  "free/killfeed/common-issues"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "logo": {
+    "light": "/favicon.svg",
+    "dark": "/favicon.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Discord",
+        "href": "https://discord.gg/VuMcnbmEby"
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "discord": "https://discord.gg/VuMcnbmEby"
+    }
+  }
+}
