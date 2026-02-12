@@ -1,0 +1,205 @@
+---
+title: 'Installation'
+description: 'Setting up the VIP system'
+icon: 'download'
+---
+
+# Installation
+
+Get JX VIP System installed and running on your FiveM server. This script requires JX Discord API for role verification.
+
+<Info>
+  **Estimated Time**: 15 minutes  
+  **Difficulty**: Beginner-Friendly
+</Info>
+
+---
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- ✅ FiveM server with the latest artifacts
+- ✅ A supported framework: ESX, QBCore, or Qbox
+- ✅ Discord server with VIP roles created
+- ✅ Access to your server files and `server.cfg`
+
+---
+
+## Step 1: Install Dependencies
+
+### 1.1 — Install ox_lib (Required)
+
+1. Download the latest release from [Overextended GitHub](https://github.com/overextended/ox_lib/releases)
+2. Extract the `ox_lib` folder to your `resources` directory
+3. Add to your `server.cfg`:
+   ```cfg
+   ensure ox_lib
+   ```
+
+### 1.2 — Install & Configure JX Discord API (Required)
+
+JX Discord API is **required** for VIP role verification. The VIP system will not work without it.
+
+1. Download JX Discord API
+2. Extract the `jx_discord` folder to your `resources` directory
+3. Follow the [JX Discord API installation guide](../discord-api/installation) to:
+   - Create a Discord bot
+   - Get your bot token and Guild ID
+   - Configure `config.lua` with your bot credentials
+   - Invite the bot to your Discord server
+4. Add to your `server.cfg` **after** ox_lib:
+   ```cfg
+   ensure jx_discord
+   ```
+
+<Warning>
+  JX Discord API **must** be fully configured and working before JX VIP System will function. Test it separately first.
+</Warning>
+
+---
+
+## Step 2: Install JX VIP System
+
+<Steps>
+  <Step title="Download" icon="download">
+    Download the latest version of JX VIP System
+  </Step>
+  <Step title="Extract Files" icon="file-zipper">
+    Extract the folder from the ZIP file
+  </Step>
+  <Step title="Rename Folder" icon="pen">
+    Rename the folder to `jx_vip` (lowercase, with underscore)
+  </Step>
+  <Step title="Move to Resources" icon="folder">
+    Place the `jx_vip` folder in your server's `resources` directory
+  </Step>
+</Steps>
+
+<Warning>
+  The resource **must** be named `jx_vip` exactly. Do not rename it to anything else or it will not work.
+</Warning>
+
+---
+
+## Step 3: Configure Discord Role IDs
+
+This is the most important step — you need to tell the VIP system which Discord roles grant VIP access.
+
+### Get Your Role IDs
+
+1. Open Discord
+2. Go to **User Settings** → **Advanced** → Enable **Developer Mode**
+3. Go to your Discord server
+4. Right-click your **VIP role** → **Copy ID**
+5. Right-click your **VIP+ role** → **Copy ID**
+
+### Add Role IDs to Config
+
+Open `jx_vip/shared/config.lua` and find the Discord section:
+
+```lua shared/config.lua
+Config.Discord = {
+    vipRoles = {
+        '123456789012345678', -- VIP role ID (first = VIP)
+        '987654321098765432'  -- VIP+ role ID (second = VIP+)
+    }
+}
+```
+
+Replace the placeholder IDs with your actual Discord role IDs.
+
+<Warning>
+  **Order matters**: The first role ID is treated as **VIP**, the second as **VIP+**. If you only have one VIP tier, use the same ID for both entries.
+</Warning>
+
+---
+
+## Step 4: Add to server.cfg
+
+Add the following to your `server.cfg` in the correct order:
+
+```cfg
+# 1. Framework
+ensure es_extended  # or qb-core
+
+# 2. Dependencies
+ensure oxmysql
+ensure ox_lib
+
+# 3. JX Discord API (must be before jx_vip)
+ensure jx_discord
+
+# 4. JX VIP System
+ensure jx_vip
+```
+
+<Warning>
+  **Start order is critical**: `ox_lib` and `jx_discord` must both start **before** `jx_vip`.
+</Warning>
+
+---
+
+## Step 5: Start and Test
+
+1. Save all files
+2. Start (or restart) your FiveM server
+3. Watch the console for startup messages
+
+### Verify Installation
+
+<Steps>
+  <Step title="Check Console">
+    Look for green JX VIP startup messages showing detected framework and skin menu
+  </Step>
+  <Step title="Give Yourself VIP">
+    Assign one of the configured VIP roles to yourself in Discord
+  </Step>
+  <Step title="Join the Server">
+    Connect to your FiveM server and wait a few seconds for Discord data to load
+  </Step>
+  <Step title="Open VIP Menu">
+    Press **F5** or type `/vipmenu` — the VIP menu should appear
+  </Step>
+  <Step title="Test a Feature">
+    Try using "Full Heal" or another feature to verify everything works
+  </Step>
+</Steps>
+
+---
+
+## File Structure
+
+```bash
+jx_vip/
+├── shared/
+│   ├── config.lua           ← Main configuration (editable)
+│   └── framework.lua        ← Framework detection (editable)
+├── client/
+│   ├── features.lua         ← Client-side feature logic (editable)
+│   └── menu.lua             ← Menu rendering (editable)
+├── server/
+│   ├── cooldowns.lua        ← Cooldown system (editable)
+│   ├── features.lua         ← Server-side feature logic (editable)
+│   ├── discord.lua          ← Discord integration (escrowed)
+│   ├── main.lua             ← Core logic (escrowed)
+│   └── version.lua          ← Version checking (escrowed)
+└── fxmanifest.lua
+```
+
+<Info>
+  Files marked as **editable** can be modified to customize behavior. Escrowed files cannot be edited.
+</Info>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Configuration" icon="gear" href="./configuration">
+    Customize features, prices, shop items, and travel locations
+  </Card>
+  <Card title="Exports" icon="code" href="./exports">
+    Integrate VIP checks into your own resources
+  </Card>
+</CardGroup>

@@ -1,0 +1,188 @@
+---
+title: 'Troubleshooting'
+description: 'Advanced troubleshooting for jx_discord'
+icon: 'wrench'
+---
+
+# Troubleshooting
+
+Advanced debugging steps for when the [Common Issues](./common-issues) page doesn't solve your problem.
+
+---
+
+## Verifying Bot Permissions and Intents
+
+The most common cause of issues is incorrect bot setup. Run through this checklist:
+
+<Steps>
+  <Step title="Check Bot Is In Your Server">
+    Open your Discord server → **Server Settings → Integrations**. Your bot should appear in the list. If it doesn't, re-invite it.
+  </Step>
+  <Step title="Verify Server Members Intent">
+    Go to [Developer Portal](https://discord.com/developers/applications) → your app → **Bot → Privileged Gateway Intents**. **Server Members Intent** must be enabled. Without it, the bot cannot read member data or roles.
+  </Step>
+  <Step title="Check Bot Permissions">
+    The bot needs at minimum **Read Messages/View Channels** permission in your server. If using webhooks, the webhook channel must also be accessible.
+  </Step>
+  <Step title="Verify Guild ID">
+    Make sure `Config.Guild` in `config.lua` matches your actual Discord server ID. Right-click your server name → **Copy Server ID** (Developer Mode must be enabled in Discord settings).
+  </Step>
+</Steps>
+
+---
+
+## Testing the Bot Token Manually
+
+If you're unsure whether your bot token is valid, you can test it directly.
+
+### Using the Server Console
+
+After starting the resource, check for these console messages:
+
+```
+[JX_Discord] [SUCCESS]: Guild roles updated (X roles cached)
+[JX_Discord] [SUCCESS]: Initialized successfully
+```
+
+If you see these, your token and guild ID are working correctly.
+
+### Common Token Problems
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| HTTP 401 on every request | Token is invalid or was reset | Copy a fresh token from the Developer Portal |
+| Token has extra spaces | Copy-paste error | Remove leading/trailing spaces from `Config.Token` |
+| Token in single quotes with apostrophe | Lua string issue | Make sure there are no stray characters inside the quotes |
+| Bot was deleted | Application removed from Developer Portal | Create a new bot application |
+
+---
+
+## Reading Console Output
+
+jx_discord logs messages to the server console with the prefix `[JX_Discord]`. Here's what each message type means:
+
+### Message Colors
+
+| Prefix | Meaning |
+|--------|---------|
+| `[SUCCESS]` (green) | Operation completed successfully |
+| `[INFO]` (yellow) | Informational — player connected, roles loaded, etc. |
+| `[WARN]` (yellow) | Warning — player kicked, non-critical issue |
+| `[ERROR]` (red) | Something went wrong — check the details |
+
+### What to Look For
+
+<AccordionGroup>
+  <Accordion title="On Startup" icon="power-off">
+    **Healthy startup**:
+    ```
+    [JX_Discord] [SUCCESS]: Guild roles updated (15 roles cached)
+    [JX_Discord] [SUCCESS]: Initialized successfully
+    ```
+
+    **Broken startup**:
+    ```
+    [JX_Discord] [ERROR]: Token or Guild ID not configured! Please edit config.lua
+    ```
+
+    If the role count is 0 but no error is shown, the bot may not have access to read roles in your server.
+  </Accordion>
+
+  <Accordion title="On Player Connect" icon="user-plus">
+    **Normal connection**:
+    ```
+    [JX_Discord] [INFO]: PlayerName connected with 3 roles
+    ```
+
+    **Player kicked (no Discord)**:
+    ```
+    [JX_Discord] [WARN]: PlayerName kicked - No Discord linked
+    ```
+
+    **Player kicked (not in guild)**:
+    ```
+    [JX_Discord] [WARN]: PlayerName kicked - Not in Discord server
+    ```
+  </Accordion>
+
+  <Accordion title="HTTP Errors" icon="globe">
+    **API failure**:
+    ```
+    [JX_Discord] [ERROR]: HTTP request failed (401)
+    ```
+
+    Common HTTP error codes:
+    - **401**: Invalid bot token
+    - **403**: Bot lacks permissions or isn't in the guild
+    - **404**: Invalid guild ID or user not found
+    - **429**: Rate limited by Discord
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Understanding Rate Limit Behavior
+
+jx_discord has two layers of rate limiting:
+
+### Per-Player Rate Limit
+
+- **Limit**: 1 API request per second per player
+- **Scope**: Applied individually per Discord ID
+- **Behavior**: If an export is called while rate limited, the callback returns `false` immediately
+- **Purpose**: Prevents a single script from spamming the Discord API for one player
+
+### Guild Role Refresh
+
+- **Interval**: Every 10 minutes
+- **What it does**: Re-fetches the full list of roles in your Discord server (name ↔ ID mapping)
+- **Why**: Ensures new roles added to your Discord server are recognized without a restart
+- **Console output**: `[JX_Discord] [SUCCESS]: Guild roles updated (X roles cached)`
+
+### Discord's Own Rate Limits
+
+Discord enforces its own rate limits on API requests. If jx_discord hits these limits, you'll see HTTP 429 errors in the console. To reduce the chance of this:
+
+- Keep `Config.CacheTimeout` at 300 or higher
+- Don't call exports in loops
+- Use `GetPlayerInfo` instead of multiple individual exports for the same player
+
+---
+
+## Debugging Export Calls
+
+If exports aren't returning expected data, test them directly in the server console:
+
+```lua
+-- Test GetPlayerDiscordId (synchronous)
+local discordId = exports.jx_discord:GetPlayerDiscordId(1) -- player ID 1
+print('Discord ID: ' .. tostring(discordId))
+
+-- Test GetPlayerRoles (async)
+exports.jx_discord:GetPlayerRoles(1, function(success, roles)
+    print('Success: ' .. tostring(success))
+    if roles then
+        print('Roles: ' .. json.encode(roles))
+    end
+end)
+
+-- Test GetPlayerInfo (async, all data)
+exports.jx_discord:GetPlayerInfo(1, function(success, info)
+    print('Success: ' .. tostring(success))
+    if info then
+        print('Info: ' .. json.encode(info))
+    end
+end)
+```
+
+<Tip>
+  Replace `1` with the actual server ID of a connected player. You can find player IDs in the server console or by using FiveM's built-in player list.
+</Tip>
+
+---
+
+## Still Stuck?
+
+<Card title="Join Our Discord" icon="discord" href="https://discord.gg/VuMcnbmEby" horizontal>
+  Post your issue with console logs and config (remove your bot token!) for community help
+</Card>

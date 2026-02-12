@@ -1,0 +1,173 @@
+---
+title: 'Installation'
+description: 'Installing jx_rental'
+icon: 'download'
+---
+
+# Installation
+
+Get JX Rental installed and running on your FiveM server. This script requires a database for tracking active rentals.
+
+<Info>
+  **Estimated Time**: 5-10 minutes  
+  **Difficulty**: Beginner-Friendly
+</Info>
+
+---
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- ✅ FiveM server with the latest artifacts
+- ✅ A supported framework: ESX, QBCore, or Qbox
+- ✅ MySQL database (via oxmysql)
+- ✅ Access to your server files and `server.cfg`
+
+---
+
+## Step 1: Install Dependencies
+
+### ox_lib (Required)
+
+1. Download the latest release from [Overextended GitHub](https://github.com/overextended/ox_lib/releases)
+2. Extract the `ox_lib` folder to your `resources` directory
+3. Add to your `server.cfg`:
+   ```cfg
+   ensure ox_lib
+   ```
+
+### oxmysql (Required)
+
+1. Download the latest release from [Overextended GitHub](https://github.com/overextended/oxmysql/releases)
+2. Extract the `oxmysql` folder to your `resources` directory
+3. Configure your database connection string in `server.cfg`:
+   ```cfg
+   set mysql_connection_string "mysql://user:password@localhost/database"
+   ensure oxmysql
+   ```
+
+### Target System (Optional)
+
+If you want target-based interaction (instead of marker/TextUI), install one of these:
+
+- **ox_target** — [Download](https://github.com/overextended/ox_target)
+- **qb-target** — [Download](https://github.com/qbcore-framework/qb-target)
+
+<Note>
+  If no target system is detected, the script falls back to marker-based interaction with TextUI.
+</Note>
+
+---
+
+## Step 2: Install JX Rental
+
+<Steps>
+  <Step title="Download" icon="download">
+    Download the latest version of JX Rental
+  </Step>
+  <Step title="Extract Files" icon="file-zipper">
+    Extract the folder from the ZIP file
+  </Step>
+  <Step title="Rename Folder" icon="pen">
+    Rename the folder to `jx_rental` (lowercase, with underscore)
+  </Step>
+  <Step title="Move to Resources" icon="folder">
+    Place the `jx_rental` folder in your server's `resources` directory
+  </Step>
+</Steps>
+
+<Warning>
+  The resource **must** be named `jx_rental` exactly. Do not rename it to anything else or it will not work.
+</Warning>
+
+---
+
+## Step 3: Add to server.cfg
+
+Add the following lines to your `server.cfg` in the correct order:
+
+```cfg
+# Framework
+ensure es_extended  # or qb-core
+
+# Dependencies
+ensure oxmysql
+ensure ox_lib
+
+# Optional
+ensure ox_target    # or qb-target (optional)
+
+# JX Rental
+ensure jx_rental
+```
+
+<Warning>
+  `oxmysql` and `ox_lib` must start **before** `jx_rental`.
+</Warning>
+
+---
+
+## Step 4: Configure
+
+1. Open `jx_rental/config.lua`
+2. Configure your rental locations, vehicles, and pricing (see [Configuration](./configuration))
+3. The database table is created automatically on first start
+
+---
+
+## Step 5: Start Your Server
+
+1. Save all files
+2. Start (or restart) your FiveM server
+3. Watch the console for startup messages
+
+### Verify Installation
+
+<Steps>
+  <Step title="Check Console">
+    Look for JX Rental startup messages — no red errors means success
+  </Step>
+  <Step title="Find a Rental Point">
+    Open the map and look for the rental blip
+  </Step>
+  <Step title="Test the UI">
+    Walk up to the rental ped/marker and interact to open the rental UI
+  </Step>
+  <Step title="Rent a Vehicle">
+    Browse, preview, and rent a vehicle to verify everything works
+  </Step>
+</Steps>
+
+---
+
+## File Structure
+
+```bash
+jx_rental/
+├── config.lua              ← Main configuration (editable)
+├── client/
+│   └── open.lua            ← Vehicle keys, custom notify/TextUI (editable)
+├── html/                   ← NUI files
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+└── ...                     ← Other files (escrowed)
+```
+
+<Info>
+  Only `config.lua` and `client/open.lua` are editable. All other client/server/shared files are escrowed.
+</Info>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Configuration" icon="gear" href="./configuration">
+    Set up locations, vehicles, pricing, and colors
+  </Card>
+  <Card title="How To Use" icon="gamepad" href="./usage">
+    Learn the rental workflow
+  </Card>
+</CardGroup>

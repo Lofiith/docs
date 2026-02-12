@@ -1,0 +1,433 @@
+---
+title: 'Common Issues'
+description: 'Troubleshooting the rental system'
+icon: 'triangle-exclamation'
+---
+
+# Common Issues
+
+Quick fixes for the most common JX Rental problems.
+
+<Note>
+  Most issues stem from missing dependencies, incorrect vehicle models, or payment configuration. Start there first.
+</Note>
+
+---
+
+## Interaction Issues
+
+<AccordionGroup>
+  <Accordion title="Can't Interact with Rental Point" icon="hand">
+    **Symptoms**: Walking up to the ped/marker does nothing, no TextUI or target option appears
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="Check Target System">
+        If using a target system, verify it's installed and detected:
+
+        ```lua config.lua
+        Config.Target = 'auto'  -- Or manually: 'ox_target', 'qb-target'
+        ```
+
+        Make sure the target resource is running:
+        ```cfg server.cfg
+        ensure ox_target  # or qb-target
+        ```
+      </Tab>
+
+      <Tab title="Check Distance">
+        You may be too far from the interaction point:
+
+        ```lua config.lua
+        Config.InteractDistance = 2.0  -- Increase if needed
+        Config.MarkerDistance = 10.0   -- Increase marker draw distance
+        ```
+      </Tab>
+
+      <Tab title="Check Location Config">
+        Verify the location coordinates are correct:
+
+        ```lua config.lua
+        Config.Locations = {
+            {
+                coords = vector3(x, y, z),  -- Must be valid coords
+                useTarget = true,            -- Match your setup
+                usePed = true                -- Ped must be enabled
+            }
+        }
+        ```
+      </Tab>
+
+      <Tab title="No Target Fallback">
+        If you don't have a target system, set `useTarget = false`:
+
+        ```lua config.lua
+        Config.Locations = {
+            {
+                useTarget = false,  -- Uses marker + TextUI instead
+                -- ...
+            }
+        }
+        ```
+      </Tab>
+    </Tabs>
+  </Accordion>
+
+  <Accordion title="Ped Not Spawning" icon="user-slash">
+    **Symptoms**: No NPC at the rental point
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Check usePed">
+        Ensure ped spawning is enabled:
+
+        ```lua config.lua
+        usePed = true
+        ```
+      </Step>
+      <Step title="Check Ped Model">
+        Verify the ped model name is valid:
+
+        ```lua config.lua
+        ped = {
+            model = 's_m_m_pilot_02',  -- Must be a valid ped model
+            scenario = 'WORLD_HUMAN_CLIPBOARD'
+        }
+        ```
+      </Step>
+      <Step title="Restart Resource">
+        Peds spawn on resource start — restart with `restart jx_rental`
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Rental Issues
+
+<AccordionGroup>
+  <Accordion title="UI Not Opening" icon="rectangle-xmark">
+    **Symptoms**: Interact with rental point but UI doesn't appear
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Check F8 Console">
+        Open F8 and look for JavaScript or NUI errors
+      </Step>
+      <Step title="Check Resource Files">
+        Verify the `html/` folder exists with `index.html`, `style.css`, and `script.js`
+      </Step>
+      <Step title="Clear Cache">
+        Close FiveM, delete cache folder, and rejoin
+      </Step>
+      <Step title="Restart Resource">
+        Run `restart jx_rental` in server console
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Vehicle Not Spawning After Rental" icon="car">
+    **Symptoms**: Payment goes through but no vehicle appears
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="Check Spawn Coords">
+        Verify the spawn coordinates aren't inside a building or underground:
+
+        ```lua config.lua
+        spawn = vector3(x, y, z)  -- Must be a valid, clear location
+        ```
+
+        Go to the coordinates in-game to verify they're accessible.
+      </Tab>
+
+      <Tab title="Check Vehicle Model">
+        Ensure the vehicle model name is a valid GTA V spawn name:
+
+        ```lua config.lua
+        {model = 'adder', label = 'Adder', price = 8000}
+        -- 'adder' must be a valid GTA vehicle model
+        ```
+      </Tab>
+
+      <Tab title="Check Console">
+        Look for server-side errors about vehicle creation failing
+      </Tab>
+    </Tabs>
+  </Accordion>
+
+  <Accordion title="Max Rentals Reached" icon="ban">
+    **Symptoms**: Can't rent more vehicles, UI shows limit reached
+
+    **Fix**: Increase the max active rentals or return existing ones:
+
+    ```lua config.lua
+    Config.MaxActiveRentals = 4  -- Increase if needed
+    ```
+
+    Or destroy/return an existing rental vehicle to free a slot.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Payment Issues
+
+<AccordionGroup>
+  <Accordion title="Payment Failing / Not Enough Money" icon="money-bill">
+    **Symptoms**: Error when trying to rent, money not deducted
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="Check Account Type">
+        Ensure the payment account matches your framework:
+
+        ```lua config.lua
+        Config.PaymentAccount = 'cash'  -- ESX: 'money', QBCore: 'cash'
+        ```
+      </Tab>
+
+      <Tab title="Check ox_inventory">
+        If using ox_inventory money items:
+
+        ```lua config.lua
+        Config.UseOxInventoryMoney = true  -- Enable for ox_inventory
+        ```
+      </Tab>
+
+      <Tab title="Check Framework">
+        Verify framework detection is working:
+
+        ```lua config.lua
+        Config.Framework = 'auto'  -- Or set manually
+        ```
+      </Tab>
+    </Tabs>
+  </Accordion>
+
+  <Accordion title="Wrong Price Showing" icon="tag">
+    **Symptoms**: UI shows unexpected prices
+
+    **Check**: Verify your pricing mode and vehicle prices:
+
+    ```lua config.lua
+    Config.Pricing = {
+        mode = 'one_time',  -- 'one_time' shows flat price, 'hourly' shows per-hour
+    }
+
+    -- Vehicle price is used directly for one-time, or as hourly rate
+    {model = 'adder', label = 'Adder', price = 8000}
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Vehicle Key Issues
+
+<AccordionGroup>
+  <Accordion title="No Vehicle Keys After Rental" icon="key">
+    **Symptoms**: Vehicle spawns but player can't enter/drive it
+
+    **Fix**: Configure your key system in `client/open.lua`:
+
+    ```lua client/open.lua
+    function GiveVehicleKeys(vehicle, plate)
+        -- Uncomment and modify for your key system:
+
+        -- qb-vehiclekeys
+        -- TriggerEvent('vehiclekeys:client:SetOwner', plate)
+
+        -- wasabi_carlock
+        -- exports.wasabi_carlock:GiveKey(plate)
+
+        -- qs-vehiclekeys
+        -- TriggerServerEvent('qs-vehiclekeys:server:AcquireVehicleKeys', plate)
+    end
+    ```
+
+    <Warning>
+      You must uncomment and configure the correct key system for your server. The function is empty by default.
+    </Warning>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Preview Issues
+
+<AccordionGroup>
+  <Accordion title="Preview Vehicle Not Showing" icon="eye-slash">
+    **Symptoms**: Selecting a vehicle doesn't spawn a preview
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Check Preview Coords">
+        Verify preview coordinates are valid and accessible:
+
+        ```lua config.lua
+        preview = {
+            coords = vector3(x, y, z),  -- Must be clear ground
+            heading = 60.0
+        }
+        ```
+      </Step>
+      <Step title="Check Vehicle Model">
+        Ensure the model name is valid. Invalid models won't spawn.
+      </Step>
+      <Step title="Check F8 Console">
+        Look for client-side errors about model loading
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Preview Color Not Applying" icon="palette">
+    **Symptoms**: Color picker works but preview stays default color
+
+    **Check**: Verify color customization is enabled:
+
+    ```lua config.lua
+    Config.ColorCustomization = {
+        enabled = true,  -- Must be true
+        -- ...
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Resource Errors
+
+<AccordionGroup>
+  <Accordion title="Resource Won't Start" icon="circle-xmark">
+    **Symptoms**: `ensure jx_rental` does nothing or shows errors
+
+    **Checklist**:
+
+    <Steps>
+      <Step title="Check Folder Name">
+        Must be named exactly `jx_rental` (lowercase, underscore)
+      </Step>
+      <Step title="Check Dependencies">
+        Both `ox_lib` and `oxmysql` must start before `jx_rental`:
+
+        ```cfg server.cfg
+        ensure oxmysql
+        ensure ox_lib
+        ensure jx_rental
+        ```
+      </Step>
+      <Step title="Check Database">
+        Verify your MySQL connection string is correct in `server.cfg`
+      </Step>
+      <Step title="Verify Files">
+        Ensure `fxmanifest.lua` exists in the folder
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Database Errors" icon="database">
+    **Symptoms**: SQL errors in server console
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="Check Connection">
+        Verify your database connection:
+
+        ```cfg server.cfg
+        set mysql_connection_string "mysql://user:password@localhost/database"
+        ```
+      </Tab>
+
+      <Tab title="Check oxmysql">
+        Ensure oxmysql is installed and started:
+
+        ```cfg server.cfg
+        ensure oxmysql  # Must be before jx_rental
+        ```
+      </Tab>
+
+      <Tab title="Table Creation">
+        The rental table is created automatically on first start. If it fails, check that your database user has `CREATE TABLE` permissions.
+      </Tab>
+    </Tabs>
+  </Accordion>
+
+  <Accordion title="Config Syntax Errors" icon="code">
+    **Symptoms**: `syntax error near...` in console
+
+    **Common Mistakes**:
+
+    ```lua
+    -- ❌ Wrong (missing comma between vehicles)
+    vehicles = {
+        {model = 'blista', label = 'Blista', price = 500}
+        {model = 'issi2', label = 'Issi', price = 450}
+    }
+
+    -- ✅ Correct
+    vehicles = {
+        {model = 'blista', label = 'Blista', price = 500},
+        {model = 'issi2', label = 'Issi', price = 450}
+    }
+    ```
+
+    <Tip>
+      Use a Lua syntax checker or editor with syntax highlighting to catch errors.
+    </Tip>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Blip Issues
+
+<AccordionGroup>
+  <Accordion title="Blips Not Showing on Map" icon="map">
+    **Symptoms**: No rental icons on the minimap or pause map
+
+    **Fix**: Check blip configuration for each location:
+
+    ```lua config.lua
+    blip = {
+        enabled = true,       -- Must be true
+        sprite = 326,
+        color = 1,
+        scale = 0.8,
+        shortRange = true     -- Set to false to always show
+    }
+    ```
+
+    If `shortRange = true`, the blip only appears when you're nearby.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Still Having Issues?
+
+<CardGroup cols={2}>
+  <Card title="Configuration Guide" icon="gear" href="./configuration">
+    Review all configuration options
+  </Card>
+  <Card title="Join Discord" icon="discord" href="https://discord.gg/VuMcnbmEby">
+    Get help from the community
+  </Card>
+</CardGroup>
+
+<Tip>
+  **When asking for help, provide**:
+  - Full error message from console
+  - Your `config.lua` (remove sensitive data)
+  - Your framework and target system
+  - What you've already tried
+</Tip>

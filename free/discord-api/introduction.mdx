@@ -1,0 +1,101 @@
+---
+title: 'JX Discord API'
+description: 'Lightweight Discord integration for FiveM servers'
+icon: 'discord'
+---
+
+# JX Discord API
+
+A lightweight, server-side Discord API integration for FiveM. It provides exports that other scripts can use to look up player Discord data including roles, usernames, and avatars.
+
+<Note>
+  **Free & Open Source** - Fully open source, including all core logic in `server/server.lua`.
+</Note>
+
+## Key Features
+
+- Discord role verification for players
+- Avatar and username lookup via Discord API
+- Connection logging via Discord webhooks
+- Player data caching with configurable timeout
+- Built-in rate limiting to avoid Discord API abuse
+- Optional guild membership enforcement (kick players not in your Discord)
+
+---
+
+## How It Works
+
+This is a **server-side only** resource — there are no client scripts. It runs entirely on the server, making HTTP requests to the Discord API to fetch player data.
+
+When a player connects, the script:
+
+<Steps>
+  <Step title="Identify Player">
+    Reads the player's Discord identifier from their FiveM account
+  </Step>
+  <Step title="Fetch Discord Data">
+    Queries the Discord API for their user info and guild membership
+  </Step>
+  <Step title="Cache Results">
+    Stores the data in memory so future lookups are instant
+  </Step>
+  <Step title="Provide Exports">
+    Other scripts can call exports to get roles, avatars, usernames, and more
+  </Step>
+</Steps>
+
+---
+
+## Used By
+
+Other JX scripts depend on jx_discord for Discord data:
+
+<CardGroup cols={3}>
+  <Card title="JX VIP" icon="star">
+    **Required** dependency. Uses Discord roles to verify VIP membership.
+  </Card>
+  <Card title="JX Gangs" icon="users">
+    **Optional**. Uses Discord username display for gang members.
+  </Card>
+  <Card title="JX Redzone" icon="crosshairs">
+    **Optional**. Uses Discord roles for redzone permissions.
+  </Card>
+</CardGroup>
+
+---
+
+## File Structure
+
+| File | Description |
+|------|-------------|
+| `config.lua` | All configuration options — the only file you need to edit |
+| `server/server.lua` | Core logic (open source, viewable and editable) |
+| `server/version.lua` | Version check on startup |
+| `fxmanifest.lua` | Resource manifest |
+
+---
+
+## Quick Start
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="./installation">
+    Set up the Discord bot and configure the script
+  </Card>
+  <Card title="Configuration" icon="gear" href="./configuration">
+    Customize caching, kick behavior, and webhooks
+  </Card>
+  <Card title="Exports" icon="code" href="./exports">
+    Use exports to fetch Discord data from other scripts
+  </Card>
+  <Card title="Common Issues" icon="circle-exclamation" href="./common-issues">
+    Troubleshoot common problems
+  </Card>
+</CardGroup>
+
+---
+
+## Need Help?
+
+<Card title="Join Our Discord" icon="discord" href="https://discord.gg/VuMcnbmEby" horizontal>
+  Get support, share your setup, and stay updated with releases
+</Card>

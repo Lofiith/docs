@@ -1,0 +1,321 @@
+---
+title: 'How To Use'
+description: 'In-game guide for the gang system'
+icon: 'gamepad'
+---
+
+# How To Use
+
+This guide covers everything you need to know about using JX Gangs in-game — from admin setup to daily member gameplay.
+
+---
+
+## For Admins / Server Owners
+
+<AccordionGroup>
+  <Accordion title="Creating a Gang" icon="plus">
+    Use the `/creategang` command to open the gang creation UI. This requires admin permissions (configured in `Config.CreateGangPermissions`).
+
+    <Steps>
+      <Step title="Run the Command">
+        Type `/creategang` in chat
+      </Step>
+      <Step title="Fill Out the Form">
+        The creation UI opens where you set the gang name, label, and other details
+      </Step>
+      <Step title="Submit">
+        Confirm creation — the gang is now live and ready for members
+      </Step>
+    </Steps>
+
+    <Info>
+      The gang starts at the **Starter** tier by default with 10 max members, 3 ranks, and 5 rank edits. You can change tiers through the admin panel.
+    </Info>
+  </Accordion>
+
+  <Accordion title="Managing All Gangs" icon="users-gear">
+    Use the `/managegangs` command to open the admin management panel. This lets you view and manage every gang on the server.
+
+    From this panel you can:
+    - View all gangs and their details
+    - Edit gang settings and tiers
+    - Manage members across all gangs
+    - Delete gangs
+
+    This command requires permissions configured in `Config.ManageGangsPermissions`.
+  </Accordion>
+
+  <Accordion title="Setting a Player's Gang" icon="user-pen">
+    Manually assign a player to a gang with a specific rank:
+
+    ```
+    /setgang [playerID] [gangName] [rankLevel]
+    ```
+
+    **Example:**
+    ```
+    /setgang 1 ballas 3
+    ```
+
+    This sets player ID 1 to the "ballas" gang at rank level 3 (typically Owner).
+  </Accordion>
+
+  <Accordion title="Viewing Active Turfs" icon="map">
+    Use the `/turfs` command to see all currently active turf captures. This shows:
+
+    - Which turfs are being contested
+    - Which gangs are fighting
+    - Capture progress
+
+    You can also **teleport** to any active turf directly from this interface.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## For Gang Owners / Leaders
+
+Gang owners (rank level 3 by default) have full control over their gang. Open the management UI by pressing **F7** or typing `/gangmanage`.
+
+### Dashboard Tab
+
+The dashboard gives you an overview of your gang:
+
+- **Turf Wins** — Total turfs captured by your gang
+- **Cash Collected** — Total money earned through gang activities
+- **Member Count** — Current members vs your tier's maximum
+
+### Members Tab
+
+Manage your gang's roster:
+
+<Steps>
+  <Step title="View Members">
+    See all members with their rank, join date, and stats (kills, deaths, turfs)
+  </Step>
+  <Step title="Invite Players">
+    Click **"Add Player"** to see nearby players (within the configured radius). Select a player to send them an invite.
+  </Step>
+  <Step title="Promote / Demote">
+    Click on a member to promote or demote them to a different rank level
+  </Step>
+  <Step title="Kick Members">
+    Remove a member from the gang entirely
+  </Step>
+</Steps>
+
+<Warning>
+  Actions require specific rank levels. Check `Config.GangPermissions` to see which rank can perform which actions.
+</Warning>
+
+### Ranks Tab
+
+Create and manage your gang's rank structure:
+
+- **Create Rank** — Add a new rank with a label and level number
+- **Edit Rank** — Change a rank's label or level
+- **Delete Rank** — Remove a rank (members at that rank will need to be reassigned)
+
+<Info>
+  The number of ranks and rank edits you can make is limited by your gang's tier. Starter tier allows 3 ranks and 5 edits. Ultimate tier allows 15 ranks with unlimited edits.
+</Info>
+
+### Recruiting Tab
+
+Manage incoming applications from players who used `/gangapply`:
+
+- View all pending applications
+- **Accept** an application to add the player to your gang
+- **Decline** an application to reject it
+
+### Leaderboard Tab
+
+View detailed stats for all gang members:
+
+| Stat | Description |
+|------|-------------|
+| Kills | Total kills across all gang activities |
+| Deaths | Total deaths across all gang activities |
+| Turfs | Number of turf captures participated in |
+| K/D Ratio | Kill/death ratio |
+
+### Stash Management
+
+Gang leaders (highest rank) can place stash locations in the world:
+
+<Steps>
+  <Step title="Open Stash Settings">
+    Access stash management through the gang menu
+  </Step>
+  <Step title="Place Gang Stash">
+    Set the location for your gang's shared stash (120 slots / 180,000 weight by default)
+  </Step>
+  <Step title="Place Personal Stash">
+    Set the location for personal member stashes (60 slots / 100,000 weight by default)
+  </Step>
+  <Step title="Use the Stash">
+    Walk to the placed stash marker and interact to open the inventory
+  </Step>
+</Steps>
+
+---
+
+## For Gang Members
+
+### Joining a Gang
+
+There are three ways to join a gang:
+
+<Tabs>
+  <Tab title="Get Invited" icon="envelope">
+    A gang member with invite permissions can invite you directly when you're nearby. You'll receive a notification to accept or decline.
+  </Tab>
+
+  <Tab title="Apply" icon="file-lines">
+    Use the `/gangapply` command to submit an application. A gang officer will review and accept/decline it through the Recruiting tab.
+
+    To cancel a pending application:
+    ```
+    /stopapply
+    ```
+  </Tab>
+
+  <Tab title="Admin Assignment" icon="user-shield">
+    A server admin can assign you to a gang using:
+    ```
+    /setgang [yourID] [gangName] [rankLevel]
+    ```
+  </Tab>
+</Tabs>
+
+### Leaving a Gang
+
+Type `/leavegang` in chat to leave your current gang. This is permanent — you'll need to be re-invited or re-apply to rejoin.
+
+### Using the Gang Menu
+
+Press **F7** or type `/gangmanage` to open the gang management interface. What you see depends on your rank's permissions:
+
+- **All members** can typically view the Dashboard and Leaderboard
+- **Mid-rank members** may be able to invite players and accept applications
+- **Leaders** have full access to all tabs and features
+
+---
+
+## Turf Capture
+
+Turf captures are territorial battles where gangs fight to control zones across the map.
+
+<Steps>
+  <Step title="Find a Turf">
+    Go to a turf location. If blips are enabled for your gang (`displayMode: 'always'` or `'gang_only'`), you'll see them marked on the map.
+  </Step>
+  <Step title="Enter the Zone">
+    Walk into the capture zone (shown by a marker on the ground).
+  </Step>
+  <Step title="Start the Capture">
+    Press **E** to begin capturing. If countdown is enabled, there's a short delay before the capture officially starts.
+  </Step>
+  <Step title="Fight and Hold">
+    Stay in the zone and fight off rival gangs. Kills during the capture earn per-kill rewards and streak bonuses.
+  </Step>
+  <Step title="Win the Turf">
+    When the capture timer runs out, the gang with the most presence and kills captures the turf. The winning gang's rewards are deposited into their **gang stash**.
+  </Step>
+</Steps>
+
+<Info>
+  **Cooldowns**: After a turf is captured, there's a cooldown period (30 minutes by default) before it can be contested again. The `MaxActive` setting limits how many turfs can be contested simultaneously.
+</Info>
+
+### Kill Rewards During Turfs
+
+| Event | Reward |
+|-------|--------|
+| Per kill | Items defined in `killRewards.perKill` |
+| 3 kill streak | Bonus items + streak message |
+| 5 kill streak | Larger bonus + streak message |
+| 10 kill streak | Major bonus + streak message |
+
+---
+
+## Gang Wars
+
+Gang wars are wagered PvP battles between two rival gangs. The winner takes all.
+
+<Steps>
+  <Step title="Initiate a War">
+    A gang leader opens the gang menu and requests a war through the UI. They choose:
+    - **Opponent gang** — Which gang to challenge
+    - **Kill target** — How many kills to win (10–150, default 50)
+    - **Wager amount** — How much to bet ($5,000–$250,000)
+  </Step>
+  <Step title="Deposit the Wager">
+    Both gangs must deposit the wager amount. The money is held until the war concludes.
+  </Step>
+  <Step title="Opponent Responds">
+    The opposing gang's leader receives the challenge and can **accept** or **decline**. If they don't respond within the timeout period, the war is cancelled and wagers are refunded.
+  </Step>
+  <Step title="Fight">
+    Once accepted, the war begins immediately. Both gangs fight — kills are tracked in real-time.
+  </Step>
+  <Step title="Victory">
+    The first gang to reach the kill target wins. The winning gang receives **both wagers**.
+
+    If a duration limit is set and time runs out, the gang with the most kills wins.
+  </Step>
+</Steps>
+
+<Warning>
+  Each gang needs the minimum number of online players (`MinPlayersToStart`, default 2) to start a war. The gang leader must have the `manageGangWars` permission.
+</Warning>
+
+---
+
+## Airdrops
+
+Airdrops are scheduled loot crate events that spawn automatically at random locations.
+
+<Steps>
+  <Step title="Wait for Announcement">
+    Airdrops spawn automatically based on the schedule (every 30–60 minutes by default). An announcement is broadcast before the drop lands (60 seconds by default).
+  </Step>
+  <Step title="Head to the Location">
+    The airdrop location appears on the map. Race to the zone before other gangs.
+  </Step>
+  <Step title="Fight for Control">
+    Multiple gangs may converge on the airdrop. Fight to maintain control of the zone. Kills during an airdrop event earn extra rewards.
+  </Step>
+  <Step title="Loot the Crate">
+    Walk up to the crate and interact with it (press **E** for TextUI, or use target if configured with `'oxtarget'`). This starts the **minigame**.
+  </Step>
+  <Step title="Complete the Minigame">
+    Complete the minigame sequence to successfully loot the crate. You need to hit the required inputs within the time limit across multiple waves.
+  </Step>
+  <Step title="Collect Rewards">
+    Rewards are deposited into your **gang's stash**, not your personal inventory. This encourages gang coordination.
+  </Step>
+</Steps>
+
+<Info>
+  Airdrops only spawn during the configured active hours. If your server is quiet during certain hours, adjust `Config.Airdrop.Schedule.activeHours` to focus drops during peak times.
+</Info>
+
+---
+
+## Command Reference
+
+| Command | Who Can Use It | Description |
+|---------|---------------|-------------|
+| `/gangmanage` | All gang members | Open the gang management UI |
+| `/managegangs` | Admins only | Open the admin gang management panel |
+| `/creategang` | Admins only | Open the gang creation UI |
+| `/setgang [id] [gang] [rank]` | Admins only | Assign a player to a gang at a specific rank |
+| `/turfs` | Admins only | View and teleport to active turf captures |
+| `/gangapply` | Any player | Apply to join a gang |
+| `/stopapply` | Any player | Cancel a pending gang application |
+| `/leavegang` | Gang members | Leave your current gang |
+
+<Tip>
+  All command names are configurable in `Config.Commands`. If your server uses different command prefixes or names, update them there.
+</Tip>

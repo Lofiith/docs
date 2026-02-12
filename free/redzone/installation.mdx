@@ -1,0 +1,207 @@
+---
+title: 'Installation'
+description: 'Installing jx_redzone'
+icon: 'download'
+---
+
+# Installation
+
+Get JX Redzone installed and running on your FiveM server. No database setup required — zone data is saved to a local JSON file.
+
+<Info>
+  **Estimated Time**: 5 minutes  
+  **Difficulty**: Beginner-Friendly
+</Info>
+
+---
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- ✅ FiveM server with the latest artifacts
+- ✅ A supported framework: ESX, QBCore, or Qbox
+- ✅ Access to your server files and `server.cfg`
+
+---
+
+## Step 1: Install Dependencies
+
+### ox_lib (Required)
+
+1. Download the latest release from [Overextended GitHub](https://github.com/overextended/ox_lib/releases)
+2. Extract the `ox_lib` folder to your `resources` directory
+3. Add to your `server.cfg` **before** jx_redzone:
+   ```cfg
+   ensure ox_lib
+   ```
+
+### JX Discord API (Optional)
+
+If you want to use Discord role-based permissions for the zone creator or UI access, install JX Discord API:
+
+1. Download and configure [JX Discord API](../discord-api/introduction)
+2. Add to your `server.cfg` **before** jx_redzone:
+   ```cfg
+   ensure jx_discord
+   ```
+
+<Note>
+  JX Discord API is only needed if you plan to use Discord role-based permissions (`type = 'discord'`). Ace and group permissions work without it.
+</Note>
+
+---
+
+## Step 2: Install JX Redzone
+
+<Steps>
+  <Step title="Download" icon="download">
+    Download the latest version of JX Redzone
+  </Step>
+  <Step title="Extract Files" icon="file-zipper">
+    Extract the folder from the ZIP file
+  </Step>
+  <Step title="Rename Folder" icon="pen">
+    Rename the folder to `jx_redzone` (lowercase, with underscore)
+  </Step>
+  <Step title="Move to Resources" icon="folder">
+    Place the `jx_redzone` folder in your server's `resources` directory
+  </Step>
+</Steps>
+
+<Warning>
+  The resource **must** be named `jx_redzone` exactly. Do not rename it to anything else or it will not work.
+</Warning>
+
+---
+
+## Step 3: Configure Permissions
+
+Open `config.lua` and set up who can access the zone creator:
+
+<Tabs>
+  <Tab title="Ace Permission" icon="key">
+    ```lua config.lua
+    Config.Creator = {
+        permissions = {
+            type = 'ace',
+            ace = 'jx_redzone.creator'
+        }
+    }
+    ```
+
+    Then in your `server.cfg`:
+    ```cfg
+    add_ace group.admin jx_redzone.creator allow
+    ```
+  </Tab>
+
+  <Tab title="Group Permission" icon="users">
+    ```lua config.lua
+    Config.Creator = {
+        permissions = {
+            type = 'group',
+            groups = {'admin', 'superadmin'}
+        }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Discord Role" icon="discord">
+    ```lua config.lua
+    Config.Creator = {
+        permissions = {
+            type = 'discord',
+            roles = {'123456789012345678'} -- Your Discord role ID
+        }
+    }
+    ```
+
+    <Warning>Requires JX Discord API to be installed and configured.</Warning>
+  </Tab>
+</Tabs>
+
+---
+
+## Step 4: Add to server.cfg
+
+Add the following lines to your `server.cfg` in the correct order:
+
+```cfg
+# Framework (ESX, QBCore, etc.)
+ensure es_extended
+
+# Dependencies
+ensure ox_lib
+ensure jx_discord  # Optional, only if using Discord permissions
+
+# JX Redzone
+ensure jx_redzone
+```
+
+<Warning>
+  `ox_lib` must start **before** `jx_redzone`. If using Discord permissions, `jx_discord` must also start before `jx_redzone`.
+</Warning>
+
+---
+
+## Step 5: Start Your Server
+
+1. Save all files
+2. Start (or restart) your FiveM server
+3. Watch the console for startup messages
+4. Press **F7** or type `/rzcreator` in-game to test the zone creator
+
+### Verify Installation
+
+<Steps>
+  <Step title="Check Console">
+    Look for green JX Redzone messages indicating successful startup
+  </Step>
+  <Step title="Open Creator">
+    Press F7 or type `/rzcreator` with admin permissions
+  </Step>
+  <Step title="Create a Test Zone">
+    Place a small test zone and verify it appears on the map
+  </Step>
+  <Step title="Enter the Zone">
+    Walk into the zone and confirm you receive entry weapons
+  </Step>
+</Steps>
+
+<Check>
+  No database setup is required! Zones are saved to `data/zones.json` automatically.
+</Check>
+
+---
+
+## File Structure
+
+```bash
+jx_redzone/
+├── config.lua              ← Main configuration (editable)
+├── client/
+│   └── open.lua            ← HUD toggle on enter/exit (editable)
+├── server/
+│   └── open.lua            ← Custom revive logic (editable)
+├── data/
+│   └── zones.json          ← Zone storage (auto-generated)
+└── ...                     ← Other files (escrowed)
+```
+
+<Info>
+  Only `config.lua`, `client/open.lua`, and `server/open.lua` are editable. All other client/server/shared files are escrowed.
+</Info>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Configuration" icon="gear" href="./configuration">
+    Customize zone defaults, rewards, and permissions
+  </Card>
+  <Card title="How To Use" icon="gamepad" href="./usage">
+    Learn how to create zones and use player features
+  </Card>
+</CardGroup>

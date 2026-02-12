@@ -1,0 +1,235 @@
+---
+title: 'How To Use'
+description: 'In-game guide for the redzone system'
+icon: 'gamepad'
+---
+
+# How To Use
+
+Learn how to create and manage PvP zones as an admin, and how to use redzone features as a player.
+
+---
+
+## For Admins — Creating Zones
+
+Zones are created entirely in-game using the visual zone creator. No config editing required.
+
+### Opening the Creator
+
+You must have admin permissions (configured in `Config.Creator.permissions`).
+
+<Tabs>
+  <Tab title="Keybind" icon="keyboard">
+    Press **F7** to open the zone creator (remappable in FiveM keybind settings).
+  </Tab>
+
+  <Tab title="Command" icon="terminal">
+    Type `/rzcreator` in chat to open the zone creator.
+  </Tab>
+</Tabs>
+
+### Creating a New Zone
+
+<Steps>
+  <Step title="Open the Creator">
+    Press F7 or type `/rzcreator`. The creator UI opens and enters freecam mode.
+  </Step>
+
+  <Step title="Position the Zone">
+    Move the freecam to the location where you want to place the zone. The zone center will be placed at the freecam position.
+  </Step>
+
+  <Step title="Configure Zone Settings">
+    In the creator panel, set the following:
+    
+    - **Name** — A display name for the zone
+    - **Radius** — How large the zone is (default: 40 units)
+    - **Color** — The zone's color on the map and in the UI
+  </Step>
+
+  <Step title="Set Entry Rewards">
+    Configure which weapon players receive when entering the zone:
+    
+    - Select from available weapon types
+    - The weapon is given automatically on entry and removed on exit
+  </Step>
+
+  <Step title="Configure Kill Rewards">
+    Set money rewards for different actions:
+    
+    - **Kill Reward** — Money earned per kill
+    - **Headshot Reward** — Bonus money for headshot kills
+    - **Streak Rewards** — Extra money at kill streak thresholds (e.g., 3, 5, 10 kills)
+  </Step>
+
+  <Step title="Set Zone Rules">
+    Toggle zone rules:
+    
+    - **Delete Vehicles** — Remove vehicles that enter the zone
+    - **Use Routing Bucket** — Isolate the zone in its own routing bucket
+    - **Block Cross-Zone Damage** — Prevent players in different zones from damaging each other
+    - **Enable Marker** — Show a ground marker at the zone border
+  </Step>
+
+  <Step title="Save the Zone">
+    Click save. The zone is stored in `data/zones.json` and becomes active immediately — no restart needed.
+  </Step>
+</Steps>
+
+### Managing Existing Zones
+
+<AccordionGroup>
+  <Accordion title="Editing a Zone" icon="pen-to-square">
+    1. Open the creator (F7 or `/rzcreator`)
+    2. Select the zone you want to edit from the list
+    3. Modify any settings (radius, rewards, rules, etc.)
+    4. Save changes — they apply immediately
+  </Accordion>
+
+  <Accordion title="Deleting a Zone" icon="trash">
+    1. Open the creator (F7 or `/rzcreator`)
+    2. Select the zone to delete
+    3. Click the delete button
+    4. The zone is removed from the map and from `data/zones.json`
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  Zones are saved to `data/zones.json`. You can also back up this file manually if you want to preserve your zone configurations.
+</Tip>
+
+---
+
+## For Players — Using Redzones
+
+### Entering a Zone
+
+<Steps>
+  <Step title="Find a Redzone">
+    Active redzones appear on the map as blips with radius circles (if blips are enabled).
+  </Step>
+
+  <Step title="Walk Into the Zone">
+    Enter the zone boundary. When you enter:
+    
+    - You receive the entry weapon automatically (if configured)
+    - Your HUD may change (depends on server setup)
+    - You enter the zone's routing bucket (if enabled) — only other players in the same zone are visible
+  </Step>
+
+  <Step title="Fight Other Players">
+    Engage in PvP combat within the zone. Rewards are earned based on your performance:
+    
+    - **Kill** — Earn money for each player you eliminate
+    - **Headshot** — Earn bonus money for headshot kills
+    - **Kill Streak** — Reach streak thresholds (e.g., 3, 5, 10 kills) for extra rewards
+  </Step>
+
+  <Step title="Death and Revive">
+    When you die in a zone, you're automatically revived after a short delay (default: 800ms). No need to call EMS or wait for respawn — you're back in the fight quickly.
+  </Step>
+
+  <Step title="Leave the Zone">
+    Walk out of the zone boundary to exit PvP mode. Your HUD is restored and entry weapons are removed.
+  </Step>
+</Steps>
+
+### Player Commands
+
+<AccordionGroup>
+  <Accordion title="/rzcolor — Color Picker" icon="palette">
+    Customize your personal zone color overlay.
+
+    1. Type `/rzcolor` in chat
+    2. A color picker UI opens
+    3. Choose from preset colors or pick a custom color
+    4. Your selected color changes how the zone visuals appear for you
+
+    <Info>
+      This is a personal preference — other players won't see your color choice.
+    </Info>
+  </Accordion>
+
+  <Accordion title="/selectstats — Stats Layout" icon="chart-bar">
+    Change how your kill statistics are displayed.
+
+    1. Type `/selectstats` in chat
+    2. Choose from three layout options:
+       - **Hex** (`stat1`) — Hexagonal display
+       - **Table** (`stat2`) — Table/grid display
+       - **Rail** (`stat3`) — Rail/bar display
+    3. Your preference is saved for future sessions
+  </Accordion>
+
+  <Accordion title="/rzlb — Leaderboard" icon="trophy">
+    View the kill leaderboard across all zones.
+
+    1. Type `/rzlb` in chat
+    2. The leaderboard UI opens showing top players
+    3. See kills, headshots, streaks, and ranking
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Reward System
+
+### How Rewards Work
+
+| Action | Default Reward | Description |
+|--------|---------------|-------------|
+| Kill | $500 | Money earned for each player kill |
+| Headshot | $250 | Bonus on top of kill reward |
+| 3 Kill Streak | $1,000 | Bonus at 3 consecutive kills |
+| 5 Kill Streak | $2,500 | Bonus at 5 consecutive kills |
+| 10 Kill Streak | $5,000 | Bonus at 10 consecutive kills |
+
+<Note>
+  All reward values are configurable per-zone in the creator. The values above are the defaults from `Config.ZoneDefaults`.
+</Note>
+
+### Reward Modes
+
+- **Random** — When multiple reward entries exist, one is chosen randomly
+- **All** — All configured rewards are given at once
+
+Kill and headshot rewards default to `'random'` mode. Streak rewards default to `'all'` mode.
+
+---
+
+## Zone Mechanics
+
+### Routing Buckets
+
+When `useRoutingBucket` is enabled for a zone, players inside that zone are moved to a separate routing bucket. This means:
+
+- Only players in the same zone can see each other
+- Players outside the zone cannot interact with or see zone players
+- Each zone gets its own bucket, starting from `Config.RoutingBuckets.base`
+
+### Cross-Zone Damage Blocking
+
+When `blockCrossZoneDamage` is enabled, players in different zones cannot damage each other — even if the zones are physically close together.
+
+### Vehicle Deletion
+
+When `deleteVehicles` is enabled, any vehicle that enters the zone boundary is automatically deleted. The cleanup interval is controlled by `Config.VehicleDelete.interval`.
+
+---
+
+## Tips
+
+<CardGroup cols={2}>
+  <Card title="Zone Placement" icon="map-pin">
+    Place zones in open areas away from spawn points. Avoid putting zones near mission areas or garages.
+  </Card>
+  <Card title="Reward Balance" icon="scale-balanced">
+    Start with lower rewards and increase based on player activity. Too-high rewards can destabilize your economy.
+  </Card>
+  <Card title="Routing Buckets" icon="layer-group">
+    Enable routing buckets for the best experience. It prevents outside interference and makes zones feel more contained.
+  </Card>
+  <Card title="Zone Size" icon="arrows-left-right">
+    A radius of 30-50 is good for close-quarters combat. Use 80-120 for larger areas with vehicles or sniping.
+  </Card>
+</CardGroup>

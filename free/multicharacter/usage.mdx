@@ -1,0 +1,196 @@
+---
+title: 'How To Use'
+description: 'In-game guide for the multicharacter system'
+icon: 'gamepad'
+---
+
+# How To Use
+
+This guide covers the full gameplay workflow for players and configuration tips for server owners.
+
+---
+
+## First Time Connecting
+
+When a player connects for the first time, they go through the full character creation flow:
+
+<Steps>
+  <Step title="Character Selector">
+    The Character Selector UI appears. No characters exist yet, so the player clicks **"Create New Character"**.
+  </Step>
+  <Step title="Registration Form">
+    The registration form appears with cinematic camera angles in the background. The player fills in:
+    - **First Name** — 2-20 characters, no numbers or special characters by default
+    - **Last Name** — Same rules as first name
+    - **Date of Birth** — Must result in an age between 18 and 100
+    - **Gender** — Male or Female
+    - **Height** — Between 120cm and 220cm
+    - **Nationality** — Selected from a dropdown of countries
+  </Step>
+  <Step title="Skin/Appearance Creator">
+    If `Config.Skin.Enabled` is `true` and a supported skin menu is installed, the appearance creator opens. The player customizes their character's look (face, hair, clothing, etc.).
+  </Step>
+  <Step title="Spawn Selector">
+    If `Config.SpawnSelector.Enabled` is `true` and jx_spawnselector is running, the spawn selector UI appears. The player picks a location to spawn at.
+  </Step>
+  <Step title="Enter the World">
+    The player spawns in the world at their chosen location. Starting items are given automatically if `Config.StartingItems.Enabled` is `true`.
+  </Step>
+</Steps>
+
+---
+
+## Returning Players
+
+Returning players who already have characters follow a simpler flow:
+
+<Steps>
+  <Step title="Character Selector">
+    The Character Selector shows all existing characters with a 3D ped preview. The player selects a character to play as.
+  </Step>
+  <Step title="Spawn">
+    Depending on configuration, the player either:
+    - Sees the spawn selector to choose a location
+    - Spawns at their last known location automatically
+  </Step>
+</Steps>
+
+Players can also create additional characters from the selector (up to `Config.Selector.MaxCharacters`).
+
+---
+
+## Switching Characters
+
+Players can switch characters without disconnecting from the server.
+
+```
+/relog
+```
+
+This command returns the player to the Character Selector UI where they can pick a different character or create a new one.
+
+<Info>
+  The `/relog` command is only available when `Config.Selector.EnableRelog` is set to `true`.
+</Info>
+
+---
+
+## Deleting Characters
+
+Players can delete characters they no longer want.
+
+```
+/deletecharacter
+```
+
+The command name can be changed via `Config.Selector.DeleteCommand`.
+
+<Warning>
+  Character deletion is only available when `Config.Selector.EnableDeleting` is set to `true`. Deleted characters cannot be recovered.
+</Warning>
+
+---
+
+## For Server Owners
+
+Here are common adjustments you'll want to make:
+
+### Adjust Max Characters
+
+Control how many characters each player can create:
+
+```lua config/selector.lua
+Config.Selector.MaxCharacters = 4  -- Change to any number
+```
+
+### Customize Starting Items
+
+Give different items to new characters:
+
+```lua config/config.lua
+Config.StartingItems = {
+    Enabled = true,
+    Items = {
+        { name = 'phone', count = 1 },
+        { name = 'bread', count = 10 },
+        { name = 'water', count = 10 },
+        { name = 'bandage', count = 3 },
+    }
+}
+```
+
+### Change Camera Angles
+
+Customize the cinematic camera during registration by editing camera points:
+
+```lua config/register.lua
+Config.Register.CameraPoints = {
+    vector4(x, y, z, heading),  -- Add your own coordinates
+    -- ...
+}
+```
+
+### Adjust Ped Preview
+
+Change where the character model stands in the selector and which direction it faces:
+
+```lua config/selector.lua
+Config.Selector.Ped = {
+    Position = vector3(-787.7076, 327.8289, 217.0379),
+    Heading = 135.3409,
+    DefaultModel = 'mp_m_freemode_01',
+    Animation = {
+        Enabled = true,
+        Dict = "anim@amb@casino@valet_scenario@pose_d@",
+        Name = "base_idle",
+        Props = {}
+    }
+}
+```
+
+### Edit Nationality List
+
+Add or remove countries from the registration dropdown:
+
+```lua config/register.lua
+Config.Register.Countries = {
+    "United States", "Canada", "Mexico",
+    -- Add or remove countries as needed
+}
+```
+
+### Change Validation Rules
+
+Relax or tighten name and age requirements:
+
+```lua config/register.lua
+Config.Register.Validation = {
+    FirstName = {
+        MinLength = 3,          -- Require at least 3 characters
+        MaxLength = 15,         -- Allow up to 15 characters
+        AllowNumbers = false,
+        AllowSpecialChars = false
+    },
+    -- ...
+}
+```
+
+---
+
+## Client Exports
+
+JX Multicharacter provides the following client-side exports for integration with other resources:
+
+```lua
+-- Open the skin/appearance creator
+exports.jx_multicharacter:OpenSkinCreator()
+
+-- Start the cinematic registration camera
+exports.jx_multicharacter:StartRegistrationCamera()
+
+-- Stop the registration camera
+exports.jx_multicharacter:StopRegistrationCamera()
+
+-- Update the ped model shown during registration
+exports.jx_multicharacter:UpdateRegisterPedModel()
+```

@@ -1,0 +1,152 @@
+---
+title: 'Installation'
+description: 'Setting up jx_discord on your server'
+icon: 'download'
+---
+
+# Installation
+
+This guide walks you through installing and configuring JX Discord API from scratch.
+
+---
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- ✅ A FiveM server with the latest artifacts
+- ✅ Access to your server files and `server.cfg`
+- ✅ A Discord server you own or have admin access to
+- ✅ A Discord account to create a bot application
+
+<Info>
+  **No database required.** jx_discord stores everything in memory. Dependencies `yarn` and `webpack` are built into FiveM — no separate install needed.
+</Info>
+
+---
+
+## Step 1: Place the Resource
+
+1. Download `jx_discord` from our releases
+2. Extract the folder into your server's `resources` directory
+3. Make sure the folder is named exactly `jx_discord`
+
+---
+
+## Step 2: Add to server.cfg
+
+Add the following line to your `server.cfg`:
+
+```cfg
+ensure jx_discord
+```
+
+<Warning>
+  If other scripts depend on jx_discord (like `jx_vip`), make sure `ensure jx_discord` appears **before** them in your server.cfg.
+</Warning>
+
+---
+
+## Step 3: Create a Discord Bot
+
+<Steps>
+  <Step title="Open Developer Portal">
+    Go to [https://discord.com/developers/applications](https://discord.com/developers/applications) and log in
+  </Step>
+  <Step title="Create Application">
+    Click **New Application**, give it a name (e.g. "My Server Bot"), and click **Create**
+  </Step>
+  <Step title="Create Bot">
+    Go to the **Bot** tab on the left and click **Add Bot** if one doesn't already exist
+  </Step>
+  <Step title="Enable Server Members Intent">
+    Under **Bot → Privileged Gateway Intents**, enable **Server Members Intent**. This is required for the script to read guild member data.
+  </Step>
+  <Step title="Copy Bot Token">
+    Under the **Bot** tab, click **Reset Token** (or **Copy** if visible). Save this token — you'll need it in the next step.
+  </Step>
+</Steps>
+
+<Warning>
+  **Never share your bot token publicly.** Anyone with your token can control your bot. If it leaks, reset it immediately in the Developer Portal.
+</Warning>
+
+---
+
+## Step 4: Get Your Guild ID
+
+1. Open Discord
+2. Go to **User Settings → Advanced**
+3. Enable **Developer Mode**
+4. Right-click your server name in the sidebar
+5. Click **Copy Server ID**
+
+---
+
+## Step 5: Configure config.lua
+
+Open `jx_discord/config.lua` and fill in your bot token and guild ID:
+
+```lua config.lua
+Config.Token = 'YOUR_BOT_TOKEN_HERE'
+Config.Guild = 'YOUR_GUILD_ID_HERE'
+```
+
+That's the minimum required configuration. See the [Configuration](./configuration) page for all available options.
+
+---
+
+## Step 6: Invite the Bot to Your Server
+
+1. Go back to the [Developer Portal](https://discord.com/developers/applications)
+2. Select your application → **OAuth2** tab
+3. Under **OAuth2 URL Generator**, check the `bot` scope
+4. Under **Bot Permissions**, select at minimum:
+   - Read Messages/View Channels
+5. Copy the generated URL and open it in your browser
+6. Select your Discord server and authorize the bot
+
+---
+
+## Step 7: Restart Your Server
+
+Restart your FiveM server. You should see in the console:
+
+```
+[JX_Discord] [SUCCESS]: Guild roles updated (X roles cached)
+[JX_Discord] [SUCCESS]: Initialized successfully
+```
+
+If you see errors instead, check the [Common Issues](./common-issues) page.
+
+---
+
+## Start Order Reference
+
+Here's the recommended order in your `server.cfg`:
+
+```cfg
+# Framework (if using one)
+ensure es_extended  # or qb-core
+
+# JX Discord API (before any scripts that depend on it)
+ensure jx_discord
+
+# Scripts that use jx_discord
+ensure jx_vip
+ensure jx_gangs
+# etc.
+```
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Configuration" icon="gear" href="./configuration">
+    Customize caching, webhooks, and kick behavior
+  </Card>
+  <Card title="Exports" icon="code" href="./exports">
+    Use Discord data in your own scripts
+  </Card>
+</CardGroup>

@@ -1,0 +1,139 @@
+---
+title: 'Common Issues'
+description: 'Troubleshooting the killfeed'
+icon: 'triangle-exclamation'
+---
+
+# Common Issues
+
+Quick fixes for the most common jx_killfeed problems.
+
+---
+
+## Display Issues
+
+<AccordionGroup>
+  <Accordion title="Killfeed not showing" icon="eye-slash">
+    **Symptoms**: Kills happen but no notifications appear on screen.
+
+    **Fix**:
+
+    <Steps>
+      <Step title="Check resource is started">
+        Run `ensure jx_killfeed` in your server console and verify there are no errors
+      </Step>
+      <Step title="Check NUI files exist">
+        Make sure the `web/` folder contains `index.html`, `styles.css`, and `main.js`. If any are missing, re-download the resource.
+      </Step>
+      <Step title="Check fxmanifest.lua">
+        Verify that `ui_page 'web/index.html'` is present in `fxmanifest.lua`
+      </Step>
+      <Step title="Clear FiveM cache">
+        Delete your FiveM cache folder and rejoin the server. NUI files can sometimes get cached incorrectly.
+      </Step>
+      <Step title="Check F8 console">
+        Open the F8 console in-game and look for any JavaScript or NUI errors
+      </Step>
+    </Steps>
+
+    <Tip>
+      If the resource starts without errors but the killfeed still doesn't show, the issue is almost always a missing or corrupted file in the `web/` folder.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="Position looks wrong" icon="arrows-up-down-left-right">
+    **Symptoms**: Killfeed appears in the wrong place or overlaps with other UI elements.
+
+    **Fix**:
+
+    Only three position values are valid:
+
+    ```lua
+    Config.Position = 'top-center'    -- Top center
+    Config.Position = 'center-left'   -- Middle left
+    Config.Position = 'center-right'  -- Middle right (default)
+    ```
+
+    Check for typos — common mistakes include:
+    - `'center'` (not valid, must be `'center-left'` or `'center-right'`)
+    - `'top-left'` or `'top-right'` (not valid, only `'top-center'`)
+    - Missing quotes or extra spaces
+
+    <Warning>
+      If you use an invalid position value, the killfeed may not display at all or appear in an unexpected location.
+    </Warning>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Sound Issues
+
+<AccordionGroup>
+  <Accordion title="Sound not playing" icon="volume-xmark">
+    **Symptoms**: Kill notifications appear but no sound plays.
+
+    **Fix**:
+
+    <Steps>
+      <Step title="Enable sound in config">
+        Make sure sound is enabled:
+        ```lua
+        Config.EnableSound = true
+        ```
+      </Step>
+      <Step title="Check sound file exists">
+        Verify `web/sounds/kill.ogg` exists. If the file is missing, the sound won't play.
+      </Step>
+      <Step title="Check file format">
+        The sound file must be in `.ogg` format. Other formats (`.mp3`, `.wav`) won't work unless you also update the JavaScript in `web/main.js`.
+      </Step>
+      <Step title="Restart the resource">
+        Run `restart jx_killfeed` after changing the config
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## General Issues
+
+<AccordionGroup>
+  <Accordion title="No framework dependency needed" icon="puzzle-piece">
+    **Confused about frameworks?**
+
+    jx_killfeed is **completely standalone**. It does not need ESX, QBCore, QBX, ox_lib, or any other framework or library. It works on any FiveM server.
+
+    If you see someone asking about framework compatibility — it's not an issue. Just `ensure jx_killfeed` and it works.
+  </Accordion>
+
+  <Accordion title="Resource won't start" icon="circle-xmark">
+    **Symptoms**: `ensure jx_killfeed` does nothing or shows an error.
+
+    **Checklist**:
+
+    <Steps>
+      <Step title="Check folder name">
+        Must be named exactly `jx_killfeed`
+      </Step>
+      <Step title="Check fxmanifest.lua exists">
+        The resource needs a valid `fxmanifest.lua` in the root folder
+      </Step>
+      <Step title="Check file structure">
+        The folder should contain: `config.lua`, `client/`, `server/`, `web/`, `fxmanifest.lua`
+      </Step>
+      <Step title="Check server.cfg">
+        Line should be exactly `ensure jx_killfeed`
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Still Having Issues?
+
+<Card title="Join Our Discord" icon="discord" href="https://discord.gg/VuMcnbmEby" horizontal>
+  Get help from the community — include your config and any error messages
+</Card>

@@ -1,0 +1,256 @@
+---
+title: 'Common Issues'
+description: 'Troubleshooting jx_multicharacter'
+icon: 'triangle-exclamation'
+---
+
+# Common Issues
+
+Quick solutions to the most frequently encountered problems with jx_multicharacter.
+
+<Note>
+  Most issues can be resolved by checking your configuration and ensuring dependencies are installed. Start there first!
+</Note>
+
+---
+
+## Database Issues
+
+<AccordionGroup>
+  <Accordion title="'Table doesn't exist' Errors" icon="database">
+    **Symptoms**: SQL errors in console about missing `jx_multicharacter` table
+
+    **Cause**: The `install.sql` file was not imported before starting the resource.
+
+    **Fix**:
+
+    <Steps>
+      <Step title="Open Database Tool">
+        Open HeidiSQL, phpMyAdmin, or your preferred database tool
+      </Step>
+      <Step title="Import SQL">
+        Open and run the `install.sql` file from the jx_multicharacter folder
+      </Step>
+      <Step title="Verify Tables">
+        Check that `jx_multicharacter` table exists and `users` table has `nationality` and `lastlocation` columns
+      </Step>
+      <Step title="Restart Resource">
+        Restart the server or run `restart jx_multicharacter` in console
+      </Step>
+    </Steps>
+
+    <Warning>
+      The SQL is **never** auto-imported. You must run it manually every time you do a fresh install.
+    </Warning>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## UI Issues
+
+<AccordionGroup>
+  <Accordion title="Character Creation Screen Stuck / Not Loading" icon="spinner">
+    **Symptoms**: Screen goes black or the NUI interface doesn't appear
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="Check NUI Files">
+        Verify the NUI files exist in the resource:
+
+        ```
+        jx_multicharacter/web/dist/index.html
+        jx_multicharacter/web/dist/assets/
+        ```
+
+        If the `web/dist/` folder is missing or empty, re-download the resource.
+      </Tab>
+
+      <Tab title="Check Console">
+        Open the F8 console and look for NUI errors. Common causes:
+        - Missing `web/dist/` files
+        - Another resource blocking NUI
+        - Browser cache issues (try clearing FiveM cache)
+      </Tab>
+
+      <Tab title="Check Framework">
+        Ensure your framework is detected properly:
+
+        ```lua config/config.lua
+        Config.Framework = 'auto'  -- or 'esx', 'qbcore', 'qbox'
+        ```
+
+        Check server console for framework detection messages.
+      </Tab>
+    </Tabs>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Skin Creator Issues
+
+<AccordionGroup>
+  <Accordion title="Skin Creator Not Opening" icon="shirt">
+    **Symptoms**: After registration, the skin/appearance menu never opens
+
+    **Why This Happens**:
+    - No supported skin menu is installed on your server
+    - The skin menu isn't being detected
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="Install a Skin Menu">
+        Install one of these supported appearance menus:
+        - `illenium-appearance`
+        - `qb-clothing`
+        - `esx_skin`
+        - `skinchanger`
+        - `fivem-appearance`
+        - `codem-appearance`
+        - `ag_appearance`
+      </Tab>
+
+      <Tab title="Manual Selection">
+        If auto-detection isn't working, manually specify your skin menu:
+
+        ```lua config/skin.lua
+        Config.Skin.Menu = "illenium-appearance"  -- Replace with your menu
+        ```
+      </Tab>
+
+      <Tab title="Disable Skin Creator">
+        If you don't want appearance customization:
+
+        ```lua config/skin.lua
+        Config.Skin.Enabled = false
+        ```
+      </Tab>
+    </Tabs>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Spawn Selector Issues
+
+<AccordionGroup>
+  <Accordion title="Spawn Selector Not Showing" icon="map-pin">
+    **Symptoms**: After character login, no spawn selector appears
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Check Config">
+        Verify spawn selector is enabled:
+
+        ```lua config/config.lua
+        Config.SpawnSelector = {
+            Enabled = true,
+            Resource = 'jx_spawnselector'
+        }
+        ```
+      </Step>
+      <Step title="Check Resource">
+        Make sure `jx_spawnselector` is installed and started in your `server.cfg`:
+
+        ```cfg
+        ensure jx_spawnselector
+        ```
+      </Step>
+      <Step title="Check Start Order">
+        `jx_spawnselector` should be started before or alongside `jx_multicharacter`.
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Command Issues
+
+<AccordionGroup>
+  <Accordion title="/relog Not Working" icon="arrow-rotate-left">
+    **Symptoms**: Typing `/relog` does nothing
+
+    **Fix**:
+
+    Ensure relog is enabled in your config:
+
+    ```lua config/selector.lua
+    Config.Selector.EnableRelog = true
+    ```
+
+    Restart the resource after changing this setting.
+  </Accordion>
+
+  <Accordion title="Name Validation Rejecting Names" icon="text">
+    **Symptoms**: Players can't submit names that should be valid
+
+    **Fix**:
+
+    Check your validation settings:
+
+    ```lua config/register.lua
+    Config.Register.Validation = {
+        FirstName = {
+            MinLength = 2,            -- Lower this if names are too short
+            MaxLength = 20,           -- Raise this for longer names
+            AllowNumbers = false,     -- Set true to allow numbers
+            AllowSpecialChars = false -- Set true for accented characters, hyphens, etc.
+        },
+        -- Same for LastName
+    }
+    ```
+
+    <Tip>
+      If your server has players with accented names (é, ñ, ü, etc.), consider setting `AllowSpecialChars = true`.
+    </Tip>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Conflict Issues
+
+<AccordionGroup>
+  <Accordion title="Conflicting with Existing Multicharacter" icon="clone">
+    **Symptoms**: Two character selectors appear, players stuck on loading, or database errors
+
+    **Fix**:
+
+    You **must** disable any other multicharacter resource. Only one should be running at a time.
+
+    Common resources to disable in `server.cfg`:
+
+    ```cfg
+    # Remove or comment out these lines:
+    # ensure esx_multicharacter
+    # ensure qb-multicharacter
+    # ensure qbx_multicharacter
+    ```
+
+    <Warning>
+      Running two multicharacter systems simultaneously will cause major issues including database conflicts and broken spawning.
+    </Warning>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Still Having Issues?
+
+<CardGroup cols={2}>
+  <Card title="Installation Guide" icon="download" href="./installation">
+    Review step-by-step installation
+  </Card>
+  <Card title="Configuration Guide" icon="gear" href="./configuration">
+    Double-check your configuration
+  </Card>
+</CardGroup>
+
+<Card title="Join Our Discord" icon="discord" href="https://discord.gg/VuMcnbmEby" horizontal>
+  Get help from the community — provide your error messages and config when asking for support
+</Card>

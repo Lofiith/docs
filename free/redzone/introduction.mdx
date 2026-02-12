@@ -1,0 +1,131 @@
+---
+title: 'JX Redzone'
+description: 'PvP redzone system with in-game zone creator'
+icon: 'crosshairs'
+---
+
+# Redzone
+
+A fully-featured PvP redzone system with an in-game visual zone creator. Design, place, and manage combat zones directly from the game — no config file editing needed for zone setup.
+
+<Note>
+  **Free Resource** - Works with ESX, QBCore, and Qbox via auto-detection.
+</Note>
+
+## What It Does
+
+Create and manage PvP combat zones with:
+
+- **In-Game Zone Creator** — Visually place and configure zones using a freecam creator UI
+- **Configurable Rewards** — Money for kills, headshots, and kill streaks
+- **Routing Bucket Isolation** — Each zone runs in its own routing bucket to prevent outside interference
+- **Auto-Revive** — Automatic respawn with ambulance script detection
+- **Leaderboard** — Track top players across all zones
+- **Stats Display** — Three layout options: hex, table, and rail
+- **Color Picker** — Players choose their personal zone color overlay
+- **Map Blips** — Radius circles and markers for active zones
+- **Entry Weapons** — Automatic weapon loadout when entering a zone
+
+## How It Works
+
+<Steps>
+  <Step title="Admin Creates a Zone">
+    Press F7 or type `/rzcreator` to open the visual zone creator with freecam
+  </Step>
+  <Step title="Configure the Zone">
+    Set the zone name, radius, rewards, rules, and entry weapons
+  </Step>
+  <Step title="Zone Goes Live">
+    The zone appears on the map immediately — no restart required
+  </Step>
+  <Step title="Players Enter and Fight">
+    Players walk in, receive weapons, earn rewards for kills, and auto-revive on death
+  </Step>
+</Steps>
+
+---
+
+## Features Overview
+
+<Tabs>
+  <Tab title="Zone Creator" icon="wand-magic-sparkles">
+    Admins create zones entirely in-game:
+
+    - Freecam positioning
+    - Configurable radius, color, and rules
+    - Entry weapon selection
+    - Kill, headshot, and streak reward setup
+    - Edit or delete existing zones
+    - All data saved to `data/zones.json` — no database required
+  </Tab>
+
+  <Tab title="Player UIs" icon="palette">
+    Players have access to several UI commands:
+
+    - `/rzcolor` — Personal color picker for zone overlay
+    - `/selectstats` — Choose stats display layout (hex, table, rail)
+    - `/rzlb` — View the kill leaderboard
+  </Tab>
+
+  <Tab title="Zone Mechanics" icon="shield-halved">
+    Each zone supports:
+
+    - Vehicle deletion inside zones
+    - Routing bucket isolation (no outside players)
+    - Cross-zone damage blocking
+    - Configurable map blips with radius circles
+    - Marker display at zone borders
+  </Tab>
+
+  <Tab title="Revive System" icon="heart-pulse">
+    Auto-revive with ambulance script detection:
+
+    - **Auto mode**: Detects wasabi_ambulance, ak47_ambulance, qbox, qb, or esx ambulance
+    - **Manual mode**: Specify which ambulance script to use
+    - **Custom mode**: Write your own revive logic in `server/open.lua`
+  </Tab>
+</Tabs>
+
+---
+
+## Requirements
+
+<CardGroup cols={2}>
+  <Card title="ox_lib" icon="box" href="https://github.com/overextended/ox_lib">
+    Modern UI and utilities library (required)
+  </Card>
+  <Card title="Framework" icon="server">
+    ESX, QBCore, or Qbox (auto-detected)
+  </Card>
+</CardGroup>
+
+<Info>
+  No database required — zones are stored in `data/zones.json`.
+</Info>
+
+---
+
+## Quick Start
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="./installation">
+    Get the redzone system running in minutes
+  </Card>
+  <Card title="Configuration" icon="gear" href="./configuration">
+    Customize zone defaults, rewards, and permissions
+  </Card>
+  <Card title="How To Use" icon="gamepad" href="./usage">
+    Learn admin zone creation and player commands
+  </Card>
+  <Card title="Common Issues" icon="triangle-exclamation" href="./common-issues">
+    Troubleshoot common problems
+  </Card>
+</CardGroup>
+
+---
+
+## Need Help?
+
+<Card title="Join Our Discord" icon="discord" href="https://discord.gg/VuMcnbmEby" horizontal>
+  Get support, share your setups, and stay updated with releases
+</Card>

@@ -1,0 +1,89 @@
+---
+title: 'How To Use'
+description: 'Using the spawn selector in-game'
+icon: 'gamepad'
+---
+
+# How To Use
+
+The spawn selector provides a simple, intuitive way for players to choose where they enter the world.
+
+---
+
+## Player Workflow
+
+<Steps>
+  <Step title="Character Login">
+    After selecting or creating a character (via jx_multicharacter or another system), the spawn selector UI automatically appears.
+  </Step>
+  <Step title="View the Map">
+    A map of Los Santos is displayed with location pins at each configured spawn point.
+  </Step>
+  <Step title="Choose a Location">
+    Click on a location pin to see its name and description. Click again or confirm to spawn there.
+  </Step>
+  <Step title="Last Location (Optional)">
+    If the player has logged in before, a **"Last Location"** option is available. This spawns the player at the exact position where they last logged out.
+  </Step>
+  <Step title="Spawn">
+    The player spawns at the selected coordinates and can begin playing immediately.
+  </Step>
+</Steps>
+
+---
+
+## Default Spawn Locations
+
+The spawn selector comes pre-configured with 5 locations:
+
+| Location | Description |
+|----------|-------------|
+| **Pillbox** | Pillbox Medical Center |
+| **Legion Square** | Central Legion Square |
+| **Beach** | The beach area |
+| **Los Santos Airport** | The main airport |
+| **Parking Lot** | Central parking |
+
+These can be customized, added to, or removed in `config/spawn.lua`. See the [Configuration Guide](./configuration) for details.
+
+---
+
+## Last Location
+
+When a player disconnects, their position is automatically saved to the database. On their next login, they can choose to return to that exact spot instead of a fixed spawn point.
+
+<Info>
+  Last location data is stored in the `lastlocation` column of the `users` table. This is shared with jx_multicharacter if both are installed.
+</Info>
+
+---
+
+## For Server Owners
+
+### Triggering the Spawn Selector Manually
+
+If you're using a custom multicharacter system (not jx_multicharacter), you can trigger the spawn selector via the server-side export:
+
+```lua
+-- Call this server-side after the player has selected their character
+exports.jx_spawnselector:RequestSpawnSelector(source)
+```
+
+### Disabling for New Characters
+
+If you want new characters to always spawn at a fixed location (e.g., the skin creator position) instead of seeing the spawn selector:
+
+```lua config/spawn.lua
+Config.Spawn.EnableForNewCharacters = false
+```
+
+### Changing the UI Text
+
+Customize the title and description shown on the spawn selector screen:
+
+```lua config/spawn.lua
+Config.Spawn.UI = {
+    Title = "WHERE TO?",
+    Description = "Pick your starting point."
+}
+```

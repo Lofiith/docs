@@ -1,0 +1,125 @@
+---
+title: 'Configuration'
+description: 'Configuring the killfeed display'
+icon: 'gear'
+---
+
+# Configuration
+
+All settings are in a single file: `config.lua`.
+
+<Info>
+  Restart the resource (`restart jx_killfeed`) after making any changes.
+</Info>
+
+---
+
+## Config Options
+
+```lua config.lua
+Config = {}
+
+-- UI Position: 'top-center', 'center-left', 'center-right'
+Config.Position = 'center-right'
+
+-- Maximum number of killfeed entries displayed at once
+Config.MaxEntries = 5
+
+-- Enable or disable kill notification sound
+Config.EnableSound = false
+```
+
+---
+
+### Config.Position
+
+Where the killfeed appears on screen.
+
+| Value | Description |
+|-------|-------------|
+| `'top-center'` | Top center of the screen |
+| `'center-left'` | Middle of the screen, left side |
+| `'center-right'` | Middle of the screen, right side (default) |
+
+```lua
+Config.Position = 'center-right'
+```
+
+<Warning>
+  Only these three values are valid. Using anything else will cause the killfeed to not display properly.
+</Warning>
+
+---
+
+### Config.MaxEntries
+
+Maximum number of kill entries shown at once. When a new kill happens and the list is full, the oldest entry fades out.
+
+| Value | Description |
+|-------|-------------|
+| `5` | Default — shows up to 5 entries |
+| `3` | Minimal — fewer entries, less screen clutter |
+| `10` | Extended — more entries visible at once |
+
+```lua
+Config.MaxEntries = 5
+```
+
+<Tip>
+  For servers with lots of PvP action, you may want to increase this. For roleplay servers, a lower value keeps the UI cleaner.
+</Tip>
+
+---
+
+### Config.EnableSound
+
+Whether to play a sound effect when a kill notification appears.
+
+```lua
+Config.EnableSound = false -- Set to true to enable
+```
+
+The sound file is located at `web/sounds/kill.ogg`. You can replace it with any `.ogg` audio file to use a custom sound — just keep the same filename.
+
+---
+
+## Customizing the Appearance
+
+Beyond `config.lua`, you can customize the visual appearance by editing files in the `web/` folder.
+
+### Styling
+
+Edit `web/styles.css` to change colors, sizes, fonts, animations, and layout:
+
+```css
+/* Example: change the background color of kill entries */
+.kill-entry {
+    background: rgba(0, 0, 0, 0.7);
+}
+```
+
+### Icons
+
+Replace SVG files in `web/svg/` to use custom weapon icons. The default icons included are:
+- `gun.svg` — weapon icon
+- `target.svg` — crosshair/target icon
+
+### Fonts
+
+Replace the font file in `web/fonts/` to use a different typeface. The default font is `MeticulaExtraBold.ttf`.
+
+### Sounds
+
+Replace `web/sounds/kill.ogg` with your own sound file. Keep the filename as `kill.ogg` and use the `.ogg` format.
+
+---
+
+## Full Config Reference
+
+```lua config.lua
+Config = {}
+
+Config.Position = 'center-right'  -- 'top-center', 'center-left', 'center-right'
+Config.MaxEntries = 5             -- Max entries shown at once
+Config.EnableSound = false        -- Play sound on kill notification
+```

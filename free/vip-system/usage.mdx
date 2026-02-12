@@ -1,0 +1,250 @@
+---
+title: 'How To Use'
+description: 'Using VIP features in-game'
+icon: 'gamepad'
+---
+
+# How To Use
+
+Learn how to access and use VIP features in-game, from opening the menu to using each perk.
+
+---
+
+## Getting VIP Access
+
+Before you can use VIP features, you need a VIP role in the server's Discord:
+
+<Steps>
+  <Step title="Join the Discord Server">
+    Join the server's Discord community if you haven't already
+  </Step>
+  <Step title="Get a VIP Role">
+    Obtain a VIP or VIP+ role — this is typically through a purchase, giveaway, or community reward (managed by server staff)
+  </Step>
+  <Step title="Connect to FiveM">
+    Join the FiveM server. Your Discord roles are checked automatically on connect.
+  </Step>
+  <Step title="Wait for Sync">
+    Allow a few seconds after joining for Discord data to load. Your VIP status is then available.
+  </Step>
+</Steps>
+
+<Note>
+  If you just received a VIP role, you may need to reconnect to the FiveM server or use `/viprefresh` for it to take effect.
+</Note>
+
+---
+
+## Opening the VIP Menu
+
+<Tabs>
+  <Tab title="Keybind" icon="keyboard">
+    Press **F5** to open the VIP menu (default keybind, remappable in FiveM settings).
+  </Tab>
+
+  <Tab title="Command" icon="terminal">
+    Type `/vipmenu` in chat to open the VIP menu.
+  </Tab>
+</Tabs>
+
+The menu displays all available features based on your VIP tier, along with prices and cooldown status.
+
+---
+
+## Using Features
+
+### VIP Features (Both Tiers)
+
+<AccordionGroup>
+  <Accordion title="Full Heal — $500" icon="heart">
+    Instantly restore your health to 100%.
+
+    - **Price**: $500 (default)
+    - **Cooldown**: 5 minutes
+    - **How**: Open VIP menu → Select "Full Heal"
+    - Money is deducted automatically
+  </Accordion>
+
+  <Accordion title="Full Armor — $750" icon="shield-halved">
+    Instantly restore your armor to 100%.
+
+    - **Price**: $750 (default)
+    - **Cooldown**: 5 minutes
+    - **How**: Open VIP menu → Select "Full Armor"
+  </Accordion>
+
+  <Accordion title="Vehicle Repair — $1,000" icon="wrench">
+    Fully repair your current vehicle (engine, body, and visual damage).
+
+    - **Price**: $1,000 (default)
+    - **Cooldown**: 10 minutes
+    - **Requirement**: Must be in a vehicle
+    - **How**: Get in a vehicle → Open VIP menu → Select "Repair Vehicle"
+  </Accordion>
+
+  <Accordion title="Vehicle Wash — $200" icon="droplet">
+    Clean your current vehicle, removing dirt and grime.
+
+    - **Price**: $200 (default)
+    - **Cooldown**: 2 minutes
+    - **Requirement**: Must be in a vehicle
+    - **How**: Get in a vehicle → Open VIP menu → Select "Wash Vehicle"
+  </Accordion>
+
+  <Accordion title="Clothing Menu — Free" icon="shirt">
+    Open your server's skin/clothing customization menu.
+
+    - **Price**: Free
+    - **Cooldown**: 1 minute
+    - **Requirement**: A supported skin menu must be installed on the server
+    - **How**: Open VIP menu → Select "Clothing Menu"
+  </Accordion>
+</AccordionGroup>
+
+### VIP+ Exclusive Features
+
+<AccordionGroup>
+  <Accordion title="God Mode — $2,000" icon="shield">
+    Become invincible for 5 minutes. No damage can hurt you.
+
+    - **Price**: $2,000 (default)
+    - **Duration**: 5 minutes
+    - **Cooldown**: 30 minutes
+    - **Tier**: VIP+ only
+    - **How**: Open VIP menu → Select "God Mode"
+    - The effect automatically ends after the duration expires
+
+    <Warning>
+      God mode deactivates automatically when the timer runs out or when the resource restarts.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Invisibility — $1,000" icon="eye-slash">
+    Become invisible to all other players for 3 minutes.
+
+    - **Price**: $1,000 (default)
+    - **Duration**: 3 minutes
+    - **Cooldown**: 20 minutes
+    - **Tier**: VIP+ only
+    - **How**: Open VIP menu → Select "Invisibility"
+    - Other players cannot see you during the effect
+
+    <Note>
+      You can still interact with the world and take damage while invisible (unless god mode is also active).
+    </Note>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## VIP Shop
+
+The VIP Shop is an exclusive item store with tiered pricing. VIP+ members get lower prices and access to exclusive items.
+
+<Steps>
+  <Step title="Open VIP Menu">
+    Press F5 or type `/vipmenu`
+  </Step>
+  <Step title="Select VIP Shop">
+    Choose the "VIP Shop" option from the menu
+  </Step>
+  <Step title="Browse Items">
+    See available items with names, prices, and quantities
+  </Step>
+  <Step title="Purchase">
+    Select an item to buy. Money is deducted and items are added to your inventory.
+  </Step>
+</Steps>
+
+### Tier Differences
+
+| Aspect | VIP | VIP+ |
+|--------|-----|------|
+| Item prices | Standard | Discounted |
+| Item quantities | Standard | Higher |
+| Exclusive items | ❌ | ✅ (lockpick, repair kit, etc.) |
+
+---
+
+## Quick Travel
+
+VIP+ members can teleport to preset locations around the map.
+
+<Steps>
+  <Step title="Open VIP Menu">
+    Press F5 or type `/vipmenu`
+  </Step>
+  <Step title="Select Quick Travel">
+    Choose "Quick Travel" from the menu
+  </Step>
+  <Step title="Pick a Destination">
+    Browse available locations with their prices
+  </Step>
+  <Step title="Confirm">
+    Select a location. Money is deducted and you're teleported instantly.
+  </Step>
+</Steps>
+
+**Default Locations**:
+
+| Location | Price |
+|----------|-------|
+| Hospital | $200 |
+| City Hall | $200 |
+| Airport | $300 |
+| Beach | $250 |
+
+<Note>
+  Quick Travel is VIP+ only by default. Locations and prices are configured by the server admin.
+</Note>
+
+---
+
+## Useful Commands
+
+| Command | Description |
+|---------|-------------|
+| `/vipmenu` | Open the VIP menu (alternative to F5) |
+| `/vipstatus` | Check your current VIP tier and status |
+| `/viprefresh` | Force refresh your Discord role cache — use this if you just got a new role |
+
+---
+
+## Cooldowns
+
+Most features have cooldown timers to prevent spam. When a feature is on cooldown:
+
+- The menu shows the remaining cooldown time
+- You cannot use the feature until the timer expires
+- Each feature has its own independent cooldown
+
+**Default Cooldowns**:
+
+| Feature | Cooldown |
+|---------|----------|
+| Heal | 5 minutes |
+| Armor | 5 minutes |
+| Vehicle Repair | 10 minutes |
+| Vehicle Wash | 2 minutes |
+| Clothing Menu | 1 minute |
+| God Mode | 30 minutes |
+| Invisibility | 20 minutes |
+
+---
+
+## Tips
+
+<CardGroup cols={2}>
+  <Card title="Refresh After Role Change" icon="arrows-rotate">
+    Just got VIP? Use `/viprefresh` or reconnect to the server for it to take effect.
+  </Card>
+  <Card title="Check Cooldowns" icon="clock">
+    Open the menu to see remaining cooldown times before planning your actions.
+  </Card>
+  <Card title="Vehicle Features" icon="car">
+    You must be in a vehicle to use Vehicle Repair and Vehicle Wash. Get in first, then open the menu.
+  </Card>
+  <Card title="Shop Smart" icon="cart-shopping">
+    VIP+ members get better shop prices. If you're planning a big purchase, the upgrade pays for itself.
+  </Card>
+</CardGroup>

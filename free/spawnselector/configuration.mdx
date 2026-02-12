@@ -1,0 +1,268 @@
+---
+title: 'Configuration'
+description: 'Configuring spawn locations'
+icon: 'gear'
+---
+
+# Configuration
+
+This page covers every configuration option for jx_spawnselector. All changes require a resource restart to take effect.
+
+<Info>
+  All configuration is done in the `config/` folder. These files are **not escrowed** and can be freely modified.
+</Info>
+
+## Configuration Files
+
+<CodeGroup>
+
+```bash File Structure
+jx_spawnselector/
+└── config/
+    ├── config.lua    ← Main settings (framework, theme, debug)
+    └── spawn.lua     ← Spawn locations and UI text
+```
+
+</CodeGroup>
+
+---
+
+## config/config.lua
+
+### Config.Debug
+
+**Type**: `boolean`  
+**Default**: `true`
+
+Enables debug logging in the console. Set to `false` in production.
+
+```lua
+Config.Debug = false
+```
+
+---
+
+### Config.Framework
+
+**Type**: `string`  
+**Default**: `'auto'`  
+**Options**: `'auto'`, `'esx'`, `'qbcore'`, `'qbox'`
+
+Which framework to use. Auto-detection works for most servers.
+
+```lua
+Config.Framework = 'auto'
+```
+
+---
+
+### Config.EnableVersionCheck
+
+**Type**: `boolean`  
+**Default**: `true`
+
+Whether to check for new versions on resource start. Notifies in console if an update is available.
+
+```lua
+Config.EnableVersionCheck = true
+```
+
+---
+
+### Config.Locale
+
+**Type**: `string`  
+**Default**: `'en'`  
+**Options**: `'en'`, `'es'`
+
+The language used for in-game messages and notifications.
+
+```lua
+Config.Locale = 'en'
+```
+
+---
+
+### Config.Theme
+
+**Type**: `table`
+
+The accent colors used in the NUI interface.
+
+```lua
+Config.Theme = {
+    Primary = '#F41A3E',   -- Main accent color
+    Secondary = '#AF3347'  -- Secondary accent color
+}
+```
+
+---
+
+## config/spawn.lua
+
+### Config.Spawn.Enabled
+
+**Type**: `boolean`  
+**Default**: `true`
+
+Enable or disable the spawn selector entirely.
+
+```lua
+Config.Spawn.Enabled = true
+```
+
+---
+
+### Config.Spawn.EnableForNewCharacters
+
+**Type**: `boolean`  
+**Default**: `true`
+
+Whether to show the spawn selector for newly created characters (first login).
+
+```lua
+Config.Spawn.EnableForNewCharacters = true
+```
+
+---
+
+### Config.Spawn.UI
+
+**Type**: `table`
+
+Title and description text shown on the spawn selector screen.
+
+```lua
+Config.Spawn.UI = {
+    Title = "SPAWN SELECTOR",
+    Description = "Select a location to spawn into the world or use your previous location."
+}
+```
+
+---
+
+### Config.Spawn.Locations
+
+**Type**: `table` (array)
+
+The list of spawn locations displayed on the map. Each location has the following fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique identifier for the location |
+| `name` | `string` | Display name shown in the UI |
+| `description` | `string` | Short description of the location |
+| `coords` | `vector4` | Spawn coordinates `(x, y, z, heading)` |
+| `image` | `string` | Path to a preview image |
+| `position` | `table` | Pin position on the map (`top` and `left` as CSS percentages) |
+
+### Default Locations
+
+```lua
+Config.Spawn.Locations = {
+    {
+        id = "pillbox",
+        name = "PILLBOX",
+        description = "Spawn at Pillbox Medical Center",
+        coords = vector4(276.5700, -592.4682, 43.2621, 77.0045),
+        image = "./assets/spawn-locations/pillbox.png",
+        position = { top = "35%", left = "65%" }
+    },
+    {
+        id = "legion",
+        name = "LEGION SQUARE",
+        description = "Spawn at Legion Square",
+        coords = vector4(164.1626, -990.0618, 30.0919, 155.2279),
+        image = "./assets/spawn-locations/pillbox.png",
+        position = { top = "45%", left = "55%" }
+    },
+    {
+        id = "beach",
+        name = "BEACH",
+        description = "Spawn at the beach",
+        coords = vector4(-1536.7526, -940.8774, 11.5661, 323.2977),
+        image = "./assets/spawn-locations/pillbox.png",
+        position = { top = "55%", left = "45%" }
+    },
+    {
+        id = "airport",
+        name = "LOS SANTOS AIRPORT",
+        description = "Spawn at the airport",
+        coords = vector4(-1042.5, -2745.5, 21.4, 329.1),
+        image = "./assets/spawn-locations/pillbox.png",
+        position = { top = "65%", left = "70%" }
+    },
+    {
+        id = "parking",
+        name = "PARKING LOT",
+        description = "Spawn at central parking",
+        coords = vector4(215.1, -809.1, 30.7, 158.6),
+        image = "./assets/spawn-locations/pillbox.png",
+        position = { top = "25%", left = "60%" }
+    }
+}
+```
+
+---
+
+## Adding a New Spawn Location
+
+To add a new spawn location, append a new entry to the `Config.Spawn.Locations` table.
+
+### Step-by-Step Example
+
+Let's add a **Police Station** spawn point:
+
+<Steps>
+  <Step title="Get Coordinates">
+    Go to the desired location in-game and get your coordinates. Use a command like `/coords` or `/getcoords` from your framework. You need a `vector4` value: `(x, y, z, heading)`.
+  </Step>
+  <Step title="Create an Image (Optional)">
+    Take a screenshot of the location and save it to:
+
+    ```
+    jx_spawnselector/web/public/assets/spawn-locations/police.png
+    ```
+
+    If you don't have a custom image, you can reuse an existing one.
+  </Step>
+  <Step title="Determine Map Position">
+    The `position` field places the pin on the NUI map image. Use CSS percentage values for `top` and `left`. Experiment with values to get the pin in the right spot:
+    - `top: "0%"` = top of map, `top: "100%"` = bottom of map
+    - `left: "0%"` = left side, `left: "100%"` = right side
+  </Step>
+  <Step title="Add to Config">
+    Add the new entry to `config/spawn.lua`:
+
+    ```lua
+    {
+        id = "police",
+        name = "POLICE STATION",
+        description = "Spawn at Mission Row Police Station",
+        coords = vector4(428.23, -984.28, 30.71, 3.54),
+        image = "./assets/spawn-locations/police.png",
+        position = { top = "40%", left = "62%" }
+    },
+    ```
+  </Step>
+  <Step title="Restart Resource">
+    Run `restart jx_spawnselector` in your server console.
+  </Step>
+</Steps>
+
+<Tip>
+  Each location's `id` must be unique. Use simple lowercase identifiers like `"hospital"`, `"police"`, `"garage"`, etc.
+</Tip>
+
+---
+
+## Server-Side Export
+
+Other resources can trigger the spawn selector for any player:
+
+```lua
+-- Server-side export
+exports.jx_spawnselector:RequestSpawnSelector(source)
+```
+
+This is how jx_multicharacter integrates with the spawn selector automatically.

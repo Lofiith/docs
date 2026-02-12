@@ -1,0 +1,91 @@
+---
+title: 'JX Multicharacter'
+description: 'Character creation and selection system for FiveM'
+icon: 'id-card'
+---
+
+# JX Multicharacter
+
+A fully featured multicharacter system for FiveM with a modern NUI interface. Create and manage multiple characters per player with a sleek character selector, registration form, and skin/appearance customization.
+
+<Note>
+  **Free & Open Source** - Completely free to use and modify for your server.
+</Note>
+
+## What It Does
+
+JX Multicharacter provides a complete character management experience:
+
+- **Character Selector** — Browse and select from existing characters with a 3D ped preview
+- **Character Creator** — Registration form for first name, last name, date of birth, gender, height, and nationality
+- **Skin/Appearance Customization** — Integrates with popular appearance menus (illenium-appearance, qb-clothing, esx_skin, and more)
+- **Spawn Selector Integration** — Optional integration with jx_spawnselector to choose a spawn location after login
+- **Starting Items** — Automatically give items to newly created characters
+
+## Framework Support
+
+<Tabs>
+  <Tab title="ESX" icon="server">
+    Full support with `@es_extended/imports.lua`. This is the primary framework.
+  </Tab>
+
+  <Tab title="QBCore" icon="server">
+    Auto-detected when QBCore is present. No extra configuration needed.
+  </Tab>
+
+  <Tab title="Qbox" icon="server">
+    Auto-detected when Qbox (qbx_core) is present. No extra configuration needed.
+  </Tab>
+</Tabs>
+
+## File Structure
+
+<CodeGroup>
+
+```bash Resource Structure
+jx_multicharacter/
+├── config/
+│   ├── config.lua          ← Main settings
+│   ├── register.lua        ← Registration settings
+│   ├── selector.lua        ← Selector settings
+│   └── skin.lua            ← Skin creator settings
+├── locales/
+│   ├── en.lua              ← English translations
+│   └── es.lua              ← Spanish translations
+├── client/                 ← Client scripts (escrowed)
+├── server/                 ← Server scripts (escrowed)
+├── bridge/                 ← Framework bridge (escrowed)
+├── utils/                  ← Utilities (escrowed)
+├── web/dist/               ← NUI interface
+├── install.sql             ← Database setup
+└── fxmanifest.lua
+```
+
+</CodeGroup>
+
+<Info>
+  **Editable files**: Everything in `config/` and `locales/` can be freely modified. Client, server, bridge, and utils scripts are escrowed.
+</Info>
+
+## Quick Start Guide
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="./installation">
+    Get jx_multicharacter installed and running
+  </Card>
+  <Card title="Configuration" icon="gear" href="./configuration">
+    Customize registration, selector, and skin settings
+  </Card>
+  <Card title="How To Use" icon="gamepad" href="./usage">
+    Learn the in-game workflow for players and server owners
+  </Card>
+  <Card title="Common Issues" icon="triangle-exclamation" href="./common-issues">
+    Troubleshooting common problems
+  </Card>
+</CardGroup>
+
+## Need Help?
+
+<Card title="Join Our Discord" icon="discord" href="https://discord.gg/VuMcnbmEby" horizontal>
+  Get support, share your implementations, and stay updated with the latest releases
+</Card>

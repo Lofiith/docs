@@ -1,0 +1,162 @@
+---
+title: 'Configuration'
+description: 'Configuring jx_discord settings'
+icon: 'gear'
+---
+
+# Configuration
+
+All settings are in a single file: `config.lua`. This file is server-side only — modders can't dump it from the client.
+
+<Info>
+  Restart the resource (`restart jx_discord`) after making any changes.
+</Info>
+
+---
+
+## Bot Configuration
+
+These two settings are **required** for the script to function.
+
+```lua config.lua
+Config.Token = ''   -- Your Discord Bot Token
+Config.Guild = ''   -- Your Discord Guild/Server ID
+```
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `Config.Token` | string | Your Discord bot token from the [Developer Portal](https://discord.com/developers/applications). **Keep this secret. Never share it publicly.** |
+| `Config.Guild` | string | Your Discord server ID. The bot must be a member of this server. |
+
+<Warning>
+  If either value is left empty, the script will print an error on startup and will not function.
+</Warning>
+
+---
+
+## Player Requirements
+
+Control whether players need Discord linked or guild membership to play.
+
+```lua config.lua
+Config.RequireDiscord = false
+Config.RequireInGuild = false
+Config.KickMessage = 'You must be in our Discord server to play. Join: discord.gg/jxscripts'
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `Config.RequireDiscord` | boolean | `false` | If `true`, players without a linked Discord account will be kicked on connect. |
+| `Config.RequireInGuild` | boolean | `false` | If `true`, players must be a member of your Discord server to play. Players who aren't in the server will see `Config.KickMessage`. |
+| `Config.KickMessage` | string | *(see above)* | The message shown to kicked players when they fail the Discord or guild check. |
+
+<Tabs>
+  <Tab title="Open Server" icon="lock-open">
+    Anyone can join, Discord is optional:
+
+    ```lua
+    Config.RequireDiscord = false
+    Config.RequireInGuild = false
+    ```
+  </Tab>
+
+  <Tab title="Discord Required" icon="discord">
+    Players must have Discord linked to their FiveM account:
+
+    ```lua
+    Config.RequireDiscord = true
+    Config.RequireInGuild = false
+    ```
+  </Tab>
+
+  <Tab title="Guild Required" icon="shield-halved">
+    Players must be in your Discord server:
+
+    ```lua
+    Config.RequireDiscord = true
+    Config.RequireInGuild = true
+    Config.KickMessage = 'Join our Discord first: discord.gg/yourserver'
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Cache Settings
+
+Control how Discord data is cached to reduce API calls.
+
+```lua config.lua
+Config.RefreshCacheOnConnect = true
+Config.CacheTimeout = 300
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `Config.RefreshCacheOnConnect` | boolean | `true` | Clears cached Discord data when a player reconnects, ensuring fresh data on every join. |
+| `Config.CacheTimeout` | number | `300` | How long (in seconds) Discord data is cached before being re-fetched. `300` = 5 minutes. |
+
+<Tip>
+  **Lower timeout** = more accurate data but more Discord API calls. **Higher timeout** = fewer API calls but data may be stale. 300 seconds (5 minutes) is a good balance for most servers.
+</Tip>
+
+---
+
+## Webhook Configuration
+
+Optionally log player connections to a Discord channel.
+
+```lua config.lua
+Config.LogWebhookURL = ''
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `Config.LogWebhookURL` | string | `''` (empty) | A Discord webhook URL. If set, the script sends an embed to this channel every time a player connects, showing their Discord username, avatar, role count, and roles. |
+
+### Setting Up a Webhook
+
+<Steps>
+  <Step title="Open Channel Settings">
+    Right-click a Discord text channel → **Edit Channel**
+  </Step>
+  <Step title="Go to Integrations">
+    Click **Integrations → Webhooks → New Webhook**
+  </Step>
+  <Step title="Copy URL">
+    Name the webhook, then click **Copy Webhook URL**
+  </Step>
+  <Step title="Paste in Config">
+    ```lua
+    Config.LogWebhookURL = 'https://discord.com/api/webhooks/...'
+    ```
+  </Step>
+</Steps>
+
+Leave the value as an empty string (`''`) to disable connection logging.
+
+---
+
+## Full Config Reference
+
+Here's the complete `config.lua` with all options and their defaults:
+
+```lua config.lua
+Config = {}
+
+-- Discord Bot Configuration (Required)
+Config.Token = ''                    -- Your Discord Bot Token
+Config.Guild = ''                    -- Your Discord Guild/Server ID
+
+-- Player Requirements
+Config.RequireDiscord = false        -- Kick players without Discord
+Config.RequireInGuild = false        -- Kick players not in the Discord server
+Config.KickMessage = 'You must be in our Discord server to play. Join: discord.gg/jxscripts'
+
+-- Cache Settings
+Config.RefreshCacheOnConnect = true  -- Refresh player data when they connect
+Config.CacheTimeout = 300           -- Cache Discord data for 300 seconds (5 minutes)
+
+-- Webhook
+Config.LogWebhookURL = ''           -- Discord Webhook URL for connection logs
+```

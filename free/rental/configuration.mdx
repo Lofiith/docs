@@ -1,0 +1,464 @@
+---
+title: 'Configuration'
+description: 'Configuring the rental system'
+icon: 'gear'
+---
+
+# Configuration
+
+Customize every aspect of JX Rental through `config.lua`. Set up locations, vehicles, pricing, colors, and interaction methods.
+
+<Info>
+  All configuration changes require a resource restart: `restart jx_rental`
+</Info>
+
+---
+
+## Configuration File
+
+All settings are in `config.lua` in the root of the `jx_rental` folder.
+
+```bash
+jx_rental/
+├── config.lua          ← Configuration file
+├── client/open.lua     ← Vehicle keys & custom functions (editable)
+└── html/               ← NUI interface
+```
+
+---
+
+## General Settings
+
+### Auto-Detection Settings
+
+The script auto-detects your framework, TextUI, notification system, and target system. You can override any of these manually.
+
+```lua config.lua
+Config.Framework = 'auto'   -- 'auto', 'esx', 'qbcore', 'qbox'
+Config.TextUI = 'auto'      -- 'auto', 'ox_lib', 'qb', 'esx', 'custom'
+Config.Notify = 'auto'      -- 'auto', 'ox_lib', 'qb', 'esx', 'custom'
+Config.Target = 'auto'      -- 'auto', 'ox_target', 'qb-target', 'none'
+```
+
+<Tabs>
+  <Tab title="Auto (Recommended)" icon="wand-magic-sparkles">
+    Leave all values at `'auto'` and the script will detect the correct system for each.
+
+    ```lua config.lua
+    Config.Framework = 'auto'
+    Config.TextUI = 'auto'
+    Config.Notify = 'auto'
+    Config.Target = 'auto'
+    ```
+  </Tab>
+
+  <Tab title="Manual Override" icon="hand">
+    Manually specify each system if auto-detection fails:
+
+    ```lua config.lua
+    Config.Framework = 'esx'
+    Config.TextUI = 'ox_lib'
+    Config.Notify = 'ox_lib'
+    Config.Target = 'ox_target'
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+### Config.PaymentAccount
+
+<ParamField path="Config.PaymentAccount" type="string" default="'cash'">
+  Which account to deduct payment from when renting a vehicle.
+</ParamField>
+
+```lua config.lua
+Config.PaymentAccount = 'cash'  -- 'cash' or 'bank'
+```
+
+---
+
+### Config.UseOxInventoryMoney
+
+<ParamField path="Config.UseOxInventoryMoney" type="boolean" default="false">
+  When `true`, uses the `money` item from ox_inventory instead of framework cash when paying with cash.
+</ParamField>
+
+```lua config.lua
+Config.UseOxInventoryMoney = false
+```
+
+<Note>
+  Only relevant when `Config.PaymentAccount = 'cash'` and you're using ox_inventory.
+</Note>
+
+---
+
+### Distances
+
+```lua config.lua
+Config.MarkerDistance = 10.0    -- Distance to see the interaction marker
+Config.InteractDistance = 2.0   -- Distance to interact with the rental point
+```
+
+---
+
+### Config.MaxActiveRentals
+
+<ParamField path="Config.MaxActiveRentals" type="number" default="4">
+  Maximum number of vehicles a player can have rented at the same time.
+</ParamField>
+
+```lua config.lua
+Config.MaxActiveRentals = 4
+```
+
+---
+
+## UI Settings
+
+### Accent Colors
+
+```lua config.lua
+Config.UI = {
+    accentColor = '#e82546',         -- Primary UI color
+    accentGradient = '#ff4d6d'       -- Gradient end color
+}
+```
+
+---
+
+## Pricing Settings
+
+### Config.Pricing
+
+```lua config.lua
+Config.Pricing = {
+    mode = 'one_time',          -- 'hourly' or 'one_time'
+    allowModeSelect = false,    -- Allow players to choose between hourly/one-time
+    minimumHours = 1            -- Minimum rental hours (for hourly mode)
+}
+```
+
+<Tabs>
+  <Tab title="One-Time Payment" icon="money-bill">
+    Players pay once and keep the vehicle until it's returned or despawned:
+
+    ```lua config.lua
+    Config.Pricing = {
+        mode = 'one_time',
+        allowModeSelect = false
+    }
+    ```
+  </Tab>
+
+  <Tab title="Hourly Payment" icon="clock">
+    Players pay per hour of rental time:
+
+    ```lua config.lua
+    Config.Pricing = {
+        mode = 'hourly',
+        allowModeSelect = false,
+        minimumHours = 1
+    }
+    ```
+  </Tab>
+
+  <Tab title="Player's Choice" icon="hand-pointer">
+    Let players choose between hourly or one-time:
+
+    ```lua config.lua
+    Config.Pricing = {
+        mode = 'one_time',       -- Default selection
+        allowModeSelect = true,  -- Show both options
+        minimumHours = 1
+    }
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Color Customization
+
+### Config.ColorCustomization
+
+Allow players to customize the vehicle color before renting.
+
+```lua config.lua
+Config.ColorCustomization = {
+    enabled = true,
+    defaultColor = {r = 255, g = 255, b = 255},  -- Default vehicle color (white)
+    palette = {
+        {label = 'White',  r = 255, g = 255, b = 255},
+        {label = 'Black',  r = 0,   g = 0,   b = 0},
+        {label = 'Red',    r = 232, g = 37,  b = 70},
+        {label = 'Blue',   r = 59,  g = 130, b = 246},
+        {label = 'Green',  r = 34,  g = 197, b = 94},
+        {label = 'Yellow', r = 234, g = 179, b = 8},
+        {label = 'Orange', r = 249, g = 115, b = 22},
+        {label = 'Purple', r = 168, g = 85,  b = 247}
+    }
+}
+```
+
+Each palette entry requires:
+- `label` — Display name in the color picker
+- `r`, `g`, `b` — RGB color values (0-255)
+
+<Tip>
+  Set `enabled = false` to disable color customization entirely. Vehicles will use their default color.
+</Tip>
+
+---
+
+## Locations
+
+### Config.Locations
+
+Define rental points around the map. Each location has its own coordinates, ped, blip, preview position, and spawn position.
+
+```lua config.lua
+Config.Locations = {
+    {
+        name = 'Airport Rental',         -- Display name
+        useTarget = true,                -- Use target system for interaction
+        usePed = true,                   -- Spawn a ped at the location
+
+        coords = vector3(-1037.17, -2737.73, 20.17),  -- Ped/marker position
+        heading = 330.0,                                -- Ped facing direction
+
+        ped = {
+            model = 's_m_m_pilot_02',    -- Ped model name
+            scenario = 'WORLD_HUMAN_CLIPBOARD' -- Ped animation
+        },
+
+        preview = {
+            coords = vector3(-1033.5, -2730.8, 20.17),  -- Where preview vehicle spawns
+            heading = 60.0                                -- Preview vehicle facing
+        },
+
+        spawn = vector3(-1030.0, -2725.0, 20.17),  -- Where rented vehicle spawns
+
+        blip = {
+            enabled = true,             -- Show map blip
+            sprite = 326,               -- Blip icon ID
+            color = 1,                  -- Blip color ID
+            scale = 0.8,                -- Blip size
+            shortRange = true           -- Only show when nearby
+        }
+    },
+    -- Add more locations here...
+}
+```
+
+### Location Properties Breakdown
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `name` | string | Display name for the rental point |
+| `useTarget` | boolean | Use ox_target/qb-target for interaction |
+| `usePed` | boolean | Spawn an NPC ped at the location |
+| `coords` | vector3 | Position of the ped/marker |
+| `heading` | number | Ped facing direction (degrees) |
+| `ped.model` | string | Ped model name |
+| `ped.scenario` | string | Ped animation scenario |
+| `preview.coords` | vector3 | Where the preview vehicle appears |
+| `preview.heading` | number | Preview vehicle direction |
+| `spawn` | vector3 | Where the rented vehicle spawns |
+| `blip.enabled` | boolean | Show blip on map |
+| `blip.sprite` | number | Blip sprite ID |
+| `blip.color` | number | Blip color ID |
+| `blip.scale` | number | Blip size |
+| `blip.shortRange` | boolean | Only show blip when nearby |
+
+<Tip>
+  Set `usePed = false` to use just a marker. Set `useTarget = false` to use marker + TextUI instead of the target system.
+</Tip>
+
+---
+
+## Vehicles
+
+### Config.Vehicles
+
+Define the vehicle catalog organized by categories. Each category contains vehicles with their model name, display label, and price.
+
+```lua config.lua
+Config.Vehicles = {
+    {
+        category = 'compact',
+        label = 'Compact',
+        vehicles = {
+            {model = 'blista',   label = 'Blista',     price = 500},
+            {model = 'brioso',   label = 'Brioso 300', price = 600},
+            {model = 'issi2',    label = 'Issi',       price = 450}
+        }
+    },
+    {
+        category = 'sedan',
+        label = 'Sedan',
+        vehicles = {
+            {model = 'stanier',  label = 'Stanier',    price = 800},
+            {model = 'schafter2', label = 'Schafter',   price = 1200},
+            {model = 'tailgater', label = 'Tailgater',  price = 1000}
+        }
+    },
+    {
+        category = 'sports',
+        label = 'Sports',
+        vehicles = {
+            {model = 'elegy2',   label = 'Elegy RH8',  price = 2500},
+            {model = 'jester',   label = 'Jester',      price = 3000},
+            {model = 'sultan',   label = 'Sultan',      price = 2000}
+        }
+    },
+    {
+        category = 'suv',
+        label = 'SUV',
+        vehicles = {
+            {model = 'baller',   label = 'Baller',     price = 1800},
+            {model = 'granger',  label = 'Granger',    price = 1500},
+            {model = 'xls',      label = 'XLS',        price = 2200}
+        }
+    },
+    {
+        category = 'super',
+        label = 'Super',
+        vehicles = {
+            {model = 'adder',    label = 'Adder',      price = 8000},
+            {model = 'zentorno', label = 'Zentorno',    price = 7500},
+            {model = 't20',      label = 'T20',        price = 9000}
+        }
+    }
+}
+```
+
+### Vehicle Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `model` | string | GTA vehicle spawn name |
+| `label` | string | Display name in the UI |
+| `price` | number | Rental cost (per-hour or one-time based on pricing mode) |
+
+<Warning>
+  Make sure vehicle model names are valid GTA V spawn names. Invalid models will fail to spawn.
+</Warning>
+
+---
+
+## Editable Files
+
+### client/open.lua
+
+Customize vehicle key giving, notifications, and TextUI through the open file.
+
+<AccordionGroup>
+  <Accordion title="GiveVehicleKeys" icon="key">
+    Called after a vehicle is rented. Add your key system integration here.
+
+    ```lua client/open.lua
+    function GiveVehicleKeys(vehicle, plate)
+        -- Example: qb-vehiclekeys
+        -- TriggerEvent('vehiclekeys:client:SetOwner', plate)
+
+        -- Example: wasabi_carlock
+        -- exports.wasabi_carlock:GiveKey(plate)
+
+        -- Example: qs-vehiclekeys
+        -- TriggerServerEvent('qs-vehiclekeys:server:AcquireVehicleKeys', plate)
+    end
+    ```
+  </Accordion>
+
+  <Accordion title="CustomNotify" icon="bell">
+    Override the default notification system:
+
+    ```lua client/open.lua
+    function CustomNotify(message, type)
+        -- type: 'success', 'error', 'info'
+        -- Add your custom notification logic here
+    end
+    ```
+  </Accordion>
+
+  <Accordion title="CustomShowTextUI / CustomHideTextUI" icon="display">
+    Override the default TextUI (only used when target is disabled):
+
+    ```lua client/open.lua
+    function CustomShowTextUI(message)
+        -- Show your custom TextUI
+    end
+
+    function CustomHideTextUI()
+        -- Hide your custom TextUI
+    end
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Full Example Configuration
+
+```lua config.lua
+Config = {}
+
+Config.Framework = 'auto'
+Config.TextUI = 'auto'
+Config.Notify = 'auto'
+Config.Target = 'auto'
+
+Config.PaymentAccount = 'cash'
+Config.UseOxInventoryMoney = false
+Config.MarkerDistance = 10.0
+Config.InteractDistance = 2.0
+Config.MaxActiveRentals = 4
+
+Config.UI = {
+    accentColor = '#e82546',
+    accentGradient = '#ff4d6d'
+}
+
+Config.Pricing = {
+    mode = 'one_time',
+    allowModeSelect = false,
+    minimumHours = 1
+}
+
+Config.ColorCustomization = {
+    enabled = true,
+    defaultColor = {r = 255, g = 255, b = 255},
+    palette = {
+        {label = 'White',  r = 255, g = 255, b = 255},
+        {label = 'Black',  r = 0,   g = 0,   b = 0},
+        {label = 'Red',    r = 232, g = 37,  b = 70},
+        {label = 'Blue',   r = 59,  g = 130, b = 246}
+    }
+}
+
+Config.Locations = {
+    {
+        name = 'Airport Rental',
+        useTarget = true,
+        usePed = true,
+        coords = vector3(-1037.17, -2737.73, 20.17),
+        heading = 330.0,
+        ped = { model = 's_m_m_pilot_02', scenario = 'WORLD_HUMAN_CLIPBOARD' },
+        preview = { coords = vector3(-1033.5, -2730.8, 20.17), heading = 60.0 },
+        spawn = vector3(-1030.0, -2725.0, 20.17),
+        blip = { enabled = true, sprite = 326, color = 1, scale = 0.8, shortRange = true }
+    }
+}
+
+Config.Vehicles = {
+    {
+        category = 'compact',
+        label = 'Compact',
+        vehicles = {
+            {model = 'blista', label = 'Blista', price = 500}
+        }
+    }
+}
+```

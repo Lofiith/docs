@@ -1,0 +1,138 @@
+---
+title: 'Installation'
+description: 'Setting up jx_spawnselector'
+icon: 'download'
+---
+
+# Installation
+
+This guide walks you through installing jx_spawnselector on your FiveM server.
+
+<Info>
+  **Estimated Time**: 5 minutes  
+  **Difficulty**: Beginner-Friendly
+</Info>
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- ✅ FiveM server with the latest artifacts
+- ✅ [oxmysql](https://github.com/overextended/oxmysql) installed and running
+- ✅ Access to your server files and `server.cfg`
+
+---
+
+## Step 1: Install oxmysql
+
+If you don't already have **oxmysql** installed:
+
+1. Download the latest release from [Overextended GitHub](https://github.com/overextended/oxmysql/releases)
+2. Extract the `oxmysql` folder to your `resources` directory
+3. Add to your `server.cfg`:
+   ```cfg
+   ensure oxmysql
+   ```
+
+---
+
+## Step 2: Place the Resource
+
+<Steps>
+  <Step title="Download jx_spawnselector" icon="download">
+    Download the latest version from our official source
+  </Step>
+  <Step title="Extract Files" icon="file-zipper">
+    Extract the folder from the ZIP file
+  </Step>
+  <Step title="Rename Folder" icon="pen">
+    Rename the folder to `jx_spawnselector` (lowercase, with underscore)
+  </Step>
+  <Step title="Move to Resources" icon="folder">
+    Place the `jx_spawnselector` folder in your server's `resources` directory
+  </Step>
+</Steps>
+
+---
+
+## Step 3: Add to server.cfg
+
+Add jx_spawnselector to your `server.cfg` **after** oxmysql:
+
+```cfg
+# Database
+ensure oxmysql
+
+# Framework
+ensure es_extended  # or qb-core / qbx_core
+
+# Spawn Selector
+ensure jx_spawnselector
+
+# Multicharacter (if using)
+ensure jx_multicharacter
+```
+
+---
+
+## Step 4: Configure Spawn Locations
+
+Open `config/spawn.lua` and customize the spawn locations for your server. The default configuration includes 5 locations (Pillbox, Legion Square, Beach, Airport, and Parking Lot).
+
+See the [Configuration Guide](./configuration) for details on adding and editing locations.
+
+---
+
+## Step 5: Restart Server
+
+1. Save all configuration files
+2. Start (or restart) your FiveM server
+3. Watch the console for startup messages
+
+### Verify Installation
+
+To verify everything is working:
+
+1. Join your FiveM server
+2. After character selection, the Spawn Selector UI should appear
+3. Click a location pin on the map to spawn there
+
+---
+
+## Using with jx_multicharacter
+
+If you're using **jx_multicharacter**, make sure the spawn selector is configured in its config:
+
+```lua
+-- In jx_multicharacter/config/config.lua
+Config.SpawnSelector = {
+    Enabled = true,
+    Resource = 'jx_spawnselector'
+}
+```
+
+The spawn selector will automatically appear after character login.
+
+---
+
+## Using with Other Multicharacter Systems
+
+You can trigger the spawn selector from any resource using the server-side export:
+
+```lua
+-- Server-side: show the spawn selector for a player
+exports.jx_spawnselector:RequestSpawnSelector(source)
+```
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Configuration" icon="gear" href="./configuration">
+    Add custom spawn locations and customize the UI
+  </Card>
+  <Card title="How To Use" icon="gamepad" href="./usage">
+    Learn the in-game workflow
+  </Card>
+</CardGroup>

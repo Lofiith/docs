@@ -1,0 +1,131 @@
+---
+title: 'JX Rental'
+description: 'Vehicle rental system for FiveM'
+icon: 'car'
+---
+
+# Rental
+
+A modern vehicle rental system with a sleek NUI interface. Set up rental locations across your map with configurable vehicle categories, pricing, and color customization — all through a user-friendly in-game UI.
+
+<Note>
+  **Free Resource** - Works with ESX, QBCore, and Qbox via auto-detection.
+</Note>
+
+## What It Does
+
+Provide players with a complete vehicle rental experience:
+
+- **Multiple Rental Locations** — Place rental points anywhere on the map with peds and blips
+- **Vehicle Categories** — Organize vehicles by type (compact, sedan, sports, SUV, super)
+- **Vehicle Preview** — Players see the vehicle before committing to rent
+- **Color Customization** — Pick a custom color before renting
+- **Flexible Pricing** — Hourly or one-time payment modes
+- **Modern NUI** — Clean, responsive HTML-based interface
+
+## How It Works
+
+<Steps>
+  <Step title="Player Finds a Rental Point">
+    Rental locations appear on the map with blips (if enabled). Walk up to the ped or marker to interact.
+  </Step>
+  <Step title="Browse Vehicles">
+    The rental UI opens with categorized vehicles showing model, name, and price.
+  </Step>
+  <Step title="Preview and Customize">
+    Select a vehicle to spawn a preview. Optionally customize the vehicle color.
+  </Step>
+  <Step title="Confirm and Drive">
+    Confirm the rental, and the vehicle spawns with keys given automatically.
+  </Step>
+</Steps>
+
+---
+
+## Features Overview
+
+<Tabs>
+  <Tab title="Rental UI" icon="display">
+    Modern HTML-based NUI with:
+
+    - Category-based vehicle browsing
+    - Real-time vehicle preview
+    - Color customization with preset palette
+    - Price display (hourly or one-time)
+    - Clean, responsive design
+  </Tab>
+
+  <Tab title="Locations" icon="map-pin">
+    Fully configurable rental points:
+
+    - Custom coordinates and heading
+    - Optional NPC ped with configurable model and scenario
+    - Map blips with custom sprites and colors
+    - Separate preview and spawn positions
+    - Target system or marker/TextUI interaction
+  </Tab>
+
+  <Tab title="Vehicles" icon="car-side">
+    Organized vehicle catalog:
+
+    - Multiple categories (compact, sedan, sports, SUV, super)
+    - Per-vehicle pricing
+    - Vehicle model and display name
+    - Max 4 active rentals per player (configurable)
+  </Tab>
+
+  <Tab title="Payment" icon="credit-card">
+    Flexible payment options:
+
+    - Hourly or one-time pricing modes
+    - Cash or bank payment accounts
+    - Optional ox_inventory money item support
+    - Players can choose payment mode (if allowed)
+  </Tab>
+</Tabs>
+
+---
+
+## Requirements
+
+<CardGroup cols={2}>
+  <Card title="ox_lib" icon="box" href="https://github.com/overextended/ox_lib">
+    Modern UI and utilities library (required)
+  </Card>
+  <Card title="oxmysql" icon="database" href="https://github.com/overextended/oxmysql">
+    MySQL database driver (required)
+  </Card>
+  <Card title="Framework" icon="server">
+    ESX, QBCore, or Qbox (auto-detected)
+  </Card>
+  <Card title="Target System" icon="bullseye">
+    ox_target or qb-target (optional, for target interaction)
+  </Card>
+</CardGroup>
+
+---
+
+## Quick Start
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="./installation">
+    Get the rental system installed and running
+  </Card>
+  <Card title="Configuration" icon="gear" href="./configuration">
+    Set up locations, vehicles, and pricing
+  </Card>
+  <Card title="How To Use" icon="gamepad" href="./usage">
+    Learn the rental workflow for players
+  </Card>
+  <Card title="Common Issues" icon="triangle-exclamation" href="./common-issues">
+    Troubleshoot common problems
+  </Card>
+</CardGroup>
+
+---
+
+## Need Help?
+
+<Card title="Join Our Discord" icon="discord" href="https://discord.gg/VuMcnbmEby" horizontal>
+  Get support, share your setups, and stay updated with releases
+</Card>

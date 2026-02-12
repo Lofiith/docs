@@ -1,0 +1,199 @@
+---
+title: 'Installation'
+description: 'Setting up jx_multicharacter'
+icon: 'download'
+---
+
+# Installation
+
+This guide walks you through every step of installing jx_multicharacter on your FiveM server.
+
+<Info>
+  **Estimated Time**: 5-10 minutes  
+  **Difficulty**: Beginner-Friendly
+</Info>
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- ✅ FiveM server with the latest artifacts
+- ✅ A framework installed (ESX, QBCore, or Qbox)
+- ✅ [oxmysql](https://github.com/overextended/oxmysql) installed and running
+- ✅ Access to your database (HeidiSQL, phpMyAdmin, etc.)
+- ✅ Access to your server files and `server.cfg`
+
+---
+
+## Step 1: Install oxmysql
+
+If you don't already have **oxmysql** installed:
+
+1. Download the latest release from [Overextended GitHub](https://github.com/overextended/oxmysql/releases)
+2. Extract the `oxmysql` folder to your `resources` directory
+3. Add to your `server.cfg`:
+   ```cfg
+   ensure oxmysql
+   ```
+
+---
+
+## Step 2: Import the Database
+
+<Warning>
+  **This step is required!** The SQL file is **not** auto-imported. You must run it manually before starting the resource for the first time.
+</Warning>
+
+1. Open your database management tool (HeidiSQL, phpMyAdmin, etc.)
+2. Connect to your FiveM database
+3. Open and run the `install.sql` file from the jx_multicharacter folder
+
+The SQL file does two things:
+
+```sql
+-- Creates the jx_multicharacter table for storing character data
+CREATE TABLE IF NOT EXISTS `jx_multicharacter` ( ... );
+
+-- Adds 'nationality' and 'lastlocation' columns to the users table
+ALTER TABLE `users` ADD COLUMN IF NOT EXISTS `nationality` VARCHAR(50) DEFAULT 'Unknown';
+ALTER TABLE `users` ADD COLUMN IF NOT EXISTS `lastlocation` TEXT DEFAULT NULL;
+```
+
+<Info>
+  If your `users` table already has `nationality` or `lastlocation` columns, the `ALTER TABLE` statements will safely skip them thanks to `IF NOT EXISTS`.
+</Info>
+
+---
+
+## Step 3: Place the Resource
+
+<Steps>
+  <Step title="Download jx_multicharacter" icon="download">
+    Download the latest version from our official source
+  </Step>
+  <Step title="Extract Files" icon="file-zipper">
+    Extract the folder from the ZIP file
+  </Step>
+  <Step title="Rename Folder" icon="pen">
+    Rename the folder to `jx_multicharacter` (lowercase, with underscore)
+  </Step>
+  <Step title="Move to Resources" icon="folder">
+    Place the `jx_multicharacter` folder in your server's `resources` directory
+  </Step>
+</Steps>
+
+---
+
+## Step 4: Disable Existing Multicharacter
+
+<Warning>
+  You **must** disable or remove any existing multicharacter system to avoid conflicts. Only one multicharacter resource should be running at a time.
+</Warning>
+
+Common resources to disable:
+- `esx_multicharacter`
+- `qb-multicharacter`
+- `qbx_multicharacter`
+
+Remove or comment out their `ensure` lines in your `server.cfg`.
+
+---
+
+## Step 5: Install a Skin Menu (Optional)
+
+If you want appearance customization during character creation, install one of these supported skin menus:
+
+- `illenium-appearance`
+- `qb-clothing`
+- `esx_skin`
+- `skinchanger`
+- `fivem-appearance`
+- `codem-appearance`
+- `ag_appearance`
+
+If you don't have a skin menu, set `Config.Skin.Enabled = false` in `config/skin.lua`.
+
+---
+
+## Step 6: Add to server.cfg
+
+Add jx_multicharacter to your `server.cfg` **after** your framework and oxmysql:
+
+```cfg
+# Framework
+ensure es_extended  # or qb-core / qbx_core
+
+# Database
+ensure oxmysql
+
+# Multicharacter
+ensure jx_multicharacter
+
+# Spawn selector (optional)
+ensure jx_spawnselector
+```
+
+<Warning>
+  `jx_multicharacter` must start **after** your framework (es_extended, qb-core, or qbx_core) and **after** oxmysql.
+</Warning>
+
+---
+
+## Step 7: Configure Spawn Selector (Optional)
+
+If you're using **jx_spawnselector**, make sure:
+
+1. `jx_spawnselector` is installed and started in your `server.cfg`
+2. In `config/config.lua`, verify the spawn selector settings:
+
+```lua
+Config.SpawnSelector = {
+    Enabled = true,
+    Resource = 'jx_spawnselector' -- Must match the resource name
+}
+```
+
+If you're using a different spawn selector, set `Resource` to `'custom'` and handle the logic yourself.
+
+---
+
+## Step 8: Configure Settings
+
+Open the files in the `config/` folder and adjust settings to your liking:
+
+- **`config/config.lua`** — Framework, theme colors, spawn selector, starting items
+- **`config/register.lua`** — Registration form settings and validation rules
+- **`config/selector.lua`** — Character selector UI, max characters, relog command
+- **`config/skin.lua`** — Skin creator settings and spawn points
+
+See the [Configuration Guide](./configuration) for detailed explanations of every option.
+
+---
+
+## Step 9: Restart Server
+
+1. Save all configuration files
+2. Start (or restart) your FiveM server
+3. Watch the console for startup messages
+
+### Verify Installation
+
+To verify everything is working:
+
+1. Join your FiveM server
+2. The Character Selector UI should appear
+3. Create a new character through the registration form
+4. If a skin menu is installed, the appearance creator should open after registration
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Configuration" icon="gear" href="./configuration">
+    Customize every aspect of the multicharacter system
+  </Card>
+  <Card title="How To Use" icon="gamepad" href="./usage">
+    Learn the full gameplay workflow
+  </Card>
+</CardGroup>

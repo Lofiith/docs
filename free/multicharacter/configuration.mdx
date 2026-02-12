@@ -1,0 +1,537 @@
+---
+title: 'Configuration'
+description: 'Configuring the multicharacter system'
+icon: 'gear'
+---
+
+# Configuration
+
+This page covers every configuration option available across all four config files. All changes require a resource restart to take effect.
+
+<Info>
+  All configuration is done in the `config/` folder. These files are **not escrowed** and can be freely modified.
+</Info>
+
+## Configuration Files
+
+<CodeGroup>
+
+```bash File Structure
+jx_multicharacter/
+└── config/
+    ├── config.lua       ← Main settings (framework, theme, spawn selector, items)
+    ├── register.lua     ← Registration form and validation
+    ├── selector.lua     ← Character selector UI and camera
+    └── skin.lua         ← Skin/appearance creator
+```
+
+</CodeGroup>
+
+---
+
+## config/config.lua
+
+The main configuration file for general settings.
+
+### Config.Debug
+
+**Type**: `boolean`  
+**Default**: `false`
+
+Enables debug logging in the console. Keep this `false` in production.
+
+```lua
+Config.Debug = false
+```
+
+---
+
+### Config.Framework
+
+**Type**: `string`  
+**Default**: `'auto'`  
+**Options**: `'auto'`, `'esx'`, `'qbcore'`, `'qbox'`
+
+Which framework to use. Auto-detection works for most servers.
+
+```lua
+Config.Framework = 'auto'
+```
+
+---
+
+### Config.Locale
+
+**Type**: `string`  
+**Default**: `'en'`  
+**Options**: `'en'`, `'es'`
+
+The language used for in-game messages and notifications.
+
+```lua
+Config.Locale = 'en'
+```
+
+---
+
+### Config.Theme
+
+**Type**: `table`
+
+The accent colors used in the NUI interface. Both values should be hex color codes.
+
+```lua
+Config.Theme = {
+    Primary = '#E82546',   -- Main accent color
+    Secondary = '#AF3347'  -- Secondary accent color
+}
+```
+
+---
+
+### Config.SpawnSelector
+
+**Type**: `table`
+
+Controls whether a spawn selector is shown after character login and which resource handles it.
+
+```lua
+Config.SpawnSelector = {
+    Enabled = true,                  -- Show spawn selector after login
+    Resource = 'jx_spawnselector'    -- Resource name ('jx_spawnselector' or 'custom')
+}
+```
+
+- Set `Enabled = false` to skip the spawn selector entirely
+- Set `Resource = 'custom'` if you want to handle spawn selection with your own logic
+
+---
+
+### Config.StartingItems
+
+**Type**: `table`
+
+Automatically give items to newly created characters. Requires a framework with inventory support.
+
+```lua
+Config.StartingItems = {
+    Enabled = true,
+    Items = {
+        { name = 'phone', count = 1 },
+        { name = 'bread', count = 5 },
+        { name = 'water', count = 5 },
+    }
+}
+```
+
+<Tip>
+  Make sure the item names match your framework's item registry. For ESX, check the `items` table in your database. For QBCore, check `qb-core/shared/items.lua`.
+</Tip>
+
+---
+
+## config/register.lua
+
+Controls the character registration (creation) form.
+
+### Config.Register.Enable
+
+**Type**: `boolean`  
+**Default**: `true`
+
+Enable or disable the character registration form entirely.
+
+```lua
+Config.Register.Enable = true
+```
+
+---
+
+### Config.Register.DateFormat
+
+**Type**: `string`  
+**Default**: `"MM/DD/YYYY"`
+
+The date format used when storing dates of birth in the database.
+
+```lua
+Config.Register.DateFormat = "MM/DD/YYYY"
+```
+
+---
+
+### Config.Register.UI
+
+**Type**: `table`
+
+The title and description text shown on the registration screen.
+
+```lua
+Config.Register.UI = {
+    Title = "CHARACTER CREATOR",
+    Description = "Please fill out the information below to create your character profile."
+}
+```
+
+---
+
+### Config.Register.Validation
+
+**Type**: `table`
+
+Detailed validation rules for each registration field. These are enforced both client-side and server-side.
+
+```lua
+Config.Register.Validation = {
+    FirstName = {
+        MinLength = 2,            -- Minimum characters
+        MaxLength = 20,           -- Maximum characters
+        AllowNumbers = false,     -- Allow digits in the name
+        AllowSpecialChars = false -- Allow special characters (!@#$, etc.)
+    },
+    LastName = {
+        MinLength = 2,
+        MaxLength = 20,
+        AllowNumbers = false,
+        AllowSpecialChars = false
+    },
+    DateOfBirth = {
+        MinimumAge = 18,          -- Youngest allowed age
+        MaximumAge = 100          -- Oldest allowed age
+    },
+    Height = {
+        Minimum = 120,            -- Minimum height in cm
+        Maximum = 220,            -- Maximum height in cm
+        Unit = "cm"               -- Display unit
+    }
+}
+```
+
+---
+
+### Config.Register.CameraPoints
+
+**Type**: `table` (array of `vector4`)
+
+Camera positions used during the registration process. The camera cycles through these positions cinematically while the player fills out the form.
+
+```lua
+Config.Register.CameraPoints = {
+    vector4(-787.7076, 327.8289, 217.0379, 135.3409),
+    vector4(-789.2, 330.5, 217.5, 180.0),
+    vector4(-792.5, 332.1, 218.0, 225.0),
+    vector4(-790.6786, 342.5465, 216.8384, 243.8741),
+    vector4(-782.5854, 339.2917, 216.8386, 126.1401),
+    vector4(-786.9450, 320.4200, 217.0381, 3.0035)
+}
+```
+
+<Tip>
+  You can add, remove, or change these positions to create your own cinematic camera sequence. Each `vector4` is `(x, y, z, heading)`.
+</Tip>
+
+---
+
+### Config.Register.Countries
+
+**Type**: `table` (array of strings)
+
+List of countries available in the nationality dropdown during registration. The default list includes 180+ countries. You can add, remove, or reorder them.
+
+```lua
+Config.Register.Countries = {
+    "United States", "Canada", "Mexico", "United Kingdom",
+    -- ... full list in register.lua
+}
+```
+
+---
+
+## config/selector.lua
+
+Controls the character selector UI and related commands.
+
+### Config.Selector.Enabled
+
+**Type**: `boolean`  
+**Default**: `true`
+
+Enable the character selector UI on connect.
+
+```lua
+Config.Selector.Enabled = true
+```
+
+---
+
+### Config.Selector.EnableRelog
+
+**Type**: `boolean`  
+**Default**: `true`
+
+Allow players to use the `/relog` command to return to the character selector without disconnecting.
+
+```lua
+Config.Selector.EnableRelog = true
+```
+
+---
+
+### Config.Selector.EnableDeleting
+
+**Type**: `boolean`  
+**Default**: `true`
+
+Allow players to delete their characters.
+
+```lua
+Config.Selector.EnableDeleting = true
+```
+
+---
+
+### Config.Selector.DeleteCommand
+
+**Type**: `string`  
+**Default**: `"deletecharacter"`
+
+The command name used to delete a character.
+
+```lua
+Config.Selector.DeleteCommand = "deletecharacter"
+```
+
+---
+
+### Config.Selector.MaxCharacters
+
+**Type**: `number`  
+**Default**: `4`
+
+Maximum number of characters each player can create.
+
+```lua
+Config.Selector.MaxCharacters = 4
+```
+
+---
+
+### Config.Selector.UI
+
+**Type**: `table`
+
+Title and description text for the character selector screen.
+
+```lua
+Config.Selector.UI = {
+    Title = "CHARACTER SELECTOR",
+    Description = "Choose a character or create a new one to continue."
+}
+```
+
+---
+
+### Config.Selector.Camera
+
+**Type**: `table`
+
+Camera position, rotation, and field of view for the character selector preview.
+
+```lua
+Config.Selector.Camera = {
+    Position = vector3(-785.0, 328.0, 217.5),
+    Rotation = vector3(0.0, 0.0, 180.0),
+    FOV = 30.0
+}
+```
+
+---
+
+### Config.Selector.Ped
+
+**Type**: `table`
+
+Controls the ped (character model) displayed in the selector preview.
+
+```lua
+Config.Selector.Ped = {
+    Position = vector3(-787.7076, 327.8289, 217.0379),
+    Heading = 135.3409,
+    DefaultModel = 'mp_m_freemode_01',   -- Model when no characters exist
+    Animation = {
+        Enabled = true,
+        Dict = "anim@amb@casino@valet_scenario@pose_d@",
+        Name = "base_idle",
+        Props = {}                        -- Optional props during animation
+    }
+}
+```
+
+---
+
+## config/skin.lua
+
+Controls the skin/appearance creator that opens after character registration.
+
+### Config.Skin.Enabled
+
+**Type**: `boolean`  
+**Default**: `true`
+
+Enable the skin creator after character registration. Requires a supported skin menu to be installed.
+
+```lua
+Config.Skin.Enabled = true
+```
+
+---
+
+### Config.Skin.Menu
+
+**Type**: `string`  
+**Default**: `"auto"`  
+**Options**: `"auto"`, `"illenium-appearance"`, `"qb-clothing"`, `"esx_skin"`, `"skinchanger"`, `"fivem-appearance"`, `"codem-appearance"`, `"ag_appearance"`, `"ak47_clothing"`, `"custom"`
+
+Which appearance menu to open for character customization. When set to `"auto"`, the script detects which skin menu is installed on your server.
+
+```lua
+Config.Skin.Menu = "auto"
+```
+
+---
+
+### Config.Skin.DisableHealthRegen
+
+**Type**: `boolean`  
+**Default**: `false`
+
+Disable GTA's default health regeneration.
+
+```lua
+Config.Skin.DisableHealthRegen = false
+```
+
+---
+
+### Config.Skin.EnableRefreshSkinCommand
+
+**Type**: `boolean`  
+**Default**: `true`
+
+Allow players to use `/refreshskin` to reload their appearance. Useful if clothing glitches occur.
+
+```lua
+Config.Skin.EnableRefreshSkinCommand = true
+```
+
+---
+
+### Config.Skin.RememberLastOutfit
+
+**Type**: `boolean`  
+**Default**: `false`
+
+Save and restore the player's last worn outfit when they relog.
+
+```lua
+Config.Skin.RememberLastOutfit = false
+```
+
+---
+
+### Config.Skin.CreatingPoint
+
+**Type**: `vector4`
+
+The player's position during the skin creation process.
+
+```lua
+Config.Skin.CreatingPoint = vector4(-268.8202, -956.5901, 31.2231, 207.4599)
+```
+
+---
+
+### Config.Skin.DefaultSpawn
+
+**Type**: `vector4`
+
+Where the player spawns after finishing skin creation (if no spawn selector is enabled).
+
+```lua
+Config.Skin.DefaultSpawn = vector4(-268.8202, -956.5901, 31.2231, 207.4599)
+```
+
+---
+
+## Complete Example Configuration
+
+<Tabs>
+  <Tab title="Roleplay Server" icon="users">
+    A typical configuration for a serious roleplay server with strict validation.
+
+    ```lua config/config.lua
+    Config = {}
+    Config.Debug = false
+    Config.Framework = 'auto'
+    Config.Locale = 'en'
+    Config.Theme = {
+        Primary = '#E82546',
+        Secondary = '#AF3347'
+    }
+    Config.SpawnSelector = {
+        Enabled = true,
+        Resource = 'jx_spawnselector'
+    }
+    Config.StartingItems = {
+        Enabled = true,
+        Items = {
+            { name = 'phone', count = 1 },
+            { name = 'bread', count = 5 },
+            { name = 'water', count = 5 },
+        }
+    }
+    ```
+
+    ```lua config/selector.lua
+    Config.Selector = {}
+    Config.Selector.Enabled = true
+    Config.Selector.EnableRelog = true
+    Config.Selector.EnableDeleting = false  -- Prevent accidental deletion
+    Config.Selector.MaxCharacters = 2       -- Strict RP: fewer characters
+    ```
+  </Tab>
+
+  <Tab title="Casual Server" icon="gamepad">
+    A relaxed configuration that allows more freedom.
+
+    ```lua config/config.lua
+    Config = {}
+    Config.Debug = false
+    Config.Framework = 'auto'
+    Config.Locale = 'en'
+    Config.Theme = {
+        Primary = '#3B82F6',
+        Secondary = '#1D4ED8'
+    }
+    Config.SpawnSelector = {
+        Enabled = false   -- Skip spawn selector
+    }
+    Config.StartingItems = {
+        Enabled = true,
+        Items = {
+            { name = 'phone', count = 1 },
+            { name = 'bread', count = 10 },
+            { name = 'water', count = 10 },
+        }
+    }
+    ```
+
+    ```lua config/selector.lua
+    Config.Selector = {}
+    Config.Selector.Enabled = true
+    Config.Selector.EnableRelog = true
+    Config.Selector.EnableDeleting = true
+    Config.Selector.MaxCharacters = 6   -- More characters allowed
+    ```
+  </Tab>
+</Tabs>

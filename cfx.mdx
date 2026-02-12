@@ -1,0 +1,58 @@
+---
+title: 'CFX Authentication'
+description: 'How to authenticate and manage your Cfx.re account for JX Scripts'
+icon: 'key'
+---
+
+# CFX Authentication
+
+Some JX Scripts resources use **Cfx.re (FiveM) asset escrow** for distribution and licensing. This page explains how authentication works and how to manage your assets.
+
+## What is Cfx.re Asset Escrow?
+
+Cfx.re asset escrow is the official FiveM system for distributing paid resources. When you purchase a script through the [Cfx.re Tebex store](https://fivem.net), the resource is tied to your Cfx.re account and can only be downloaded through your Keymaster.
+
+## Accessing Your Resources
+
+<Steps>
+  <Step title="Log into Keymaster">
+    Go to [keymaster.fivem.net](https://keymaster.fivem.net) and sign in with your Cfx.re account.
+  </Step>
+  <Step title="Find Your Assets">
+    Navigate to **Granted Assets** to see all resources you've purchased or been granted access to.
+  </Step>
+  <Step title="Download the Resource">
+    Click on the resource you want to download. You'll receive the latest version of the script.
+  </Step>
+  <Step title="Transfer to Server">
+    Place the downloaded resource folder into your server's `resources` directory and add `ensure resource_name` to your `server.cfg`.
+  </Step>
+</Steps>
+
+## Server Licensing
+
+<Tip>
+  Each Cfx.re server requires its own **server license key** to run. Make sure your server key is properly configured in your `server.cfg` file.
+</Tip>
+
+Your purchased assets are tied to your Cfx.re account, **not** a specific server. You can use them on any server that is registered under your account.
+
+## Common Issues
+
+<AccordionGroup>
+  <Accordion title="Asset not showing in Keymaster">
+    Make sure you're logged into the same Cfx.re account you used to make the purchase. If you used a different account, you'll need to contact support.
+  </Accordion>
+
+  <Accordion title="Resource won't start on server">
+    Ensure your server's license key is valid and associated with your Cfx.re account. Expired or invalid keys will prevent escrowed resources from loading.
+  </Accordion>
+
+  <Accordion title="Transfer to another account">
+    Cfx.re does not officially support transferring assets between accounts. Purchases are final and bound to the purchasing account.
+  </Accordion>
+</AccordionGroup>
+
+## Need Help?
+
+If you're having trouble with authentication or accessing your purchased resources, join our [Discord server](https://discord.gg/jxscripts) and open a support ticket.

@@ -1,0 +1,223 @@
+---
+title: 'Installation'
+description: 'Installing and setting up jx_gangs'
+icon: 'download'
+---
+
+# Installation Guide
+
+This guide walks you through installing and configuring JX Gangs from start to finish. Follow each step carefully to ensure everything works properly.
+
+---
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- ✅ FiveM server with the latest artifacts
+- ✅ Basic knowledge of FiveM resource installation
+- ✅ Access to your server files and server.cfg
+- ✅ A MySQL database (via oxmysql)
+
+---
+
+## Step 1: Install Dependencies
+
+JX Gangs requires two dependencies to function.
+
+### 1.1 — Install ox_lib
+
+**ox_lib** is a modern utility library used for the UI, notifications, and caching.
+
+1. Download the latest release from [Overextended GitHub](https://github.com/overextended/ox_lib/releases)
+2. Extract the `ox_lib` folder to your `resources` directory
+3. Add to your `server.cfg`:
+   ```cfg
+   ensure ox_lib
+   ```
+
+### 1.2 — Install oxmysql
+
+**oxmysql** is required for database operations.
+
+1. Download the latest release from [Overextended GitHub](https://github.com/overextended/oxmysql/releases)
+2. Extract the `oxmysql` folder to your `resources` directory
+3. Add to your `server.cfg` with your connection string:
+   ```cfg
+   set mysql_connection_string "mysql://user:password@localhost/database"
+   ensure oxmysql
+   ```
+
+<Warning>
+  Both ox_lib and oxmysql **must** start before jx_gangs in your server.cfg.
+</Warning>
+
+---
+
+## Step 2: Install JX Gangs
+
+1. Download the latest version of JX Gangs
+2. Extract the ZIP file
+3. Rename the folder to exactly `jx_gangs` (lowercase, with underscore)
+4. Place the `jx_gangs` folder in your `resources` directory
+
+<Warning>
+  The folder **must** be named `jx_gangs` exactly. The script won't work if renamed.
+</Warning>
+
+---
+
+## Step 3: Add to server.cfg
+
+Add these lines to your `server.cfg` in the correct start order:
+
+```cfg
+# 1. Start your framework (if using one)
+ensure es_extended  # or qb-core / qbx_core
+
+# 2. Start oxmysql
+ensure oxmysql
+
+# 3. Start ox_lib
+ensure ox_lib
+
+# 4. (Optional) Start JX Discord API for Discord name display
+ensure jx_discord
+
+# 5. Start JX Gangs
+ensure jx_gangs
+```
+
+<Info>
+  ox_lib and oxmysql **must** start before jx_gangs. If you're using jx_discord, it should also start before jx_gangs.
+</Info>
+
+---
+
+## Step 4: Database Setup
+
+### Automatic Setup (Default)
+
+By default, `Config.AutoSQL` is set to `true`. This means the database tables will be **automatically created** on first server start. You don't need to do anything — just start the server and the 7 required tables will be created for you:
+
+- `jx_gangs`
+- `jx_gang_ranks`
+- `jx_gang_members`
+- `jx_gang_applications`
+- `jx_gang_stats`
+- `jx_gang_stashes`
+- `jx_gang_wars`
+
+### Manual Setup (If Auto Fails)
+
+If automatic table creation fails for any reason:
+
+<Steps>
+  <Step title="Open the SQL File">
+    Navigate to `jx_gangs/sql/gangs.sql`
+  </Step>
+  <Step title="Import Into Database">
+    Import the file into your MySQL database using phpMyAdmin, HeidiSQL, or the MySQL CLI
+  </Step>
+  <Step title="ESX Inventory Users Only">
+    If you are using **esx_inventory** specifically, you also need to import `sql/esx_stashes.sql` for stash support
+  </Step>
+</Steps>
+
+<Warning>
+  **ESX Inventory users**: You must import `sql/esx_stashes.sql` in addition to `gangs.sql` for stashes to work properly. Other inventory systems (ox_inventory, qs-inventory, qb-inventory) do not require this extra step.
+</Warning>
+
+---
+
+## Step 5: Optional — Discord Name Display
+
+If you want player names in the gang UI to show **Discord usernames** instead of in-game character names:
+
+1. Install [JX Discord API](../discord-api/installation) and configure it
+2. In `config/config.lua`, set:
+
+```lua
+Config.NameDisplay = 'discord'        -- Show Discord names instead of in-game names
+Config.DiscordResource = 'jx_discord' -- Name of your jx_discord resource
+```
+
+If you don't want this feature, leave `Config.NameDisplay` as `'ingame'` (the default).
+
+---
+
+## Step 6: Configure Your Settings
+
+JX Gangs has four configuration files you can customize:
+
+| File | Purpose |
+|------|---------|
+| `config/config.lua` | Main settings — permissions, tiers, commands, UI |
+| `config/config_turf.lua` | Turf capture locations, rewards, timers |
+| `config/config_gangwar.lua` | Gang war settings, wagers, kill targets |
+| `config/config_airdrop.lua` | Airdrop schedule, locations, rewards, minigame |
+
+See the [Configuration Guide](./configuration) for a full breakdown of every option.
+
+---
+
+## Step 7: Start Your Server
+
+1. Save all configuration files
+2. Start (or restart) your FiveM server
+3. Watch the console for startup messages
+
+### Successful Installation
+
+You should see messages confirming the script loaded and the database tables were created (on first start).
+
+### Verify It Works
+
+<Steps>
+  <Step title="Join the Server">
+    Connect to your FiveM server
+  </Step>
+  <Step title="Create a Gang">
+    Use the `/creategang` command (requires admin permissions) to open the creation UI
+  </Step>
+  <Step title="Open Gang Menu">
+    Press **F7** or type `/gangmanage` to open the gang management interface
+  </Step>
+  <Step title="Test Systems">
+    Invite a player, check turfs with `/turfs`, and verify stashes work
+  </Step>
+</Steps>
+
+---
+
+## Common Installation Issues
+
+### "Resource not found"
+
+**Solution**: Ensure the folder is named exactly `jx_gangs` and is in your `resources` directory.
+
+---
+
+### SQL / Database Errors
+
+**Solution**: Make sure oxmysql starts before jx_gangs. If auto-creation fails, manually import `sql/gangs.sql`.
+
+---
+
+### Dependencies Not Found
+
+**Solution**: Verify ox_lib and oxmysql are installed and listed in your server.cfg before `ensure jx_gangs`.
+
+---
+
+## Next Steps
+
+Now that JX Gangs is installed:
+
+1. **Configure the system** — Read the [Configuration Guide](./configuration) to customize everything
+2. **Learn how to use it** — Check the [How To Use](./usage) guide for admin and player workflows
+3. **Create your first gang** — Use `/creategang` to set up gangs for your server
+
+<Card title="Configuration Guide" icon="gear" href="./configuration">
+  Customize turfs, gang wars, airdrops, tiers, permissions, and more
+</Card>

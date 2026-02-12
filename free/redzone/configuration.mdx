@@ -1,0 +1,577 @@
+---
+title: 'Configuration'
+description: 'Configuring the redzone system'
+icon: 'gear'
+---
+
+# Configuration
+
+Customize every aspect of JX Redzone through `config.lua`. Zone-specific settings (radius, rewards, rules) are configured per-zone in the in-game creator, but global defaults and permissions are set here.
+
+<Info>
+  All configuration changes require a resource restart: `restart jx_redzone`
+</Info>
+
+---
+
+## Configuration File
+
+All settings are in `config.lua` in the root of the `jx_redzone` folder.
+
+```bash
+jx_redzone/
+├── config.lua          ← Configuration file
+├── client/open.lua     ← HUD toggle (editable)
+├── server/open.lua     ← Custom revive logic (editable)
+└── data/zones.json     ← Zone storage
+```
+
+---
+
+## General Settings
+
+### Config.Debug
+
+<ParamField path="Config.Debug" type="boolean" default="false">
+  Enable debug mode for development and troubleshooting. Prints additional information to the console.
+</ParamField>
+
+```lua config.lua
+Config.Debug = false
+```
+
+---
+
+### Config.Framework
+
+<ParamField path="Config.Framework" type="string" default="'auto'">
+  Framework detection mode. Set to `'auto'` to automatically detect ESX, QBCore, or Qbox.
+</ParamField>
+
+```lua config.lua
+Config.Framework = 'auto' -- 'auto', 'esx', 'qbcore', 'qbox'
+```
+
+---
+
+### Config.FrameworkResources
+
+<ParamField path="Config.FrameworkResources" type="table">
+  Resource names for each framework, used during auto-detection.
+</ParamField>
+
+```lua config.lua
+Config.FrameworkResources = {
+    esx = 'es_extended',
+    qbcore = 'qb-core',
+    qbox = 'qbx_core'
+}
+```
+
+<Tip>
+  Only change these if your framework resource has a non-standard name.
+</Tip>
+
+---
+
+### Config.MoneyAccount
+
+<ParamField path="Config.MoneyAccount" type="string" default="'money'">
+  The money account type used for rewards. Must match your framework's money account name.
+</ParamField>
+
+```lua config.lua
+Config.MoneyAccount = 'money' -- 'money', 'cash', 'bank', etc.
+```
+
+---
+
+## Creator Settings
+
+Configure the admin zone creator.
+
+### Config.Creator
+
+```lua config.lua
+Config.Creator = {
+    command = 'rzcreator',    -- Chat command to open creator
+    keybind = 'F7',           -- Keybind to open creator (remappable in FiveM settings)
+    permissions = {
+        type = 'ace',         -- 'ace', 'group', or 'discord'
+        -- Ace permission settings
+        ace = 'jx_redzone.creator',
+        -- Group permission settings
+        groups = {'admin', 'superadmin'},
+        -- Discord role settings (requires jx_discord)
+        roles = {'123456789012345678'}
+    }
+}
+```
+
+#### Permission Types
+
+<Tabs>
+  <Tab title="Ace Permissions" icon="key">
+    Use FiveM's built-in ace permission system:
+
+    ```lua config.lua
+    Config.Creator = {
+        permissions = {
+            type = 'ace',
+            ace = 'jx_redzone.creator'
+        }
+    }
+    ```
+
+    Add to `server.cfg`:
+    ```cfg
+    add_ace group.admin jx_redzone.creator allow
+    ```
+  </Tab>
+
+  <Tab title="Group Permissions" icon="users">
+    Use framework group/job-based permissions:
+
+    ```lua config.lua
+    Config.Creator = {
+        permissions = {
+            type = 'group',
+            groups = {'admin', 'superadmin', 'god'}
+        }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Discord Roles" icon="discord">
+    Use Discord role IDs (requires JX Discord API):
+
+    ```lua config.lua
+    Config.Creator = {
+        permissions = {
+            type = 'discord',
+            roles = {'123456789012345678', '987654321098765432'}
+        }
+    }
+    ```
+
+    <Warning>Requires `jx_discord` to be installed and configured.</Warning>
+  </Tab>
+</Tabs>
+
+---
+
+## Command Settings
+
+### Config.Commands
+
+<ParamField path="Config.Commands" type="table">
+  Chat commands for player UIs.
+</ParamField>
+
+```lua config.lua
+Config.Commands = {
+    rzcolor = 'rzcolor',         -- Color picker command
+    selectstats = 'selectstats', -- Stats layout selector command
+    rzlb = 'rzlb'               -- Leaderboard command
+}
+```
+
+---
+
+## UI Settings
+
+### Config.UI
+
+Configure which player UI features are enabled, the accent color, and default stats layout.
+
+```lua config.lua
+Config.UI = {
+    enableColorPicker = true,     -- Enable /rzcolor command
+    enableStatsSelector = true,   -- Enable /selectstats command
+    enableLeaderboard = true,     -- Enable /rzlb command
+    accentColor = '#e82546',      -- UI accent color (hex)
+    defaultStatsLayout = 'stat1'  -- Default stats layout
+    -- stat1 = hex, stat2 = table, stat3 = rail
+}
+```
+
+**Stats Layout Options**:
+- `'stat1'` — Hexagonal layout
+- `'stat2'` — Table layout
+- `'stat3'` — Rail layout
+
+---
+
+### Config.UI.Permissions
+
+Control who can access each player UI feature. Each UI has an `allowEveryone` toggle — when `true`, all players can use it regardless of other permission settings.
+
+```lua config.lua
+Config.UI = {
+    Permissions = {
+        color = {
+            allowEveryone = true,    -- Allow all players to use color picker
+            type = 'ace',            -- 'ace', 'group', or 'discord'
+            ace = 'jx_redzone.color',
+            groups = {'vip'},
+            roles = {'123456789012345678'}
+        },
+        stats = {
+            allowEveryone = true,
+            type = 'ace',
+            ace = 'jx_redzone.stats',
+            groups = {'vip'},
+            roles = {'123456789012345678'}
+        },
+        leaderboard = {
+            allowEveryone = true,
+            type = 'ace',
+            ace = 'jx_redzone.leaderboard',
+            groups = {'vip'},
+            roles = {'123456789012345678'}
+        }
+    }
+}
+```
+
+<Tip>
+  Set `allowEveryone = true` for each UI to let all players access it without permission checks.
+</Tip>
+
+---
+
+## Color Presets
+
+### Config.ColorPresets
+
+Configure preset color swatches available in the `/rzcolor` color picker.
+
+```lua config.lua
+Config.ColorPresets = {
+    '#e82546', -- Red
+    '#3b82f6', -- Blue
+    '#22c55e', -- Green
+    '#eab308', -- Yellow
+    '#a855f7', -- Purple
+    '#f97316', -- Orange
+    '#06b6d4', -- Cyan
+    '#ec4899', -- Pink
+}
+```
+
+---
+
+## Storage Settings
+
+### Config.Storage
+
+<ParamField path="Config.Storage.file" type="string" default="'data/zones.json'">
+  File path where zone data is stored. Relative to the resource root.
+</ParamField>
+
+```lua config.lua
+Config.Storage = {
+    file = 'data/zones.json'
+}
+```
+
+<Note>
+  No database is required. All zone data is file-based. The file is created automatically when you save your first zone.
+</Note>
+
+---
+
+## Zone Defaults
+
+### Config.ZoneDefaults
+
+Default values applied to new zones created in the creator UI. These can be overridden per-zone.
+
+```lua config.lua
+Config.ZoneDefaults = {
+    radius = 40,              -- Zone radius in game units
+    viewDistance = 150,        -- Draw distance for zone visuals
+    color = '#e82546',        -- Default zone color
+
+    blip = {
+        enabled = true,       -- Show map blip
+        radiusEnabled = true, -- Show radius circle on map
+        radiusAlpha = 128,    -- Radius circle opacity (0-255)
+        shortRange = false,   -- Only show blip when nearby
+        sprite = 310,         -- Blip sprite ID
+        color = 1,            -- Blip color ID
+        scale = 0.8           -- Blip size
+    },
+
+    rules = {
+        deleteVehicles = true,        -- Remove vehicles inside zone
+        useRoutingBucket = true,      -- Isolate zone in its own routing bucket
+        blockCrossZoneDamage = true,  -- Prevent damage between zones
+        markerEnabled = true          -- Show ground marker at zone border
+    },
+
+    entryRewards = {
+        weapon = 'WEAPON_CARBINERIFLE'  -- Weapon given on zone entry
+    },
+
+    killRewards = {
+        money = 500                     -- Money reward per kill
+    },
+
+    headshotRewards = {
+        money = 250                     -- Bonus money for headshot kills
+    },
+
+    streaks = {
+        {kills = 3, money = 1000},      -- Streak reward at 3 kills
+        {kills = 5, money = 2500},
+        {kills = 10, money = 5000}
+    }
+}
+```
+
+---
+
+## Routing Buckets
+
+### Config.RoutingBuckets
+
+<ParamField path="Config.RoutingBuckets.base" type="number" default="47000">
+  Starting routing bucket ID. Each zone gets a unique bucket starting from this number.
+</ParamField>
+
+```lua config.lua
+Config.RoutingBuckets = {
+    base = 47000
+}
+```
+
+<Warning>
+  Make sure this range doesn't conflict with other scripts that use routing buckets. Each zone consumes one bucket ID.
+</Warning>
+
+---
+
+## Vehicle Deletion
+
+### Config.VehicleDelete
+
+<ParamField path="Config.VehicleDelete.interval" type="number" default="5000">
+  Interval in milliseconds for checking and deleting vehicles inside zones.
+</ParamField>
+
+```lua config.lua
+Config.VehicleDelete = {
+    interval = 5000  -- Check every 5 seconds
+}
+```
+
+<Tip>
+  Increase this value if you experience performance issues on busy servers. Lower values clean up vehicles faster.
+</Tip>
+
+---
+
+## Reward Modes
+
+### Config.Rewards
+
+Control how rewards are distributed when multiple reward entries exist.
+
+```lua config.lua
+Config.Rewards = {
+    killMode = 'random',      -- 'random' or 'all'
+    headshotMode = 'random',  -- 'random' or 'all'
+    streakMode = 'all'        -- 'all' (streaks always give all matching rewards)
+}
+```
+
+**Modes**:
+- `'random'` — Picks one reward randomly from the configured list
+- `'all'` — Gives all configured rewards at once
+
+---
+
+## Revive System
+
+### Config.Revive
+
+Configure how players are revived after dying in a zone.
+
+```lua config.lua
+Config.Revive = {
+    mode = 'auto',       -- Detection mode
+    reviveDelay = 800    -- Delay in ms before reviving
+}
+```
+
+<Tabs>
+  <Tab title="Auto Mode" icon="wand-magic-sparkles">
+    **Recommended** — Automatically detects your ambulance script:
+
+    ```lua config.lua
+    Config.Revive = {
+        mode = 'auto',
+        reviveDelay = 800
+    }
+    ```
+
+    Detection order: wasabi_ambulance → ak47_ambulance → qbox → qb → esx
+  </Tab>
+
+  <Tab title="Manual Mode" icon="hand">
+    Manually specify your ambulance script:
+
+    ```lua config.lua
+    Config.Revive = {
+        mode = 'wasabi',   -- 'wasabi', 'ak47', 'qbox', 'qb', 'esx'
+        reviveDelay = 800
+    }
+    ```
+  </Tab>
+
+  <Tab title="Custom Mode" icon="code">
+    Write your own revive logic in `server/open.lua`:
+
+    ```lua config.lua
+    Config.Revive = {
+        mode = 'custom',
+        reviveDelay = 800
+    }
+    ```
+
+    Then edit `server/open.lua` with your custom revive function.
+  </Tab>
+</Tabs>
+
+---
+
+## Weapon Settings
+
+### Config.Weapons
+
+<ParamField path="Config.Weapons.equipEntryWeapon" type="boolean" default="true">
+  Whether to automatically equip the entry weapon when a player enters the zone.
+</ParamField>
+
+```lua config.lua
+Config.Weapons = {
+    equipEntryWeapon = true  -- Auto-equip weapon on zone entry
+}
+```
+
+---
+
+## Editable Files
+
+Only three files are editable — all other files are escrowed:
+
+<AccordionGroup>
+  <Accordion title="config.lua" icon="gear">
+    The main configuration file. Contains all settings documented on this page.
+  </Accordion>
+
+  <Accordion title="client/open.lua" icon="display">
+    Customize HUD behavior when players enter or exit a zone. Use this to hide/show your server's custom HUD elements.
+
+    ```lua client/open.lua
+    -- Called when a player enters a redzone
+    function OnEnterZone(zoneName)
+        -- Hide your HUD here
+        -- Example: exports['your_hud']:Hide()
+    end
+
+    -- Called when a player exits a redzone
+    function OnExitZone(zoneName)
+        -- Show your HUD here
+        -- Example: exports['your_hud']:Show()
+    end
+    ```
+  </Accordion>
+
+  <Accordion title="server/open.lua" icon="server">
+    Customize revive logic when using `Config.Revive.mode = 'custom'`. Write your own server-side revive function here.
+
+    ```lua server/open.lua
+    -- Called when a player needs to be revived in a zone
+    function CustomRevive(source)
+        -- Your custom revive logic here
+    end
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+  Do not modify escrowed files — they cannot be edited and changes will be lost on updates.
+</Warning>
+
+---
+
+## Full Example Configuration
+
+```lua config.lua
+Config = {}
+
+Config.Debug = false
+Config.Framework = 'auto'
+Config.MoneyAccount = 'money'
+
+Config.Creator = {
+    command = 'rzcreator',
+    keybind = 'F7',
+    permissions = {
+        type = 'ace',
+        ace = 'jx_redzone.creator'
+    }
+}
+
+Config.Commands = {
+    rzcolor = 'rzcolor',
+    selectstats = 'selectstats',
+    rzlb = 'rzlb'
+}
+
+Config.UI = {
+    enableColorPicker = true,
+    enableStatsSelector = true,
+    enableLeaderboard = true,
+    accentColor = '#e82546',
+    defaultStatsLayout = 'stat1'
+}
+
+Config.ZoneDefaults = {
+    radius = 40,
+    viewDistance = 150,
+    color = '#e82546',
+    blip = {
+        enabled = true,
+        radiusEnabled = true,
+        radiusAlpha = 128,
+        shortRange = false,
+        sprite = 310,
+        color = 1,
+        scale = 0.8
+    },
+    rules = {
+        deleteVehicles = true,
+        useRoutingBucket = true,
+        blockCrossZoneDamage = true,
+        markerEnabled = true
+    },
+    entryRewards = { weapon = 'WEAPON_CARBINERIFLE' },
+    killRewards = { money = 500 },
+    headshotRewards = { money = 250 },
+    streaks = {
+        {kills = 3, money = 1000},
+        {kills = 5, money = 2500},
+        {kills = 10, money = 5000}
+    }
+}
+
+Config.RoutingBuckets = { base = 47000 }
+Config.VehicleDelete = { interval = 5000 }
+Config.Rewards = { killMode = 'random', headshotMode = 'random', streakMode = 'all' }
+Config.Revive = { mode = 'auto', reviveDelay = 800 }
+Config.Weapons = { equipEntryWeapon = true }
+Config.Storage = { file = 'data/zones.json' }
+```

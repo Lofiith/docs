@@ -1,0 +1,154 @@
+---
+title: 'How To Use'
+description: 'Using the vehicle rental system'
+icon: 'gamepad'
+---
+
+# How To Use
+
+Learn the full rental workflow — from finding a rental point to driving away in your new vehicle.
+
+---
+
+## Renting a Vehicle
+
+<Steps>
+  <Step title="Find a Rental Point">
+    Rental locations appear on the map as blips (if enabled in the config). Head to the nearest rental point.
+
+    <Info>
+      If blips are disabled, ask your server admin for rental locations.
+    </Info>
+  </Step>
+
+  <Step title="Interact with the Rental Point">
+    Depending on your server's configuration:
+
+    <Tabs>
+      <Tab title="Target System" icon="bullseye">
+        If the server uses **ox_target** or **qb-target**, aim at the rental ped and click the interaction option.
+      </Tab>
+
+      <Tab title="Marker / TextUI" icon="display">
+        If no target system is configured, walk up to the rental ped or marker. A TextUI prompt appears when you're close enough — press the indicated key to interact.
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Browse Vehicle Categories">
+    The rental UI opens showing vehicle categories:
+
+    - **Compact** — Small, affordable city cars
+    - **Sedan** — Mid-range sedans
+    - **Sports** — Performance vehicles
+    - **SUV** — Large utility vehicles
+    - **Super** — High-end supercars
+
+    Click a category to see available vehicles with their names and prices.
+  </Step>
+
+  <Step title="Select and Preview a Vehicle">
+    Click on a vehicle to select it. A preview of the vehicle spawns at the rental point so you can see exactly what you're renting before committing.
+
+    <Tip>
+      Browse multiple vehicles to compare — a new preview spawns each time you select a different vehicle.
+    </Tip>
+  </Step>
+
+  <Step title="Customize the Color (Optional)">
+    If color customization is enabled, you can pick a color for your vehicle before renting:
+
+    - Choose from the preset color palette
+    - The preview vehicle updates to show your selected color
+    - Each color has a label (e.g., White, Black, Red, Blue)
+  </Step>
+
+  <Step title="Review the Price">
+    The UI shows the rental price based on your server's pricing mode:
+
+    - **One-Time** — Pay once and keep the vehicle
+    - **Hourly** — Pay per hour of rental time
+    - If your server allows mode selection, choose between the two
+
+    Payment is deducted from cash or bank depending on server config.
+  </Step>
+
+  <Step title="Confirm the Rental">
+    Click the confirm button to finalize the rental:
+
+    - Money is deducted from your account
+    - The vehicle spawns at the designated spawn point
+    - Vehicle keys are given automatically
+    - The rental is now active
+  </Step>
+
+  <Step title="Drive Away">
+    Walk to the spawn point, get in your vehicle, and go! The vehicle is yours until it's returned, despawned, or the rental expires (if using hourly mode).
+  </Step>
+</Steps>
+
+---
+
+## Active Rentals
+
+### Rental Limits
+
+Each player can have a maximum number of active rentals at the same time (default: 4). If you've reached the limit, you'll need to return a rental before renting another vehicle.
+
+### What Counts as Active
+
+A rental is considered active as long as the vehicle exists in the game world. The rental ends when:
+
+- The vehicle is despawned or destroyed
+- The server restarts
+- The hourly rental time expires (if using hourly mode)
+
+---
+
+## Payment
+
+### Payment Methods
+
+| Method | Description |
+|--------|-------------|
+| **Cash** | Deducted from your cash/pocket money |
+| **Bank** | Deducted from your bank account |
+
+The payment method is configured by your server admin. Some servers may use ox_inventory money items for cash payments.
+
+### Pricing Modes
+
+<Tabs>
+  <Tab title="One-Time" icon="money-bill">
+    Pay the full price once. The vehicle is yours until it's gone.
+
+    **Example**: A Blista costs $500 — you pay $500 and drive it as long as you want.
+  </Tab>
+
+  <Tab title="Hourly" icon="clock">
+    Pay per hour of rental time. The price shown in the UI is the hourly rate.
+
+    **Example**: A Blista costs $500/hour — renting for 3 hours costs $1,500.
+
+    The minimum rental time is configured by the server (default: 1 hour).
+  </Tab>
+</Tabs>
+
+---
+
+## Tips
+
+<CardGroup cols={2}>
+  <Card title="Preview Before You Pay" icon="eye">
+    Always preview the vehicle first. The preview spawns at the rental point so you can see the model and your chosen color before spending money.
+  </Card>
+  <Card title="Check Your Balance" icon="wallet">
+    Make sure you have enough cash or bank balance before trying to rent. The UI shows the price, but the transaction will fail if you're short.
+  </Card>
+  <Card title="Watch Your Rental Count" icon="hashtag">
+    You can only have a limited number of active rentals. If you can't rent a new vehicle, check how many you already have.
+  </Card>
+  <Card title="Park Safely" icon="square-parking">
+    Rental vehicles aren't saved to your garage. If it despawns or gets destroyed, the rental is over. Park in safe areas.
+  </Card>
+</CardGroup>

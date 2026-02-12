@@ -1,0 +1,431 @@
+---
+title: 'Common Issues'
+description: 'Troubleshooting the redzone system'
+icon: 'triangle-exclamation'
+---
+
+# Common Issues
+
+Quick fixes for the most common JX Redzone problems.
+
+<Note>
+  Most issues come from permission misconfiguration or revive mode detection. Start there first.
+</Note>
+
+---
+
+## Creator Issues
+
+<AccordionGroup>
+  <Accordion title="Creator Not Opening" icon="rectangle-xmark">
+    **Symptoms**: Pressing F7 or typing `/rzcreator` does nothing
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Check Permissions">
+        Verify your permission type matches your setup:
+
+        ```lua config.lua
+        Config.Creator = {
+            permissions = {
+                type = 'ace',  -- Must match: 'ace', 'group', or 'discord'
+                ace = 'jx_redzone.creator'
+            }
+        }
+        ```
+      </Step>
+      <Step title="Verify Ace Permission">
+        If using ace permissions, check your `server.cfg`:
+
+        ```cfg
+        add_ace group.admin jx_redzone.creator allow
+        ```
+      </Step>
+      <Step title="Check Framework Group">
+        If using group permissions, ensure your player is in the correct admin group for your framework (ESX/QBCore).
+      </Step>
+      <Step title="Check Discord Role">
+        If using Discord permissions, verify:
+        - JX Discord API is installed and running
+        - Your Discord role ID is correct in the config
+        - You have the role in Discord
+      </Step>
+      <Step title="Check Keybind Conflict">
+        Another resource may be using F7. Try the `/rzcreator` command instead, or remap the keybind in FiveM settings.
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Zones Not Saving" icon="floppy-disk">
+    **Symptoms**: Created zones disappear after restart
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="File Permissions">
+        Check that the server has write permissions to the `data/` folder:
+
+        ```bash
+        jx_redzone/
+        └── data/
+            └── zones.json  ← Must be writable
+        ```
+
+        On Linux: `chmod 755 data/` and `chmod 644 data/zones.json`
+      </Tab>
+
+      <Tab title="Create Data Folder">
+        If the `data/` folder doesn't exist, create it manually:
+
+        ```bash
+        mkdir jx_redzone/data
+        ```
+
+        The `zones.json` file is created automatically when you save your first zone.
+      </Tab>
+
+      <Tab title="Check Storage Config">
+        Verify the storage path is correct:
+
+        ```lua config.lua
+        Config.Storage = {
+            file = 'data/zones.json'
+        }
+        ```
+      </Tab>
+    </Tabs>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Revive Issues
+
+<AccordionGroup>
+  <Accordion title="Players Not Reviving" icon="heart-crack">
+    **Symptoms**: Players die in zones but don't auto-revive
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="Check Revive Mode">
+        If using `'auto'` mode, the script may not detect your ambulance script:
+
+        ```lua config.lua
+        Config.Revive = {
+            mode = 'auto',  -- Try setting manually instead
+            reviveDelay = 800
+        }
+        ```
+      </Tab>
+
+      <Tab title="Set Manual Mode">
+        Manually specify your ambulance script:
+
+        ```lua config.lua
+        -- Choose the correct one:
+        Config.Revive = { mode = 'wasabi' }   -- wasabi_ambulance
+        Config.Revive = { mode = 'ak47' }     -- ak47_ambulance
+        Config.Revive = { mode = 'qbox' }     -- Qbox default
+        Config.Revive = { mode = 'qb' }       -- QBCore default
+        Config.Revive = { mode = 'esx' }      -- ESX default
+        ```
+      </Tab>
+
+      <Tab title="Use Custom Mode">
+        If your ambulance script isn't supported, use custom mode:
+
+        ```lua config.lua
+        Config.Revive = {
+            mode = 'custom',
+            reviveDelay = 800
+        }
+        ```
+
+        Then write your revive logic in `server/open.lua`.
+      </Tab>
+    </Tabs>
+
+    <Warning>
+      If you use a non-standard ambulance/death script, you'll need to use `'custom'` mode and write your own revive logic.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Revive Takes Too Long" icon="clock">
+    **Symptoms**: Players wait too long before respawning
+
+    **Fix**: Lower the revive delay:
+
+    ```lua config.lua
+    Config.Revive = {
+        mode = 'auto',
+        reviveDelay = 500  -- Reduce from default 800ms
+    }
+    ```
+
+    <Info>
+      Setting this too low (under 300ms) may cause visual glitches during the revive animation.
+    </Info>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Zone Issues
+
+<AccordionGroup>
+  <Accordion title="Vehicles Not Deleting" icon="car">
+    **Symptoms**: Vehicles remain inside zones
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Check Zone Rules">
+        Ensure vehicle deletion is enabled in the zone settings:
+
+        ```lua config.lua
+        Config.ZoneDefaults = {
+            rules = {
+                deleteVehicles = true  -- Must be true
+            }
+        }
+        ```
+
+        Also check the specific zone's settings in the creator — per-zone rules override defaults.
+      </Step>
+      <Step title="Check Interval">
+        The cleanup interval may be too high:
+
+        ```lua config.lua
+        Config.VehicleDelete = {
+            interval = 5000  -- Lower for faster cleanup
+        }
+        ```
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Cross-Zone Damage Still Happening" icon="explosion">
+    **Symptoms**: Players in different zones can damage each other
+
+    **Fix**: Enable cross-zone damage blocking:
+
+    ```lua config.lua
+    Config.ZoneDefaults = {
+        rules = {
+            blockCrossZoneDamage = true  -- Must be true
+        }
+    }
+    ```
+
+    Also check that both zones have this rule enabled in their individual zone settings.
+  </Accordion>
+
+  <Accordion title="Zone Blips Not Showing" icon="map">
+    **Symptoms**: No blips or radius circles on the map
+
+    **Fix**: Check blip settings in zone defaults:
+
+    ```lua config.lua
+    Config.ZoneDefaults = {
+        blip = {
+            enabled = true,        -- Must be true
+            radiusEnabled = true,  -- For radius circles
+            shortRange = false     -- Set to true for nearby-only
+        }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Reward Issues
+
+<AccordionGroup>
+  <Accordion title="Rewards Not Giving Money" icon="money-bill">
+    **Symptoms**: Players kill others but don't receive money
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="Check Money Account">
+        Ensure the money account matches your framework:
+
+        ```lua config.lua
+        Config.MoneyAccount = 'money'  -- ESX: 'money', QBCore: 'cash'
+        ```
+      </Tab>
+
+      <Tab title="Check Framework Detection">
+        Verify your framework is detected:
+
+        ```lua config.lua
+        Config.Framework = 'auto'  -- Or set manually: 'esx', 'qbcore', 'qbox'
+        ```
+
+        Enable debug mode to check:
+        ```lua config.lua
+        Config.Debug = true
+        ```
+      </Tab>
+
+      <Tab title="Check Zone Rewards">
+        Verify the specific zone has rewards configured. Open the creator and check the zone's kill/headshot/streak reward values.
+      </Tab>
+    </Tabs>
+  </Accordion>
+
+  <Accordion title="Streak Rewards Not Triggering" icon="fire">
+    **Symptoms**: Kill streaks not giving bonus rewards
+
+    **Check**: Verify streak configuration in the zone. The default is:
+
+    ```lua
+    streaks = {
+        {kills = 3, money = 1000},
+        {kills = 5, money = 2500},
+        {kills = 10, money = 5000}
+    }
+    ```
+
+    Also check the reward mode:
+    ```lua config.lua
+    Config.Rewards = {
+        streakMode = 'all'  -- Streaks should be 'all'
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Performance Issues
+
+<AccordionGroup>
+  <Accordion title="FPS Drops Near Zones" icon="gauge-simple-low">
+    **Symptoms**: Lower FPS when near or inside a zone
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Lower View Distance">
+        Reduce the zone view distance:
+
+        ```lua config.lua
+        Config.ZoneDefaults = {
+            viewDistance = 100  -- Lower from default 150
+        }
+        ```
+      </Step>
+      <Step title="Increase Vehicle Cleanup Interval">
+        If vehicle deletion is causing lag:
+
+        ```lua config.lua
+        Config.VehicleDelete = {
+            interval = 10000  -- Increase from default 5000
+        }
+        ```
+      </Step>
+      <Step title="Disable Markers">
+        Disable ground markers for zones:
+
+        ```lua config.lua
+        Config.ZoneDefaults = {
+            rules = {
+                markerEnabled = false
+            }
+        }
+        ```
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Resource Errors
+
+<AccordionGroup>
+  <Accordion title="Resource Won't Start" icon="circle-xmark">
+    **Symptoms**: `ensure jx_redzone` does nothing or shows errors
+
+    **Checklist**:
+
+    <Steps>
+      <Step title="Check Folder Name">
+        Must be named exactly `jx_redzone` (lowercase, underscore)
+      </Step>
+      <Step title="Check Dependencies">
+        `ox_lib` must be started before `jx_redzone`:
+
+        ```cfg server.cfg
+        ensure ox_lib
+        ensure jx_redzone
+        ```
+      </Step>
+      <Step title="Verify Files">
+        Ensure `fxmanifest.lua` exists in the folder
+      </Step>
+      <Step title="Check Console">
+        Look for red error messages in the server console for specific issues
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Config Syntax Errors" icon="code">
+    **Symptoms**: `syntax error near...` in console
+
+    **Common Mistakes**:
+
+    <Tabs>
+      <Tab title="Missing Commas">
+        ```lua
+        -- ❌ Wrong
+        rules = {
+            deleteVehicles = true
+            useRoutingBucket = true
+        }
+
+        -- ✅ Correct
+        rules = {
+            deleteVehicles = true,
+            useRoutingBucket = true
+        }
+        ```
+      </Tab>
+
+      <Tab title="Missing Quotes">
+        ```lua
+        -- ❌ Wrong
+        Config.Framework = auto
+
+        -- ✅ Correct
+        Config.Framework = 'auto'
+        ```
+      </Tab>
+    </Tabs>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Still Having Issues?
+
+<CardGroup cols={2}>
+  <Card title="Configuration Guide" icon="gear" href="./configuration">
+    Review all configuration options
+  </Card>
+  <Card title="Join Discord" icon="discord" href="https://discord.gg/VuMcnbmEby">
+    Get help from the community
+  </Card>
+</CardGroup>
+
+<Tip>
+  **When asking for help, provide**:
+  - Full error message from console
+  - Your `config.lua` (remove sensitive data)
+  - Your framework and ambulance script name
+  - What you've already tried
+</Tip>

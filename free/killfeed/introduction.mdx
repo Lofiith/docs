@@ -1,0 +1,96 @@
+---
+title: 'JX Killfeed'
+description: 'Real-time kill notification system for FiveM'
+icon: 'skull-crossbones'
+---
+
+# JX Killfeed
+
+A lightweight real-time killfeed overlay for FiveM servers. When a player kills another player, a notification appears on screen showing the killer, victim, and weapon used.
+
+<Note>
+  **Standalone** - No framework dependency. Works on any FiveM server out of the box.
+</Note>
+
+## Features
+
+- Clean, modern kill notification UI
+- Configurable screen position (top-center, center-left, center-right)
+- Configurable maximum number of entries displayed
+- Optional kill sound effect
+- Custom fonts and SVG weapon icons
+- Old entries fade out as new ones appear
+
+---
+
+## How It Works
+
+When a player kills another player:
+
+<Steps>
+  <Step title="Server Detects Kill">
+    The server detects the kill event and identifies the killer, victim, and weapon
+  </Step>
+  <Step title="Broadcast to Clients">
+    Kill data is sent to all connected players
+  </Step>
+  <Step title="Display Notification">
+    A styled notification appears on screen with killer name, weapon icon, and victim name
+  </Step>
+  <Step title="Auto-Dismiss">
+    Older entries fade out as new kills come in, up to the configured max
+  </Step>
+</Steps>
+
+---
+
+## File Structure
+
+| File | Editable | Description |
+|------|----------|-------------|
+| `config.lua` | ✅ | All configuration options |
+| `web/index.html` | ✅ | NUI overlay HTML structure |
+| `web/styles.css` | ✅ | Visual styling — customize colors, fonts, sizes |
+| `web/main.js` | ✅ | NUI JavaScript logic |
+| `web/svg/*` | ✅ | SVG weapon icons |
+| `web/fonts/*` | ✅ | Custom fonts |
+| `web/sounds/*` | ✅ | Kill sound effects |
+| `client/client.lua` | ❌ | Client logic (escrowed) |
+| `server/server.lua` | ❌ | Server logic (escrowed) |
+
+<Tip>
+  You can fully customize the look and feel by editing the files in the `web/` folder — HTML, CSS, SVGs, fonts, and sounds are all open.
+</Tip>
+
+---
+
+## Quick Start
+
+<CardGroup cols={2}>
+  <Card title="Configuration" icon="gear" href="./configuration">
+    Set position, max entries, and sound options
+  </Card>
+  <Card title="Common Issues" icon="circle-exclamation" href="./common-issues">
+    Troubleshoot display and sound problems
+  </Card>
+</CardGroup>
+
+---
+
+## Installation
+
+1. Download `jx_killfeed` from our releases
+2. Extract the folder into your server's `resources` directory
+3. Make sure the folder is named exactly `jx_killfeed`
+4. Add `ensure jx_killfeed` to your `server.cfg`
+5. Start or restart your server
+
+No dependencies, no database, no framework needed.
+
+---
+
+## Need Help?
+
+<Card title="Join Our Discord" icon="discord" href="https://discord.gg/VuMcnbmEby" horizontal>
+  Get support, share your setup, and stay updated with releases
+</Card>

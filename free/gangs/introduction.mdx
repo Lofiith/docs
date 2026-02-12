@@ -1,0 +1,177 @@
+---
+title: 'JX Gangs'
+description: 'Full-featured gang management system for FiveM'
+icon: 'users'
+---
+
+# JX Gangs
+
+A comprehensive gang management system for FiveM that goes far beyond simple gang labels. JX Gangs provides a complete suite of gang gameplay features — from creation and member management to turf warfare, gang wars, and airdrop events — all wrapped in a modern NUI web interface.
+
+<Note>
+  **Free & Open Source** — Completely free to use and modify for your server.
+</Note>
+
+## What Makes It Different
+
+This is not a basic gang label system. JX Gangs is a full gameplay loop with:
+
+- **Gang Management UI** — A polished NUI interface (F7) with dashboard, members, ranks, recruiting, and leaderboard tabs
+- **Turf Capture System** — Timed capture zones across the map with rewards, kill streaks, and cooldowns
+- **Gang War System** — Wagered PvP battles between gangs with configurable kill targets
+- **Airdrop Events** — Scheduled loot drops at random locations with a minigame to loot the crate
+- **Stash System** — Placeable gang and personal stash locations per gang
+- **Tier System** — Starter, Basic, Premium, and Ultimate tiers controlling max members, ranks, and customization
+- **Leaderboard** — Kill, death, and turf capture stats tracked per member
+
+## Framework Support
+
+JX Gangs supports **ESX**, **QBCore**, and **Qbox** with automatic framework detection. Inventory support is also auto-detected for ox_inventory, qs-inventory, qb-inventory, and esx_inventory.
+
+---
+
+## How It Works
+
+<Steps>
+  <Step title="Install Dependencies">
+    Install ox_lib and oxmysql
+  </Step>
+  <Step title="Drop In & Configure">
+    Place jx_gangs in your resources and customize the config files
+  </Step>
+  <Step title="Create Gangs">
+    Admins use /creategang to set up gangs through the creation UI
+  </Step>
+  <Step title="Players Join & Play">
+    Players get invited, apply to gangs, capture turfs, fight wars, and loot airdrops
+  </Step>
+</Steps>
+
+---
+
+## Core Systems
+
+<Tabs>
+  <Tab title="Gang Management" icon="users-gear">
+    Full member lifecycle management:
+
+    - **Invite** nearby players directly or accept applications
+    - **Promote / Demote / Kick** members based on rank permissions
+    - **Configurable Ranks** with permission levels, limited by your gang's tier
+    - **Dashboard** showing turf wins, cash collected, and member count
+    - **Leaderboard** with kills, deaths, turfs captured, and K/D ratio
+  </Tab>
+
+  <Tab title="Turfs" icon="map-location-dot">
+    Capture and hold territory across the map:
+
+    - **8 pre-configured turf locations** (fully customizable)
+    - Timed capture zones with configurable radius and capture time
+    - Per-kill rewards and kill streak bonuses during capture
+    - Cooldown system to prevent spam
+    - Rewards deposited directly into your gang stash
+  </Tab>
+
+  <Tab title="Gang Wars" icon="swords">
+    Wagered PvP battles between rival gangs:
+
+    - Gang leaders challenge other gangs through the UI
+    - Configurable kill targets (10–150) and wager amounts ($5,000–$250,000)
+    - Both gangs deposit a wager — winner takes all
+    - Per-kill rewards and kill streak bonuses during war
+    - Duration limits and pending timeouts
+  </Tab>
+
+  <Tab title="Airdrops" icon="parachute-box">
+    Scheduled loot crate events:
+
+    - **10 pre-configured drop locations** (fully customizable)
+    - Automatic scheduling with configurable intervals and active hours
+    - Announcement before the drop lands
+    - Minigame to loot the crate (configurable difficulty)
+    - Rewards go to the looting gang's stash
+    - Kill rewards for fighting during the event
+  </Tab>
+
+  <Tab title="Stashes" icon="box-open">
+    Persistent storage for gangs:
+
+    - **Gang Stash** — Shared storage for the whole gang (120 slots / 180,000 weight by default)
+    - **Personal Stash** — Per-member storage (60 slots / 100,000 weight by default)
+    - Placeable stash locations managed by the gang leader
+    - Supports ox_inventory, qs-inventory, qb-inventory, and esx_inventory
+  </Tab>
+</Tabs>
+
+---
+
+## File Structure
+
+<Tabs>
+  <Tab title="Editable Files" icon="pen">
+    You can freely modify these files:
+
+    - `config/config.lua` — Main configuration
+    - `config/config_turf.lua` — Turf capture settings and locations
+    - `config/config_gangwar.lua` — Gang war settings
+    - `config/config_airdrop.lua` — Airdrop settings and locations
+    - `locales/*.lua` — All language/translation files
+    - `sql/*.sql` — Database schema files
+  </Tab>
+
+  <Tab title="Escrowed Files" icon="lock">
+    These files are protected and cannot be edited:
+
+    - `client/*.lua` — Client-side scripts
+    - `server/*.lua` — Server-side scripts
+    - `bridge/**/*.lua` — Framework bridge files
+    - `shared/*.lua` — Shared modules
+    - `inventory/*.lua` — Inventory bridge files
+  </Tab>
+</Tabs>
+
+---
+
+## Requirements
+
+<CardGroup cols={2}>
+  <Card title="ox_lib" icon="box" href="https://github.com/overextended/ox_lib">
+    Modern UI and utilities library (required)
+  </Card>
+  <Card title="oxmysql" icon="database" href="https://github.com/overextended/oxmysql">
+    MySQL database driver (required)
+  </Card>
+  <Card title="Framework" icon="server">
+    ESX, QBCore, or Qbox — auto-detected
+  </Card>
+  <Card title="JX Discord API" icon="discord" href="../discord-api/introduction">
+    Optional — enables Discord name display
+  </Card>
+</CardGroup>
+
+---
+
+## Quick Start
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="./installation">
+    Get JX Gangs installed and running
+  </Card>
+  <Card title="Configuration" icon="gear" href="./configuration">
+    Customize turfs, wars, airdrops, tiers, and permissions
+  </Card>
+  <Card title="How To Use" icon="gamepad" href="./usage">
+    In-game guide for admins, leaders, and members
+  </Card>
+  <Card title="Common Issues" icon="circle-exclamation" href="./common-issues">
+    Troubleshoot installation and gameplay problems
+  </Card>
+</CardGroup>
+
+---
+
+## Need Help?
+
+<Card title="Join Our Discord" icon="discord" href="https://discord.gg/VuMcnbmEby" horizontal>
+  Get support, share your setup, and stay updated with releases
+</Card>

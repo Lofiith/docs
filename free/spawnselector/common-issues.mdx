@@ -1,0 +1,222 @@
+---
+title: 'Common Issues'
+description: 'Troubleshooting the spawn selector'
+icon: 'triangle-exclamation'
+---
+
+# Common Issues
+
+Quick solutions to the most frequently encountered problems with jx_spawnselector.
+
+<Note>
+  Most issues can be resolved by checking your configuration and ensuring the resource is started properly.
+</Note>
+
+---
+
+## UI Issues
+
+<AccordionGroup>
+  <Accordion title="Spawn Selector UI Not Showing" icon="eye-slash">
+    **Symptoms**: After character login, no spawn selector appears and the player spawns at a default location or gets stuck
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="Check Trigger">
+        The spawn selector must be triggered by another resource (usually jx_multicharacter). Verify:
+
+        - If using **jx_multicharacter**: Check that spawn selector is enabled in its config:
+
+          ```lua
+          -- In jx_multicharacter/config/config.lua
+          Config.SpawnSelector = {
+              Enabled = true,
+              Resource = 'jx_spawnselector'
+          }
+          ```
+
+        - If using a **custom multicharacter**: Make sure you're calling the export:
+
+          ```lua
+          -- Server-side
+          exports.jx_spawnselector:RequestSpawnSelector(source)
+          ```
+      </Tab>
+
+      <Tab title="Check Resource">
+        Ensure jx_spawnselector is actually started:
+
+        1. Check `server.cfg` has `ensure jx_spawnselector`
+        2. Check server console for startup messages
+        3. Try `restart jx_spawnselector` in console
+      </Tab>
+
+      <Tab title="Check Config">
+        Verify the spawn selector is enabled:
+
+        ```lua config/spawn.lua
+        Config.Spawn.Enabled = true
+        ```
+      </Tab>
+
+      <Tab title="Check NUI Files">
+        Verify the NUI files exist:
+
+        ```
+        jx_spawnselector/web/dist/index.html
+        jx_spawnselector/web/dist/assets/
+        ```
+
+        If the `web/dist/` folder is missing, re-download the resource.
+      </Tab>
+    </Tabs>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Spawn Issues
+
+<AccordionGroup>
+  <Accordion title="Spawning at Wrong Coordinates" icon="location-crosshairs">
+    **Symptoms**: Player spawns at an unexpected position, underground, or in the air
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="Check Coordinates">
+        Verify the `coords` field uses the correct `vector4` format:
+
+        ```lua
+        -- Correct format: vector4(x, y, z, heading)
+        coords = vector4(276.5700, -592.4682, 43.2621, 77.0045)
+
+        -- Wrong: missing heading
+        coords = vector3(276.5700, -592.4682, 43.2621)
+
+        -- Wrong: table instead of vector4
+        coords = { x = 276.57, y = -592.46, z = 43.26 }
+        ```
+      </Tab>
+
+      <Tab title="Test Coordinates">
+        Go to the coordinates in-game first to make sure they're valid:
+        1. Use a teleport command to go to the coordinates
+        2. Make sure you're standing on solid ground
+        3. Copy the exact position including the Z (height) value
+        4. Use the heading you want the player to face
+      </Tab>
+    </Tabs>
+  </Accordion>
+
+  <Accordion title="Last Location Not Working" icon="clock-rotate-left">
+    **Symptoms**: "Last Location" option doesn't appear or spawns at wrong place
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Check Database Column">
+        The `users` table needs a `lastlocation` column. If you're using jx_multicharacter, its `install.sql` creates this automatically. Otherwise, run:
+
+        ```sql
+        ALTER TABLE `users` ADD COLUMN IF NOT EXISTS `lastlocation` TEXT DEFAULT NULL;
+        ```
+      </Step>
+      <Step title="First Login">
+        Last location won't be available the first time a player connects — they haven't logged out anywhere yet. This is expected behavior.
+      </Step>
+      <Step title="Check oxmysql">
+        Ensure oxmysql is running properly and the database connection is active.
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Image Issues
+
+<AccordionGroup>
+  <Accordion title="Location Images Not Loading" icon="image">
+    **Symptoms**: Spawn location cards show broken image icons
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="Check Image Paths">
+        Verify the `image` field in each location points to a valid file:
+
+        ```lua
+        image = "./assets/spawn-locations/pillbox.png"
+        ```
+
+        The path is relative to the NUI `web/dist/` folder. Images should exist at:
+
+        ```
+        jx_spawnselector/web/dist/assets/spawn-locations/pillbox.png
+        ```
+      </Tab>
+
+      <Tab title="Check File Names">
+        Image file names are case-sensitive. Make sure:
+        - The file name matches exactly (including extension)
+        - The file is a supported format (`.png`, `.jpg`, `.jpeg`)
+      </Tab>
+
+      <Tab title="Add Custom Images">
+        When adding new spawn locations with custom images:
+
+        1. Place your image in `web/public/assets/spawn-locations/`
+        2. Rebuild the NUI if needed, or place it directly in `web/dist/assets/spawn-locations/`
+        3. Reference it in the config:
+
+        ```lua
+        image = "./assets/spawn-locations/your-image.png"
+        ```
+      </Tab>
+    </Tabs>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Map Pin Issues
+
+<AccordionGroup>
+  <Accordion title="Pins in Wrong Position on Map" icon="map">
+    **Symptoms**: Location pins don't match the actual location on the map image
+
+    **Fix**:
+
+    Adjust the `position` field for each location. The values are CSS percentages relative to the map image:
+
+    ```lua
+    position = { top = "35%", left = "65%" }
+    ```
+
+    - `top: "0%"` = top of map, `top: "100%"` = bottom
+    - `left: "0%"` = left side, `left: "100%"` = right side
+
+    <Tip>
+      Adjust values in small increments (2-5%) and restart the resource to test until the pin is positioned correctly.
+    </Tip>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Still Having Issues?
+
+<CardGroup cols={2}>
+  <Card title="Installation Guide" icon="download" href="./installation">
+    Review step-by-step installation
+  </Card>
+  <Card title="Configuration Guide" icon="gear" href="./configuration">
+    Double-check your spawn locations
+  </Card>
+</CardGroup>
+
+<Card title="Join Our Discord" icon="discord" href="https://discord.gg/VuMcnbmEby" horizontal>
+  Get help from the community — provide your error messages and config when asking for support
+</Card>

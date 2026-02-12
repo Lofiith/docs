@@ -1,0 +1,621 @@
+---
+title: 'Configuration'
+description: 'Configuring the gang system'
+icon: 'gear'
+---
+
+# Configuration
+
+JX Gangs uses four configuration files to control every aspect of the system. All config files are located in the `config/` folder.
+
+<Info>
+  Restart the resource after making changes to any config file: `restart jx_gangs`
+</Info>
+
+| File | Purpose |
+|------|---------|
+| `config/config.lua` | Main settings — framework, permissions, tiers, commands, UI |
+| `config/config_turf.lua` | Turf capture system — locations, rewards, timers |
+| `config/config_gangwar.lua` | Gang war system — wagers, kill targets, duration |
+| `config/config_airdrop.lua` | Airdrop system — schedule, locations, rewards, minigame |
+
+---
+
+## Main Config (`config.lua`)
+
+The main configuration file controls core behavior, permissions, tiers, commands, and UI appearance.
+
+### General Settings
+
+```lua config/config.lua
+Config.Debug = false          -- Enable debug prints in console
+Config.Locale = 'en'          -- Language (matches a file in locales/)
+Config.Framework = 'auto'     -- 'auto', 'esx', 'qbcore', 'qbox'
+Config.Inventory = 'auto'     -- 'auto', 'ox_inventory', 'qs-inventory', 'qb-inventory', 'esx_inventory'
+Config.Notification = 'ox'    -- Notification system to use
+Config.TextUI = 'ox'          -- Text UI system to use
+```
+
+<Tabs>
+  <Tab title="Framework" icon="server">
+    Set to `'auto'` to automatically detect your framework. Supports ESX, QBCore, and Qbox.
+
+    ```lua
+    Config.Framework = 'auto'
+    ```
+  </Tab>
+
+  <Tab title="Inventory" icon="box-open">
+    Set to `'auto'` to automatically detect your inventory system. Supports:
+
+    - `ox_inventory`
+    - `qs-inventory`
+    - `qb-inventory`
+    - `esx_inventory`
+
+    ```lua
+    Config.Inventory = 'auto'
+    ```
+  </Tab>
+</Tabs>
+
+### Database
+
+```lua config/config.lua
+Config.AutoSQL = true  -- Automatically create database tables on first start
+```
+
+When `true`, the script runs the SQL schema automatically. Set to `false` if you prefer to import `sql/gangs.sql` manually.
+
+### Name Display
+
+```lua config/config.lua
+Config.NameDisplay = 'ingame'          -- 'ingame' or 'discord'
+Config.DiscordResource = 'jx_discord'  -- Resource name of jx_discord
+```
+
+| Value | Behavior |
+|-------|----------|
+| `'ingame'` | Shows character names in the gang UI |
+| `'discord'` | Shows Discord usernames (requires jx_discord) |
+
+### Nearby Radius
+
+```lua config/config.lua
+Config.NearbyRadius = 10  -- Distance in meters to find nearby players for invites
+```
+
+When inviting players through the gang UI, only players within this radius will appear in the list.
+
+---
+
+### Commands
+
+All chat commands are configurable:
+
+```lua config/config.lua
+Config.Commands = {
+    openMenu = 'gangmanage',       -- Open gang management UI
+    manageGangs = 'managegangs',   -- Open admin gang management panel
+    gangApply = 'gangapply',       -- Apply to a gang
+    stopApply = 'stopapply',       -- Cancel a pending application
+    setGang = 'setgang',           -- Admin: /setgang [playerID] [gangName] [rankLevel]
+    createGang = 'creategang',     -- Admin: Open gang creation UI
+    leaveGang = 'leavegang',       -- Leave your current gang
+    turfs = 'turfs',               -- View active turf captures
+}
+```
+
+### Keybinds
+
+```lua config/config.lua
+Config.Keybinds = {
+    openMenu = 'F7'  -- Keybind to open the gang management menu
+}
+```
+
+### External Links
+
+```lua config/config.lua
+Config.Links = {
+    -- External URLs shown in the UI (e.g., for tier upgrade purchases)
+}
+```
+
+These links appear in the gang UI so players can navigate to your store or website to upgrade their gang tier.
+
+---
+
+### Permissions
+
+#### Gang Action Permissions
+
+`Config.GangPermissions` defines which rank level is required to perform each action within a gang:
+
+```lua config/config.lua
+Config.GangPermissions = {
+    invite = 2,            -- Minimum rank level to invite players
+    kick = 2,              -- Minimum rank level to kick members
+    promote = 3,           -- Minimum rank level to promote members
+    demote = 3,            -- Minimum rank level to demote members
+    editRanks = 3,         -- Minimum rank level to create/edit/delete ranks
+    acceptApplications = 2, -- Minimum rank level to accept/decline applications
+    manageStashes = 3,     -- Minimum rank level to place/manage stash locations
+    manageGangWars = 3,    -- Minimum rank level to start gang wars
+    dashboard = 1,         -- Minimum rank level to view the dashboard
+    leaderboard = 1,       -- Minimum rank level to view the leaderboard
+}
+```
+
+<Tip>
+  Rank level 1 is the lowest (new recruits), rank level 3 is typically the owner. Adjust these numbers to match your rank structure.
+</Tip>
+
+#### Admin Permissions
+
+Admin commands (`/creategang` and `/managegangs`) use separate permission systems:
+
+```lua config/config.lua
+Config.CreateGangPermissions = {
+    type = 'ace',              -- 'ace', 'group', or 'discord'
+    permission = 'admin',      -- Ace permission, group name, or Discord role ID
+}
+
+Config.ManageGangsPermissions = {
+    type = 'ace',
+    permission = 'admin',
+}
+```
+
+<Tabs>
+  <Tab title="Ace Permissions" icon="key">
+    Uses FiveM's built-in ace permission system:
+
+    ```lua
+    Config.CreateGangPermissions = {
+        type = 'ace',
+        permission = 'admin',  -- Player needs 'admin' ace permission
+    }
+    ```
+
+    Grant in server.cfg:
+    ```cfg
+    add_ace identifier.license:xxxxx admin allow
+    ```
+  </Tab>
+
+  <Tab title="Group Permissions" icon="users">
+    Uses your framework's group/job system:
+
+    ```lua
+    Config.CreateGangPermissions = {
+        type = 'group',
+        permission = 'admin',  -- Player needs 'admin' group
+    }
+    ```
+  </Tab>
+
+  <Tab title="Discord Role" icon="discord">
+    Uses a Discord role ID (requires jx_discord):
+
+    ```lua
+    Config.CreateGangPermissions = {
+        type = 'discord',
+        permission = '123456789012345678',  -- Discord role ID
+    }
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+### Tier System
+
+Tiers control what each gang can do based on their subscription level:
+
+```lua config/config.lua
+Config.Tiers = {
+    starter = {
+        maxMembers = 10,    -- Maximum gang members
+        maxRanks = 3,       -- Maximum number of custom ranks
+        maxRankEdits = 5,   -- Maximum rank edit operations
+    },
+    basic = {
+        maxMembers = 15,
+        maxRanks = 5,
+        maxRankEdits = 10,
+    },
+    premium = {
+        maxMembers = 25,
+        maxRanks = 8,
+        maxRankEdits = 20,
+    },
+    ultimate = {
+        maxMembers = 50,
+        maxRanks = 15,
+        maxRankEdits = -1,  -- Unlimited
+    },
+}
+```
+
+| Tier | Max Members | Max Ranks | Rank Edits |
+|------|-------------|-----------|------------|
+| Starter | 10 | 3 | 5 |
+| Basic | 15 | 5 | 10 |
+| Premium | 25 | 8 | 20 |
+| Ultimate | 50 | 15 | Unlimited |
+
+### Default Ranks
+
+Every new gang starts with these ranks:
+
+```lua config/config.lua
+Config.DefaultRanks = {
+    { label = 'Recruit', level = 1 },
+    { label = 'Member', level = 2 },
+    { label = 'Owner', level = 3 },
+}
+```
+
+<Info>
+  Gang owners can create additional ranks (up to their tier limit) and customize labels and levels through the management UI.
+</Info>
+
+### UI Colors
+
+Customize the gang management interface appearance:
+
+```lua config/config.lua
+Config.UIColors = {
+    -- Primary color, accent color, background, etc.
+    -- Customize to match your server's branding
+}
+```
+
+### Stash Settings
+
+Configure gang and personal stash properties:
+
+```lua config/config.lua
+Config.ManageGangs = {
+    gangStash = {
+        slots = 120,
+        weight = 180000,
+    },
+    personalStash = {
+        slots = 60,
+        weight = 100000,
+    },
+    marker = {
+        -- Marker appearance settings for stash locations
+    },
+}
+```
+
+---
+
+## Turf Config (`config_turf.lua`)
+
+The turf capture system allows gangs to fight over territory across the map.
+
+### General Turf Settings
+
+```lua config/config_turf.lua
+Config.Turfs = {
+    MaxActive = 3,              -- Maximum simultaneous active turf captures
+    ViewDistance = 100.0,        -- Draw distance for turf markers
+    CooldownEnabled = true,     -- Enable cooldown between captures at the same location
+    CooldownTime = 1800,        -- Cooldown in seconds (30 minutes)
+    CountdownEnabled = true,    -- Enable countdown before capture starts
+    CountdownTime = 10,         -- Countdown duration in seconds
+}
+```
+
+### Blip Settings
+
+Control how turf locations appear on the map:
+
+```lua config/config_turf.lua
+Config.Turfs.BlipSettings = {
+    displayMode = 'always',  -- 'always', 'gang_only', or 'never'
+    sprite = 543,            -- Blip icon ID
+    color = 1,               -- Blip color ID
+    scale = 0.8,             -- Blip size
+}
+```
+
+| Display Mode | Behavior |
+|-------------|----------|
+| `'always'` | All players see turf blips on the map |
+| `'gang_only'` | Only gang members see turf blips |
+| `'never'` | No blips shown on the map |
+
+### Markers
+
+```lua config/config_turf.lua
+Config.Turfs.Markers = {
+    capture = {
+        -- Marker appearance for the capture zone
+    },
+    active = {
+        -- Marker appearance when a capture is in progress
+    },
+}
+```
+
+### Turf Locations
+
+Each turf location is defined with coordinates, radius, capture time, and rewards:
+
+```lua config/config_turf.lua
+Config.Turfs.Locations = {
+    {
+        name = 'Grove Street',
+        coords = vector3(x, y, z),       -- Center of the capture zone
+        radius = 50.0,                    -- Zone radius in meters
+        teleportCoords = vector3(x, y, z), -- Teleport destination (for /turfs command)
+        captureTime = 300,                -- Time to capture in seconds (5 minutes)
+        rewards = {
+            items = {
+                { name = 'black_money', count = 5000 },
+                -- Additional reward items
+            },
+        },
+        killRewards = {
+            perKill = {
+                { name = 'black_money', count = 100 },
+            },
+            streaks = {
+                { kills = 3, reward = { name = 'black_money', count = 500 }, message = '3 Kill Streak!' },
+                { kills = 5, reward = { name = 'black_money', count = 1000 }, message = '5 Kill Streak!' },
+                -- Additional streak tiers
+            },
+        },
+    },
+    -- ... more locations
+}
+```
+
+<Info>
+  JX Gangs comes with **8 pre-configured turf locations** across the map. You can modify these or add your own.
+</Info>
+
+**Location fields explained:**
+
+| Field | Description |
+|-------|-------------|
+| `name` | Display name for the turf |
+| `coords` | Center point of the capture zone |
+| `radius` | How large the capture area is |
+| `teleportCoords` | Where admins teleport when using `/turfs` |
+| `captureTime` | How long a capture takes (seconds) |
+| `rewards.items` | Items awarded to the winning gang's stash |
+| `killRewards.perKill` | Items given per kill during the capture |
+| `killRewards.streaks` | Bonus rewards at specific kill streak milestones |
+
+---
+
+## Gang War Config (`config_gangwar.lua`)
+
+Gang wars are wagered PvP battles between two gangs.
+
+### General Settings
+
+```lua config/config_gangwar.lua
+Config.GangWar = {
+    Enabled = true,
+    MinPlayersToStart = 2,  -- Minimum players online in each gang to start a war
+}
+```
+
+### Kill Targets
+
+```lua config/config_gangwar.lua
+Config.GangWar.DefaultKillsToWin = 50   -- Default kill target
+Config.GangWar.MinKillsToWin = 10       -- Minimum allowed kill target
+Config.GangWar.MaxKillsToWin = 150      -- Maximum allowed kill target
+```
+
+The gang leader chooses a kill target when initiating a war. The first gang to reach the target wins.
+
+### Wager Settings
+
+```lua config/config_gangwar.lua
+Config.GangWar.MinWager = 5000          -- Minimum wager amount ($5,000)
+Config.GangWar.MaxWager = 250000        -- Maximum wager amount ($250,000)
+Config.GangWar.MoneyType = 'cash'       -- 'cash', 'bank', or 'black_money'
+```
+
+<Warning>
+  Make sure `MoneyType` matches a valid money account in your framework. For ESX this is typically `'money'` or `'black_money'`, for QBCore it's `'cash'` or `'bank'`.
+</Warning>
+
+### Duration & Timeout
+
+```lua config/config_gangwar.lua
+Config.GangWar.Duration = 3600           -- Max war duration in seconds (0 = unlimited)
+Config.GangWar.PendingTimeout = 300      -- Time for opponent to accept/decline (seconds)
+```
+
+### Kill Rewards
+
+```lua config/config_gangwar.lua
+Config.GangWar.KillRewards = {
+    perKill = {
+        { name = 'black_money', count = 200 },
+    },
+    streaks = {
+        { kills = 3, reward = { name = 'black_money', count = 500 }, message = '3 Kill Streak!' },
+        { kills = 5, reward = { name = 'black_money', count = 1500 }, message = '5 Kill Streak!' },
+        { kills = 10, reward = { name = 'black_money', count = 3000 }, message = '10 Kill Streak!' },
+    },
+}
+```
+
+---
+
+## Airdrop Config (`config_airdrop.lua`)
+
+Airdrops are scheduled loot crate events that spawn at random locations on the map.
+
+### General Settings
+
+```lua config/config_airdrop.lua
+Config.Airdrop = {
+    Enabled = true,
+    ViewDistance = 200.0,       -- Draw distance for airdrop markers/blips
+    ZoneRadius = 50.0,         -- Radius of the airdrop zone
+    ActiveDuration = 600,      -- How long the airdrop stays active (seconds)
+}
+```
+
+### Interaction Type
+
+```lua config/config_airdrop.lua
+Config.Airdrop.InteractionType = 'textui'  -- 'textui' or 'oxtarget'
+```
+
+| Type | Behavior |
+|------|----------|
+| `'textui'` | Press E when near the crate (uses ox_lib TextUI) |
+| `'oxtarget'` | Use ox_target to interact with the crate |
+
+### Schedule
+
+```lua config/config_airdrop.lua
+Config.Airdrop.Schedule = {
+    interval = { min = 30, max = 60 },  -- Random interval between drops (minutes)
+    activeHours = { start = 0, stop = 24 },  -- Hours during which drops can occur (24h format)
+    announceTime = 60,  -- Seconds before the drop to announce it
+}
+```
+
+<Tip>
+  Set `activeHours` to limit airdrops to peak hours only. For example, `{ start = 18, stop = 2 }` for evening/night drops.
+</Tip>
+
+### Blip & Marker Settings
+
+```lua config/config_airdrop.lua
+Config.Airdrop.BlipSettings = {
+    -- Blip appearance for the airdrop location on the map
+}
+
+Config.Airdrop.Markers = {
+    -- Marker appearance for the airdrop zone in the world
+}
+```
+
+### Airdrop Locations
+
+```lua config/config_airdrop.lua
+Config.Airdrop.Locations = {
+    { coords = vector3(x, y, z), name = 'Sandy Shores Airfield' },
+    { coords = vector3(x, y, z), name = 'Grapeseed' },
+    -- ... 10 pre-configured locations total
+}
+```
+
+<Info>
+  The script picks a random location from this list each time an airdrop spawns. You can add, remove, or modify locations freely.
+</Info>
+
+### Rewards
+
+```lua config/config_airdrop.lua
+Config.Airdrop.Rewards = {
+    items = {
+        { name = 'black_money', count = 10000 },
+        -- Additional loot items
+    },
+    money = 0,  -- Direct cash reward (0 = items only)
+}
+```
+
+Airdrop rewards are deposited into the looting gang's gang stash.
+
+### Kill Rewards
+
+```lua config/config_airdrop.lua
+Config.Airdrop.KillRewards = {
+    perKill = {
+        { name = 'black_money', count = 150 },
+    },
+    streaks = {
+        { kills = 3, reward = { name = 'black_money', count = 500 }, message = '3 Kill Streak!' },
+        { kills = 5, reward = { name = 'black_money', count = 1000 }, message = 'Domination!' },
+    },
+}
+```
+
+### Minigame
+
+The airdrop crate requires completing a minigame to loot:
+
+```lua config/config_airdrop.lua
+Config.Airdrop.Minigame = {
+    difficulty = 'medium',      -- 'easy', 'medium', 'hard'
+    timeLimit = 15,             -- Seconds to complete the minigame
+    gridSize = 5,               -- Grid dimensions
+    requiredSequence = 5,       -- Number of correct inputs required
+    totalWaves = 3,             -- Number of waves to complete
+    mistakesAllowed = 2,        -- Failed attempts before lockout
+}
+```
+
+| Setting | Description |
+|---------|-------------|
+| `difficulty` | Overall difficulty preset |
+| `timeLimit` | How long players have to complete each wave |
+| `gridSize` | Size of the minigame grid |
+| `requiredSequence` | Correct inputs needed per wave |
+| `totalWaves` | Total waves to complete for success |
+| `mistakesAllowed` | How many mistakes before the attempt fails |
+
+<Tip>
+  For a more casual server, set `difficulty = 'easy'`, increase `timeLimit`, and raise `mistakesAllowed`. For hardcore servers, use `'hard'` with fewer mistakes allowed.
+</Tip>
+
+---
+
+## Full Example: Customizing for a PvP Server
+
+Here's an example of how you might adjust configs for a PvP-focused server:
+
+<Tabs>
+  <Tab title="Turfs" icon="map-location-dot">
+    Faster captures, bigger rewards:
+
+    ```lua
+    Config.Turfs.MaxActive = 5
+    Config.Turfs.CooldownTime = 900     -- 15 min cooldown
+    -- Per location:
+    captureTime = 180,                  -- 3 minute captures
+    rewards = {
+        items = { { name = 'black_money', count = 10000 } },
+    },
+    ```
+  </Tab>
+
+  <Tab title="Gang Wars" icon="swords">
+    Lower barriers, more action:
+
+    ```lua
+    Config.GangWar.MinPlayersToStart = 1
+    Config.GangWar.DefaultKillsToWin = 25
+    Config.GangWar.MinWager = 1000
+    ```
+  </Tab>
+
+  <Tab title="Airdrops" icon="parachute-box">
+    More frequent drops:
+
+    ```lua
+    Config.Airdrop.Schedule = {
+        interval = { min = 15, max = 30 },
+        activeHours = { start = 0, stop = 24 },
+        announceTime = 30,
+    }
+    ```
+  </Tab>
+</Tabs>

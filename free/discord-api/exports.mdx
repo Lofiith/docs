@@ -1,0 +1,316 @@
+---
+title: 'Exports'
+description: 'Available server exports for jx_discord'
+icon: 'code'
+---
+
+# Exports Reference
+
+jx_discord provides 6 server-side exports that other scripts can use to look up player Discord data.
+
+<Info>
+  All exports are **server-side only**. These cannot be called from client scripts.
+</Info>
+
+<Note>
+  Exports that fetch data from Discord's API are **asynchronous** and use callbacks. This is because they make HTTP requests under the hood. The script enforces a rate limit of **1 request per second per player** to avoid hitting Discord's API limits.
+</Note>
+
+---
+
+## GetPlayerDiscordId
+
+Returns the player's Discord ID. This is a **synchronous** export — it reads from the player's FiveM identifiers, no API call needed.
+
+### Syntax
+
+```lua
+local discordId = exports.jx_discord:GetPlayerDiscordId(source)
+```
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `source` | number | Yes | Server ID of the player |
+
+### Returns
+
+| Type | Description |
+|------|-------------|
+| `string` or `nil` | The player's Discord ID, or `nil` if they don't have Discord linked |
+
+### Example
+
+```lua
+RegisterCommand('mydiscord', function(source)
+    local discordId = exports.jx_discord:GetPlayerDiscordId(source)
+
+    if discordId then
+        print('Player Discord ID: ' .. discordId)
+    else
+        print('Player does not have Discord linked')
+    end
+end)
+```
+
+---
+
+## GetPlayerAvatar
+
+Fetches the player's Discord avatar URL. **Asynchronous** — uses a callback.
+
+### Syntax
+
+```lua
+exports.jx_discord:GetPlayerAvatar(source, function(success, avatarUrl)
+    -- handle result
+end)
+```
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `source` | number | Yes | Server ID of the player |
+| `callback` | function | Yes | Called with `(success, avatarUrl)` |
+
+### Callback Values
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `success` | boolean | `true` if the avatar was fetched successfully |
+| `avatarUrl` | string or nil | Full URL to the player's Discord avatar, or `nil` on failure |
+
+### Example
+
+```lua
+RegisterCommand('avatar', function(source)
+    exports.jx_discord:GetPlayerAvatar(source, function(success, avatarUrl)
+        if success then
+            print('Avatar URL: ' .. avatarUrl)
+        else
+            print('Could not fetch avatar')
+        end
+    end)
+end)
+```
+
+---
+
+## GetPlayerUsername
+
+Fetches the player's Discord username. **Asynchronous** — uses a callback.
+
+### Syntax
+
+```lua
+exports.jx_discord:GetPlayerUsername(source, function(success, username)
+    -- handle result
+end)
+```
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `source` | number | Yes | Server ID of the player |
+| `callback` | function | Yes | Called with `(success, username)` |
+
+### Callback Values
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `success` | boolean | `true` if the username was fetched successfully |
+| `username` | string or nil | The player's Discord username, or `nil` on failure |
+
+### Example
+
+```lua
+RegisterCommand('discordname', function(source)
+    exports.jx_discord:GetPlayerUsername(source, function(success, username)
+        if success then
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {'Your Discord name is: ' .. username}
+            })
+        else
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {'Could not fetch your Discord username'}
+            })
+        end
+    end)
+end)
+```
+
+---
+
+## GetPlayerRoles
+
+Fetches the player's Discord role names. **Asynchronous** — uses a callback.
+
+### Syntax
+
+```lua
+exports.jx_discord:GetPlayerRoles(source, function(success, roles)
+    -- handle result
+end)
+```
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `source` | number | Yes | Server ID of the player |
+| `callback` | function | Yes | Called with `(success, roles)` |
+
+### Callback Values
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `success` | boolean | `true` if roles were fetched successfully |
+| `roles` | table or nil | A table of role name strings (e.g. `{"VIP", "Member"}`), or `nil` on failure |
+
+### Example
+
+```lua
+RegisterCommand('myroles', function(source)
+    exports.jx_discord:GetPlayerRoles(source, function(success, roles)
+        if success then
+            print('Player has ' .. #roles .. ' roles:')
+            for _, roleName in ipairs(roles) do
+                print('  - ' .. roleName)
+            end
+        else
+            print('Could not fetch roles')
+        end
+    end)
+end)
+```
+
+---
+
+## HasPlayerRole
+
+Checks if a player has a specific Discord role by name or ID. **Asynchronous** — uses a callback.
+
+### Syntax
+
+```lua
+exports.jx_discord:HasPlayerRole(source, roleNameOrId, function(hasRole)
+    -- handle result
+end)
+```
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `source` | number | Yes | Server ID of the player |
+| `roleNameOrId` | string | Yes | The role name (e.g. `"VIP"`) or role ID (e.g. `"123456789012345678"`) |
+| `callback` | function | Yes | Called with `(hasRole)` |
+
+### Callback Values
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `hasRole` | boolean | `true` if the player has the role, `false` otherwise |
+
+### Example
+
+```lua
+RegisterCommand('checkvip', function(source)
+    exports.jx_discord:HasPlayerRole(source, 'VIP', function(hasRole)
+        if hasRole then
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {'You have the VIP role!'}
+            })
+        else
+            TriggerClientEvent('chat:addMessage', source, {
+                args = {'You do not have the VIP role.'}
+            })
+        end
+    end)
+end)
+```
+
+<Tip>
+  You can pass either the role **name** (e.g. `"VIP"`) or the role **ID** (e.g. `"123456789012345678"`). Using the role ID is more reliable since role names can change.
+</Tip>
+
+---
+
+## GetPlayerInfo
+
+Fetches all Discord data for a player in a single call. **Asynchronous** — uses a callback.
+
+### Syntax
+
+```lua
+exports.jx_discord:GetPlayerInfo(source, function(success, info)
+    -- handle result
+end)
+```
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `source` | number | Yes | Server ID of the player |
+| `callback` | function | Yes | Called with `(success, info)` |
+
+### Callback Values
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `success` | boolean | `true` if data was fetched successfully |
+| `info` | table or nil | A table with all Discord data, or `nil` on failure |
+
+### Info Table Structure
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Discord user ID |
+| `username` | string | Discord username |
+| `avatar` | string or nil | Avatar URL |
+| `roles` | table | Table of role name strings |
+| `roleCount` | number | Number of roles |
+
+### Example
+
+```lua
+RegisterCommand('discordinfo', function(source)
+    exports.jx_discord:GetPlayerInfo(source, function(success, info)
+        if success then
+            print('Discord ID: ' .. info.id)
+            print('Username: ' .. info.username)
+            print('Avatar: ' .. (info.avatar or 'No avatar'))
+            print('Roles (' .. info.roleCount .. '):')
+            for _, roleName in ipairs(info.roles) do
+                print('  - ' .. roleName)
+            end
+        else
+            print('Could not fetch Discord info')
+        end
+    end)
+end)
+```
+
+---
+
+## Rate Limiting
+
+All async exports (everything except `GetPlayerDiscordId`) are rate limited to **1 request per second per player**. If you call an export while the player is rate limited, the callback will return `false`.
+
+This is to prevent abuse of the Discord API, which has strict rate limits. If you need to make multiple lookups for the same player, use `GetPlayerInfo` to get everything in one call.
+
+<Warning>
+  **Don't call exports in tight loops.** Cache the result and reuse it. The script already caches data for the duration set by `Config.CacheTimeout` (default: 5 minutes).
+</Warning>
+
+---
+
+## Need Help?
+
+<Card title="Join Our Discord" icon="discord" href="https://discord.gg/VuMcnbmEby" horizontal>
+  Get integration help and share your implementations
+</Card>

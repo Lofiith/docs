@@ -1,0 +1,200 @@
+---
+title: 'Common Issues'
+description: 'Troubleshooting jx_discord problems'
+icon: 'triangle-exclamation'
+---
+
+# Common Issues
+
+Quick fixes for the most common jx_discord problems.
+
+---
+
+## Startup Errors
+
+<AccordionGroup>
+  <Accordion title="Token or Guild ID not configured" icon="circle-xmark">
+    **Console message**: `[JX_Discord] [ERROR]: Token or Guild ID not configured! Please edit config.lua`
+
+    **Cause**: `Config.Token` or `Config.Guild` is empty in `config.lua`.
+
+    **Fix**:
+
+    <Steps>
+      <Step title="Open config.lua">
+        Navigate to `jx_discord/config.lua`
+      </Step>
+      <Step title="Add your bot token">
+        ```lua
+        Config.Token = 'YOUR_BOT_TOKEN_HERE'
+        ```
+      </Step>
+      <Step title="Add your guild ID">
+        ```lua
+        Config.Guild = 'YOUR_GUILD_ID_HERE'
+        ```
+      </Step>
+      <Step title="Restart the resource">
+        Run `restart jx_discord` in your server console
+      </Step>
+    </Steps>
+
+    See the [Installation guide](./installation) for how to get these values.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## HTTP Errors
+
+<AccordionGroup>
+  <Accordion title="HTTP 401 / 403 Errors" icon="lock">
+    **Console message**: `[JX_Discord] [ERROR]: HTTP request failed (401)` or `(403)`
+
+    **Cause**: The bot token is invalid, or the bot doesn't have permission to access the guild.
+
+    **Fix**:
+
+    <Tabs>
+      <Tab title="Invalid Token (401)">
+        1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
+        2. Select your application → **Bot** tab
+        3. Click **Reset Token** to generate a new one
+        4. Copy the new token into `Config.Token` in `config.lua`
+        5. Restart the resource
+      </Tab>
+
+      <Tab title="No Access (403)">
+        1. Make sure the bot is actually in your Discord server
+        2. Re-invite the bot using the OAuth2 URL from the Developer Portal
+        3. Verify `Config.Guild` matches your server ID (right-click server → Copy Server ID)
+      </Tab>
+    </Tabs>
+  </Accordion>
+
+  <Accordion title="HTTP 429 Errors (Rate Limited)" icon="clock">
+    **Console message**: `[JX_Discord] [ERROR]: HTTP request failed (429)`
+
+    **Cause**: Too many requests to the Discord API. You've hit Discord's rate limit.
+
+    **Fix**:
+
+    - Wait a few minutes — rate limits are temporary
+    - Increase `Config.CacheTimeout` to reduce API calls:
+      ```lua
+      Config.CacheTimeout = 600 -- 10 minutes instead of 5
+      ```
+    - Avoid calling exports in loops or on every frame
+    - The script already rate limits to 1 request/sec per player, but high player counts can still trigger global limits
+
+    <Tip>
+      If you consistently hit rate limits, raise `Config.CacheTimeout` to `600` or higher.
+    </Tip>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Player Data Issues
+
+<AccordionGroup>
+  <Accordion title="Players showing no roles" icon="user-xmark">
+    **Symptoms**: Exports return empty role tables even though the player has roles in Discord.
+
+    **Cause**: The bot doesn't have the **Server Members Intent** enabled.
+
+    **Fix**:
+
+    <Steps>
+      <Step title="Open Developer Portal">
+        Go to [discord.com/developers/applications](https://discord.com/developers/applications)
+      </Step>
+      <Step title="Select your application">
+        Click on your bot's application
+      </Step>
+      <Step title="Go to Bot settings">
+        Click the **Bot** tab on the left
+      </Step>
+      <Step title="Enable Server Members Intent">
+        Under **Privileged Gateway Intents**, toggle on **Server Members Intent**
+      </Step>
+      <Step title="Save and restart">
+        Save changes, then restart `jx_discord` on your server
+      </Step>
+    </Steps>
+
+    <Warning>
+      Without the Server Members Intent, the bot cannot read guild member data including roles.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Cache not refreshing" icon="rotate">
+    **Symptoms**: Player's roles or data are outdated even after they changed in Discord.
+
+    **Cause**: Data is still cached from a previous lookup.
+
+    **Fix**:
+
+    - **Wait** for `Config.CacheTimeout` to expire (default: 300 seconds / 5 minutes)
+    - **Reconnect** — if `Config.RefreshCacheOnConnect` is `true` (default), cache clears on reconnect
+    - **Reduce cache timeout** if you need more responsive updates:
+      ```lua
+      Config.CacheTimeout = 120 -- 2 minutes
+      ```
+
+    <Info>
+      Guild roles (the role name/ID mapping) refresh automatically every 10 minutes regardless of cache settings.
+    </Info>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Webhook Issues
+
+<AccordionGroup>
+  <Accordion title="Webhook not sending" icon="paper-plane">
+    **Symptoms**: No connection log embeds appearing in your Discord channel.
+
+    **Fix**:
+
+    <Steps>
+      <Step title="Check the URL">
+        Make sure `Config.LogWebhookURL` contains a valid Discord webhook URL:
+        ```lua
+        Config.LogWebhookURL = 'https://discord.com/api/webhooks/...'
+        ```
+      </Step>
+      <Step title="Test the webhook">
+        Paste the URL into your browser — you should see a JSON response with the webhook details (not a 404 error)
+      </Step>
+      <Step title="Check channel permissions">
+        Make sure the webhook's target channel still exists and hasn't been deleted
+      </Step>
+      <Step title="Check for empty string">
+        If the value is `''` (empty string), webhook logging is disabled. This is intentional — set a URL to enable it.
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Still Having Issues?
+
+<CardGroup cols={2}>
+  <Card title="Troubleshooting" icon="wrench" href="./troubleshooting">
+    Advanced troubleshooting and debugging steps
+  </Card>
+  <Card title="Join Discord" icon="discord" href="https://discord.gg/VuMcnbmEby">
+    Get help from the community
+  </Card>
+</CardGroup>
+
+<Tip>
+  **When asking for help**, include:
+  - The full error message from the server console
+  - Your `config.lua` (remove your bot token first!)
+  - Whether the bot is in your Discord server
+  - Your FiveM server artifact version
+</Tip>

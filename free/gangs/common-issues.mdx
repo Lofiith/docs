@@ -1,0 +1,446 @@
+---
+title: 'Common Issues'
+description: 'Troubleshooting jx_gangs problems'
+icon: 'triangle-exclamation'
+---
+
+# Common Issues
+
+Quick fixes for the most common JX Gangs problems.
+
+---
+
+## Database & SQL Issues
+
+<AccordionGroup>
+  <Accordion title="SQL Errors / Tables Not Creating" icon="database">
+    **Symptoms**: Errors about missing tables, SQL syntax errors, or the script failing to start
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Check Start Order">
+        Make sure oxmysql starts **before** jx_gangs in your server.cfg:
+
+        ```cfg
+        ensure oxmysql
+        ensure ox_lib
+        ensure jx_gangs
+        ```
+      </Step>
+      <Step title="Verify Database Connection">
+        Ensure your `mysql_connection_string` in server.cfg is correct and the database is accessible
+      </Step>
+      <Step title="Manual Import">
+        If `Config.AutoSQL = true` isn't working, manually import the SQL file:
+
+        1. Open `jx_gangs/sql/gangs.sql`
+        2. Import it into your database using phpMyAdmin, HeidiSQL, or MySQL CLI
+        3. Set `Config.AutoSQL = false` to prevent conflicts
+      </Step>
+      <Step title="Check for Existing Tables">
+        If you're reinstalling, the tables may already exist. The auto-SQL should handle this, but if not, drop the old tables first and re-import
+      </Step>
+    </Steps>
+
+    <Warning>
+      The script requires 7 tables: `jx_gangs`, `jx_gang_ranks`, `jx_gang_members`, `jx_gang_applications`, `jx_gang_stats`, `jx_gang_stashes`, `jx_gang_wars`. If any are missing, the script will not function correctly.
+    </Warning>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Stash Issues
+
+<AccordionGroup>
+  <Accordion title="Stashes Not Working / Not Opening" icon="box-open">
+    **Symptoms**: Stash markers appear but the inventory doesn't open, or stashes don't save items
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="Check Inventory System">
+        JX Gangs requires a supported inventory system:
+
+        - `ox_inventory`
+        - `qs-inventory`
+        - `qb-inventory`
+        - `esx_inventory`
+
+        Make sure one of these is installed and running. If `Config.Inventory = 'auto'`, verify the correct one is being detected.
+      </Tab>
+
+      <Tab title="ESX Inventory Users">
+        If you're using **esx_inventory**, you need an additional SQL file:
+
+        1. Open `jx_gangs/sql/esx_stashes.sql`
+        2. Import it into your database
+        3. Restart the server
+
+        This creates the `jx_gang_esx_stashes` table required for ESX inventory stash support.
+
+        <Warning>
+          This step is **only** needed for esx_inventory. Other inventory systems handle stash storage automatically.
+        </Warning>
+      </Tab>
+
+      <Tab title="Check Permissions">
+        Only the highest rank (with `manageStashes` permission) can **place** stash locations. Regular members can only **use** stashes that have already been placed.
+
+        Verify in config:
+        ```lua
+        Config.GangPermissions = {
+            manageStashes = 3,  -- Rank level required to place stashes
+        }
+        ```
+      </Tab>
+    </Tabs>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Command & Permission Issues
+
+<AccordionGroup>
+  <Accordion title="/creategang Not Working" icon="plus">
+    **Symptoms**: Typing `/creategang` does nothing or shows a permission error
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Check Permission Type">
+        Verify your `Config.CreateGangPermissions` is set correctly:
+
+        ```lua
+        Config.CreateGangPermissions = {
+            type = 'ace',              -- 'ace', 'group', or 'discord'
+            permission = 'admin',
+        }
+        ```
+      </Step>
+      <Step title="Verify You Have the Permission">
+        **For ace**: Check your server.cfg has the ace granted:
+        ```cfg
+        add_ace identifier.license:xxxxx admin allow
+        ```
+
+        **For group**: Make sure your player has the correct framework group (e.g., `admin`)
+
+        **For discord**: Verify you have the specified Discord role and jx_discord is running
+      </Step>
+      <Step title="Check Command Name">
+        Make sure the command hasn't been renamed in `Config.Commands`:
+
+        ```lua
+        Config.Commands = {
+            createGang = 'creategang',  -- This is the actual command
+        }
+        ```
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Members Can't Perform Actions" icon="ban">
+    **Symptoms**: Gang members click buttons in the UI but nothing happens, or they get permission denied
+
+    **Solutions**:
+
+    Check `Config.GangPermissions` and verify the member's rank level meets the requirements:
+
+    ```lua
+    Config.GangPermissions = {
+        invite = 2,            -- Rank 2+ can invite
+        kick = 2,              -- Rank 2+ can kick
+        promote = 3,           -- Only rank 3 can promote
+        demote = 3,            -- Only rank 3 can demote
+        editRanks = 3,         -- Only rank 3 can edit ranks
+        acceptApplications = 2, -- Rank 2+ can accept applications
+        manageStashes = 3,     -- Only rank 3 can manage stashes
+        manageGangWars = 3,    -- Only rank 3 can start wars
+        dashboard = 1,         -- Everyone can view dashboard
+        leaderboard = 1,       -- Everyone can view leaderboard
+    }
+    ```
+
+    <Tip>
+      If a member has rank level 1 (Recruit) and `invite` requires level 2, they won't be able to invite. Either promote the member or lower the required level.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="/managegangs Not Working" icon="users-gear">
+    **Symptoms**: The admin management panel doesn't open
+
+    **Solution**: Same as `/creategang` — check `Config.ManageGangsPermissions`:
+
+    ```lua
+    Config.ManageGangsPermissions = {
+        type = 'ace',
+        permission = 'admin',
+    }
+    ```
+
+    Ensure the permission type and value match your setup.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Discord Integration Issues
+
+<AccordionGroup>
+  <Accordion title="Discord Names Not Showing" icon="discord">
+    **Symptoms**: Player names show as character names instead of Discord usernames
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Check NameDisplay Setting">
+        ```lua
+        Config.NameDisplay = 'discord'  -- Must be 'discord', not 'ingame'
+        ```
+      </Step>
+      <Step title="Check DiscordResource Setting">
+        ```lua
+        Config.DiscordResource = 'jx_discord'  -- Must match your jx_discord resource name
+        ```
+      </Step>
+      <Step title="Verify jx_discord Is Running">
+        Make sure jx_discord is started and working. Check with:
+        ```
+        restart jx_discord
+        ```
+      </Step>
+      <Step title="Check Player Is Linked">
+        The player must be in your Discord server and their FiveM account must be linked through the Discord API
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Turf Issues
+
+<AccordionGroup>
+  <Accordion title="Turf Capture Not Starting" icon="map-location-dot">
+    **Symptoms**: Walking into a turf zone and pressing E does nothing
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="Check MaxActive">
+        If the maximum number of simultaneous captures is already reached, new captures won't start:
+
+        ```lua
+        Config.Turfs.MaxActive = 3  -- Only 3 turfs can be active at once
+        ```
+
+        Wait for an active capture to finish or increase this limit.
+      </Tab>
+
+      <Tab title="Check Cooldown">
+        If the turf was recently captured, it may still be on cooldown:
+
+        ```lua
+        Config.Turfs.CooldownEnabled = true
+        Config.Turfs.CooldownTime = 1800  -- 30 minutes
+        ```
+
+        Wait for the cooldown to expire, or disable/reduce it for testing.
+      </Tab>
+
+      <Tab title="Check Location Config">
+        Verify the turf location is properly configured in `config_turf.lua`:
+
+        - `coords` must be valid coordinates
+        - `radius` must be large enough to stand in
+        - `captureTime` must be greater than 0
+      </Tab>
+
+      <Tab title="Must Be in a Gang">
+        Only gang members can capture turfs. Verify you're in a gang by pressing F7.
+      </Tab>
+    </Tabs>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Airdrop Issues
+
+<AccordionGroup>
+  <Accordion title="Airdrops Not Spawning" icon="parachute-box">
+    **Symptoms**: No airdrops appear on the server
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Check Enabled">
+        ```lua
+        Config.Airdrop.Enabled = true  -- Must be true
+        ```
+      </Step>
+      <Step title="Check Schedule">
+        Verify the schedule settings:
+
+        ```lua
+        Config.Airdrop.Schedule = {
+            interval = { min = 30, max = 60 },  -- Minutes between drops
+            activeHours = { start = 0, stop = 24 },  -- 0-24 = always active
+            announceTime = 60,
+        }
+        ```
+
+        If `activeHours` is restricted (e.g., `{ start = 18, stop = 2 }`), airdrops will only spawn during those hours.
+      </Step>
+      <Step title="Wait for the Interval">
+        The first airdrop won't spawn immediately. Wait for the interval period (30–60 minutes by default) after server start.
+      </Step>
+      <Step title="Check Locations">
+        Make sure `Config.Airdrop.Locations` has at least one valid location entry.
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Gang War Issues
+
+<AccordionGroup>
+  <Accordion title="Wager / Money Issues" icon="money-bill">
+    **Symptoms**: Can't start a gang war, wager not deducting, or winnings not received
+
+    **Solutions**:
+
+    <Tabs>
+      <Tab title="Check MoneyType">
+        Make sure `Config.GangWar.MoneyType` matches a valid money account in your framework:
+
+        ```lua
+        Config.GangWar.MoneyType = 'cash'
+        ```
+
+        | Framework | Common Values |
+        |-----------|--------------|
+        | ESX | `'money'`, `'bank'`, `'black_money'` |
+        | QBCore | `'cash'`, `'bank'`, `'crypto'` |
+
+        <Warning>
+          Using an account type that doesn't exist in your framework will cause the wager to fail silently.
+        </Warning>
+      </Tab>
+
+      <Tab title="Check Wager Limits">
+        Verify the gang has enough money for the wager:
+
+        ```lua
+        Config.GangWar.MinWager = 5000    -- Minimum $5,000
+        Config.GangWar.MaxWager = 250000  -- Maximum $250,000
+        ```
+      </Tab>
+
+      <Tab title="Check Player Count">
+        Both gangs need the minimum number of online players:
+
+        ```lua
+        Config.GangWar.MinPlayersToStart = 2
+        ```
+
+        If either gang has fewer players online than this, the war can't start.
+      </Tab>
+
+      <Tab title="Check Enabled">
+        ```lua
+        Config.GangWar.Enabled = true  -- Must be true
+        ```
+      </Tab>
+    </Tabs>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## General Issues
+
+<AccordionGroup>
+  <Accordion title="Gang Menu Won't Open (F7)" icon="rectangle-xmark">
+    **Symptoms**: Pressing F7 or typing `/gangmanage` does nothing
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Check You're in a Gang">
+        The menu only opens for gang members. Use `/gangapply` or ask an admin to add you.
+      </Step>
+      <Step title="Check Keybind Conflict">
+        Another resource might be using F7. Change the keybind:
+
+        ```lua
+        Config.Keybinds = {
+            openMenu = 'F7'  -- Change to another key
+        }
+        ```
+      </Step>
+      <Step title="Try the Command">
+        Use `/gangmanage` instead of the keybind to rule out keybind conflicts.
+      </Step>
+      <Step title="Check Console for Errors">
+        Open F8 and look for error messages related to jx_gangs.
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="NUI Interface Not Loading" icon="display">
+    **Symptoms**: Menu opens but shows a blank screen or doesn't render
+
+    **Solutions**:
+
+    <Steps>
+      <Step title="Clear NUI Cache">
+        Delete your FiveM cache:
+        1. Close FiveM
+        2. Go to `%localappdata%/FiveM/FiveM.app/data/`
+        3. Delete the `nui-storage` folder
+        4. Restart FiveM
+      </Step>
+      <Step title="Check web/dist Folder">
+        Ensure the `web/dist/` folder exists in jx_gangs and contains the built NUI files
+      </Step>
+      <Step title="Restart Resource">
+        ```
+        restart jx_gangs
+        ```
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Still Having Issues?
+
+<CardGroup cols={2}>
+  <Card title="Installation Guide" icon="download" href="./installation">
+    Review the step-by-step installation
+  </Card>
+  <Card title="Configuration Guide" icon="gear" href="./configuration">
+    Double-check your configuration settings
+  </Card>
+  <Card title="Discord API Issues" icon="discord" href="../discord-api/common-issues">
+    Troubleshoot Discord integration problems
+  </Card>
+  <Card title="Join Discord" icon="message-question" href="https://discord.gg/VuMcnbmEby">
+    Get help from the community
+  </Card>
+</CardGroup>
+
+<Tip>
+  **When Asking for Help**:
+  - Share the full error message from F8 or server console
+  - Include your framework (ESX/QBCore/Qbox) and inventory system
+  - Mention what you've already tried
+  - Share your config (remove any sensitive data like Discord role IDs)
+</Tip>
