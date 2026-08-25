@@ -1,0 +1,207 @@
+---
+title: 'Exports'
+description: 'Existing client and server exports provided by JX Gangs'
+icon: 'code'
+---
+
+# Exports
+
+These are the exports already included in the JX Gangs resource.
+
+<Warning>
+  Client exports must be called from a client script. Server exports must be called from a server script.
+</Warning>
+
+The examples assume the resource is named `jx_gangs`:
+
+```lua
+local value = exports.jx_gangs:ExportName(...)
+```
+
+If you renamed the resource, use its current name:
+
+```lua
+local value = exports['my_gang_resource']:ExportName(...)
+```
+
+<Warning>
+  Cache-backed exports return live in-memory tables. Treat returned tables as read-only so the cache, UI, and database do not become desynchronized.
+</Warning>
+
+## Client Exports
+
+### GetLocalGangData
+
+Returns the local player's full cached gang data, or `nil` if the player is not in a gang or the initial refresh has not completed.
+
+```lua
+local gangData = exports.jx_gangs:GetLocalGangData()
+
+if gangData then
+    print(('Gang: %s (%s)'):format(gangData.label, gangData.gang))
+    print(('Rank: %s'):format(gangData.playerRank))
+end
+```
+
+The payload includes gang information, ranks, members, permissions, daily statistics, leaderboard data, and configured stash locations.
+
+### GetHUDGangData
+
+Returns a smaller cached payload intended for HUD integrations, or `nil` if the local player is not in a gang.
+
+```lua
+local gang = exports.jx_gangs:GetHUDGangData()
+
+if gang then
+    print(('%s | Rank %s | $%s'):format(gang.label, gang.rank, gang.balance))
+end
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `gang` | string | Internal gang name |
+| `label` | string | Gang display name |
+| `rank` | number | Local player's rank level |
+| `isOwner` | boolean | Whether the local player has the highest rank |
+| `tier` | string | Gang tier |
+| `balance` | number | Gang balance |
+| `turfWins` | number | Gang turf wins |
+
+### ForceGangRefresh
+
+Refreshes the local gang and member cache from the server and returns the refreshed full gang data or `nil`.
+
+```lua
+local gangData = exports.jx_gangs:ForceGangRefresh()
+```
+
+<Warning>
+  This export waits for server callbacks. Call it after a known gang change, not every frame or inside a tight loop.
+</Warning>
+
+## Server Exports
+
+### GetPlayerGang
+
+Returns the gang name and cached member row for a framework identifier. It returns `nil, nil` if the identifier is not in an enabled gang.
+
+```lua
+local gangName, member = exports.jx_gangs:GetPlayerGang(identifier)
+
+if gangName then
+    print(('Gang: %s, rank: %s'):format(gangName, member.rank))
+end
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `identifier` | string | ESX identifier or QBCore/Qbox citizen ID stored by JX Gangs |
+
+### GetGangData
+
+Returns the cached gang table for an internal gang name, or `nil` if the gang does not exist.
+
+```lua
+local gang = exports.jx_gangs:GetGangData('ballas')
+
+if gang then
+    print(('%s has %d members'):format(gang.label, #gang.members))
+end
+```
+
+Common fields include `gang`, `label`, `owner_identifier`, `tier`, `balance`, `turf_wins`, `max_members`, `max_ranks`, `rank_edits`, `enabled`, `members`, and `ranks`.
+
+### GetGangMembers
+
+Returns the cached member rows for a gang. An unknown gang returns an empty table.
+
+```lua
+local members = exports.jx_gangs:GetGangMembers('ballas')
+
+for _, member in ipairs(members) do
+    print(member.identifier, member.rank, member.kills, member.deaths)
+end
+```
+
+Member fields include `id`, `gang`, `identifier`, `rank`, `kills`, `deaths`, `turf_wins`, and `joined_at`.
+
+### GetGangRanks
+
+Returns all cached rank rows for a gang. An unknown gang returns an empty table.
+
+```lua
+local ranks = exports.jx_gangs:GetGangRanks('ballas')
+
+for _, rank in ipairs(ranks) do
+    print(rank.rank, rank.label)
+end
+```
+
+### IsGangOwner
+
+Returns `true` when the identifier belongs to a member with the gang's highest configured rank.
+
+```lua
+local isOwner = exports.jx_gangs:IsGangOwner('ballas', identifier)
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `gangName` | string | Internal gang name |
+| `identifier` | string | Framework identifier stored in `jx_gang_members` |
+
+### UpdateMemberStats
+
+Adds an amount to a supported member statistic and persists the new value. Returns `true` if a member was updated, otherwise `false`.
+
+```lua
+local updated = exports.jx_gangs:UpdateMemberStats(identifier, 'kills', 1)
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `identifier` | string | Framework identifier stored in `jx_gang_members` |
+| `statType` | string | One of `kills`, `deaths`, or `turf_wins` |
+| `amount` | number | Amount to add; a negative value subtracts |
+
+<Warning>
+  This export writes to the database. Validate and authorize values before calling it from your own network event.
+</Warning>
+
+### GetGangCache
+
+Returns the complete in-memory gang cache keyed by internal gang name.
+
+```lua
+local gangs = exports.jx_gangs:GetGangCache()
+
+for gangName, gang in pairs(gangs) do
+    print(gangName, gang.label, #gang.members)
+end
+```
+
+Prefer the narrower read exports when you only need one gang, its members, or its ranks.
+
+### StartAirdropManual
+
+Starts an airdrop at a configured location. If `zoneName` is omitted, the script selects a random location.
+
+```lua
+local success, result = exports.jx_gangs:StartAirdropManual('Sandy Shores')
+
+if success then
+    print(('Airdrop started at %s'):format(result))
+else
+    print(('Airdrop could not start: %s'):format(result))
+end
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `zoneName` | string | No | Configured airdrop location name |
+
+On success, the export returns `true, resolvedZoneName`. On failure, it returns `false` and one of `disabled`, `already_active`, or `invalid_zone`.
+
+<Tip>
+  Add `dependency 'jx_gangs'` to the integrating resource's `fxmanifest.lua` if it cannot function without these exports. This guarantees load order.
+</Tip>
